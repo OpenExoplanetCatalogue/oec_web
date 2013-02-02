@@ -1,0 +1,298 @@
+html {min-height: 100%;}
+
+a {color: #4ba5da;}
+
+
+.floatleft {
+	float: 	left;
+	display:	block;
+}
+
+img, .aimg, .aimg img {
+	border:			0px;
+	text-decoration:	none;
+}
+a:hover {color: #282828;}
+
+body {
+	color: #282828;
+	font: normal 62.5% sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+table
+{
+	empty-cells: show;
+}
+
+li {list-style: none;}
+
+h1 {font: normal 2.3em sans-serif;}
+h2 {font: normal 1.4em sans-serif;}
+h3 {font: italic 1.2em sans-serif;}
+
+h1,h2,h3 {
+	padding-top: 6px;
+	color: #000; 
+	margin-bottom: 2px;
+}
+
+h1 img, h2 img {
+	padding-right: 5px;
+	width:22px;
+	height:22px;
+	position: relative;
+	top: 3px;
+}
+.altdownload {
+	display:block; 
+	font-size: 0.7em;
+}
+
+.clearer {clear: both; display: block; font-size: 0;}
+.left {float: left;}
+.right {float: right;}
+
+.option_box {
+	display:	block;
+	width: 		50em;
+	padding: 	0px;
+	overflow: 	hidden;
+
+}
+.option_box_left {
+	display:	block;
+	float:		left;
+	width:		23em;
+	padding: 	0px;
+	margin: 	0px;
+}
+.option_box_right {
+	display:	block;
+	float:		right;
+	padding: 	0px;
+	margin: 	0px;
+	width:		24em;
+	margin-left:	1em;
+	margin-top:	0.5em;
+}
+.option_box_right a {
+	display: 	block;
+	width: 		100%;
+	height: 	27px;
+}
+.option_box_right img {
+	position: 	relative;
+	top: 		5px;
+	margin-right:	3px;
+}
+.option_box_right h2 {
+	margin:		0px !important;
+	padding:	0px;
+	border:		0px;
+}
+.cor_option_box {
+	display:	block;
+	max-width: 50em;
+	margin-top:	0.5em;
+}
+.cor_option_box a {
+	display: 	block;
+	width: 		100%;
+	height: 	27px;
+}
+.cor_option_box img {
+	position: 	relative;
+	top: 		5px;
+	margin-right:	3px;
+}
+.cor_option_box h2 {
+	margin:		0px !important;
+	padding:	0px;
+	bordeR:		0px;
+}
+
+.inner-container {
+	border: 	0px solid #b1b1b1;
+	background: 	#FFF;
+	font-size: 	1.2em;
+	margin: 	0 auto;
+	min-width: 	750px;
+}
+
+.outer-container {
+	background: #fbfbfb url('/img/bg.png') repeat-x;
+}
+
+
+
+.header {
+	background: url('/img/header_n.jpg') no-repeat;
+	height: 250px;
+	margin-bottom: 0px;
+	text-align: right;
+}
+
+.header .title {
+	color: #000;
+	padding-top: 60px;
+	padding-right: 40px;
+	text-align: right;
+}
+.header .title .name a {
+	color: #000;
+	font-size: 5em;
+	font-weight: bold;
+	text-decoration: none;
+	text-align: right;
+}
+.header .title .name a:hover {border-color: #F60;}
+
+.header .title .tag {
+	text-align: right;
+	font-size: 1.2em;
+	letter-spacing: 0.2em;
+	padding-top: 10px;
+}
+.navigation {
+	padding-top: 50px;
+	padding-right: 30px;
+	background: #fff url('/img/header2.jpg') no-repeat;
+	float: left; 
+	width: 220px;
+}
+.navigation h2 {
+	font: bold 1.6em sans-serif;
+	line-height: 30px;
+	margin: 0;
+	padding-left: 11px;
+}
+.navigation ul {
+	padding-bottom: 10px;
+	border-top: 1px solid #000;
+}
+.navigation li {border-bottom: 1px solid #b1b1b1;}
+.navigation li a {
+	font-size: 1.1em;
+	color: #7c7c7c;
+	display: block;
+	padding: 8px 0 8px 5%;
+	text-decoration: none;
+	width: 95%;
+}
+.navigation li a:hover {
+	background: #c7c7c7;
+	color: #282828;	
+}
+
+.content {
+	margin-left: 250px;
+	margin-top: 0px;
+}
+
+.content h1{
+	margin-top: 0em;
+	margin-bottom: 0em;
+}
+.sh_box_title {
+	margin-top: 0em ! important;
+}
+.content h2{
+	margin-top: 2em;
+}
+
+.content p, .content ul {
+	max-width: 50em;
+}
+
+.footer {
+	background: #dddddd;
+	color:	#777;
+	font: 1em sans-serif;
+	margin-top: 5px;
+	padding: 10px 12px;
+	text-align: center;
+}
+.footer a {
+	text-decoration: none;
+}
+.footer a:hover {color: #282828;}
+
+.valid 
+{
+text-align: center;
+padding-top:5px;
+}
+
+
+/**** CHECKLIST ***/
+
+.checklist {
+	background-color: #9dddd8;
+	border: 1px solid #282828;
+	padding: 4px 4px 4px 4px;
+	margin: 0px;
+}
+input.checklist:hover {
+	background-color: #ffae74;
+}
+.checklisttext {
+	background-color: #fff;
+	border: 1px solid #282828;
+	padding: 1px 1px 1px 1px;
+	margin: 0px;
+}
+
+
+/* NEWS LIST   */
+
+.newslist li {
+	padding-bottom: 1em;
+	list-style-image: url("/img/item-16.png");
+}
+.planetnewslist li {
+	padding-bottom: 0.3em;
+	list-style-image: url("/img/planet-16.png");
+}
+
+/* SH Box   */
+.shimg {
+	padding-right:3px;
+	margin:0px;
+	width: 11px;
+	height: 11px;
+}
+.sh_box {
+	margin-bottom: 	10px;
+	padding:	0 5px 5px 5px;
+	border-left:	1px solid #000;
+}
+.sh_box_title a {
+	margin-left: 2em;
+}
+.sh_box_title a {
+	padding: 1px;
+	font: normal 62.5% sans-serif;
+}
+.sh_box_title p a:hover {
+	background: #f4f4f4;
+}
+
+/*  SPACING */
+.spacer {
+	display: block;
+	height: 1em;
+	width: 100%;
+}
+
+input.updatebutton
+{
+	width:20em;
+	height:1.8em;
+	background: #fff  url(/img/view-refresh.png) no-repeat;
+	padding-left: 27px;
+	border: #fff 1px;
+	font: normal 1.0em sans-serif;
+	text-align: left;
+}

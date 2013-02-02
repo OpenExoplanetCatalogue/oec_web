@@ -1,6 +1,8 @@
 <script language="php">
 include "./.inc/header.php";
 </script>
+<link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="kig" />Correlation diagrams</h2>
 <p>This page is currently being updated. 
@@ -13,25 +15,20 @@ You can click on each point to go to the system's page.
 
 <!-- ########################### -->
 <style>
-label{
-	display: inline-block;
-	float: left;
-	clear: left;
-	width: 15em;
-	text-align: right;
-	padding-right: 1em;
-}
-select, input {
-	display: inline-block;
-	float: left;
+label input {
+	margin-right:0.5em;
 }
 </style>
 <table cellspacing="0" summary="Settings">
 <tr>
-	<th scope="row">
+	<th scope="column" class="nobg"> </th>
+	<th scope="column" class="thname">Options</th>
+</tr>
+<tr>
+	<th rowspan=4 scope="row" class="spec">
 		<label>x-Axis</label>
 	</th>
-	<td>
+	<td class="data">
 		<select name="xaxis" onChange="updatePlot()">
 		<option selected value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
@@ -44,10 +41,27 @@ select, input {
 	</td>
 </tr>
 <tr>
-	<th scope="row">
+	<td class="data">
+		<label for="logscalex"><input checked name="logscale" type="checkbox" value="x" id="logscalex" onClick="updatePlot()"/>Logarithmic scale</label>
+
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="xrangeauto"><input checked name="xrangeauto" type="checkbox" value="a" id="xrangeauto" onClick="xrangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		range = [<input type="text" name="xrangel" size=8 value="0" disabled onKeyUp="xrangeUpdate()"/>,
+		<input type="text" name="xranger" size=8 value="0" disabled onKeyUp="xrangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<th rowspan=4 class="spec" scope="row">
 		<label>y-Axis</label>
 	</th>
-	<td>
+	<td class="data">
 		<select name="yaxis" onChange="updatePlot()">
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option selected value="mass">Mass [MJup]</option>
@@ -60,10 +74,26 @@ select, input {
 	</td>
 </tr>
 <tr>
-	<th scope="row">
+	<td class="data">
+		<label for="logscaley"><input checked name="logscale" type="checkbox" value="y" id="logscaley" onClick="updatePlot()"/>Logarithmic scale</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="yrangeauto"><input checked name="yrangeauto" type="checkbox" value="a" id="yrangeauto" onClick="yrangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		range = [<input type="text" name="yrangel" size=8 value="0" disabled onKeyUp="yrangeUpdate()"/>,
+		<input type="text" name="yranger" size=8 value="0" disabled onKeyUp="yrangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<th class="spec" scope="row">
 		<label>Color</label>
 	</th>
-	<td>
+	<td class="data">
 		<select name="coloraxis" onChange="updatePlot()">
 		<option value="none" checked>None</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
@@ -77,67 +107,36 @@ select, input {
 	</td>
 </tr>
 <tr>
-	<th scope="row">
-		<label for="filter_transit">Transiting planets</label>
+	<th rowspan=6 class="spec" scope="row">
+	Filter (inclusive)
 	</th>
-	<td>
-		<input checked name="discoveryfilter" type="checkbox" value="transit" id="filter_transit" onClick="updatePlot()"/>
+	<td class="data">
+		<label for="filter_transit"><input checked name="discoveryfilter" type="checkbox" value="transit" id="filter_transit" onClick="updatePlot()"/>Transiting planets</label>
 	</td>
 </tr>
 <tr>
-	<th scope="row">
-		<label for="filter_rv">Radial velocity planets</label>
-	</th>
-	<td>
-		<input checked name="discoveryfilter" type="checkbox" value="RV" id="filter_rv" onClick="updatePlot()"/>
+	<td class="data">
+		<label for="filter_rv"><input checked name="discoveryfilter" type="checkbox" value="RV" id="filter_rv" onClick="updatePlot()"/>Radial velocity planets</label>
 	</td>
 </tr>
 <tr>
-	<th scope="row">
-		<label for="filter_microlensing">Microlensing planets</label>
-	</th>
-	<td>
-		<input checked name="discoveryfilter" type="checkbox" value="microlensing" id="filter_microlensing" onClick="updatePlot()"/>
+	<td class="data">
+		<label for="filter_microlensing"><input checked name="discoveryfilter" type="checkbox" value="microlensing" id="filter_microlensing" onClick="updatePlot()"/>Microlensing planets</label>
 	</td>
 </tr>
 <tr>
-	<th scope="row">
-		<label for="filter_imaged">Directly imaged planets</label>
-	</th>
-	<td>
-		<input checked name="discoveryfilter" type="checkbox" value="imaging" id="filter_imaged" onClick="updatePlot()"/>
+	<td class="data">
+		<label for="filter_imaged">Directly imaged planets<input checked name="discoveryfilter" type="checkbox" value="imaging" id="filter_imaged" onClick="updatePlot()"/></label>
 	</td>
 </tr>
 <tr>
-	<th scope="row">
-		<label for="filter_timing">Planets found by pulsar timing</label>
-	</th>
-	<td>
-		<input checked name="discoveryfilter" type="checkbox" value="timing" id="filter_timing" onClick="updatePlot()"/>
+	<td class="data">
+		<label for="filter_timing"><input checked name="discoveryfilter" type="checkbox" value="timing" id="filter_timing" onClick="updatePlot()"/>Planets found by pulsar timing</label>
 	</td>
 </tr>
 <tr>
-	<th scope="row">
-		<label for="filter_other">Planets found by other methods</label>
-	</th>
-	<td>
-		<input checked name="discoveryfilter" type="checkbox" value="" id="filter_other" onClick="updatePlot()"/>
-	</td>
-</tr>
-<tr>
-	<th scope="row">
-		<label for="logscalex">Log scale x</label>
-	</th>
-	<td>
-		<input checked name="logscale" type="checkbox" value="x" id="logscalex" onClick="updatePlot()"/>
-	</td>
-</tr>
-<tr>
-	<th scope="row">
-		<label for="logscaley">Log scale y</label>
-	</th>
-	<td>
-		<input checked name="logscale" type="checkbox" value="y" id="logscaley" onClick="updatePlot()"/>
+	<td class="data">
+		<label for="filter_other"><input checked name="discoveryfilter" type="checkbox" value="" id="filter_other" onClick="updatePlot()"/>Planets found by other methods</label>
 	</td>
 </tr>
 </table>
@@ -198,6 +197,41 @@ var gyaxislabel = viz.append("text")
 	.attr("y", 12)
 	.attr("transform", "rotate(-90)")
 	;
+	
+	
+var xDomain;
+var yDomain;
+
+function xrangeUpdate(){
+	if(d3.select("#xrangeauto").node().checked){
+		d3.select("[name=xrangel]").attr("disabled",true);
+		d3.select("[name=xranger]").attr("disabled",true);
+		updatePlot();
+	}else{
+		d3.select("[name=xrangel]").attr("disabled",null);
+		d3.select("[name=xranger]").attr("disabled",null);
+		var newxDomain = [ parseFloat(d3.select("[name=xrangel]").node().value), parseFloat(d3.select("[name=xranger]").node().value) ];
+		if (newxDomain[0]!=xDomain[0] || newxDomain[1]!=xDomain[1]){
+			xDomain = newxDomain;
+			updatePlot();
+		}
+	}
+}
+function yrangeUpdate(){
+	if(d3.select("#yrangeauto").node().checked){
+		d3.select("[name=yrangel]").attr("disabled",true);
+		d3.select("[name=yranger]").attr("disabled",true);
+		updatePlot();
+	}else{
+		d3.select("[name=yrangel]").attr("disabled",null);
+		d3.select("[name=yranger]").attr("disabled",null);
+		var newyDomain = [ parseFloat(d3.select("[name=yrangel]").node().value), parseFloat(d3.select("[name=yranger]").node().value) ];
+		if (newyDomain[0]!=yDomain[0] || newyDomain[1]!=yDomain[1]){
+			yDomain = newyDomain;
+			updatePlot();
+		}
+	}
+}
 
 var colorkey;
 var colorScale;
@@ -248,22 +282,32 @@ var updatePlot = function(){
 		if(logscaley && d3.select(d).select(ykey).text()<=0.) return false;
 		return true;
 	});
-	var xDomain = [
-		d3.min(planets, function(d) { 
-			return	parseFloat(d3.select(d).select(xkey).text()); 
-		}),
-		d3.max(planets, function(d) { 
-			return	parseFloat(d3.select(d).select(xkey).text()); 
-		})
-		];
-	var yDomain = [
-		d3.min(planets, function(d) { 
-			return	parseFloat(d3.select(d).select(ykey).text()); 
-		}),
-		d3.max(planets, function(d) { 
-			return	parseFloat(d3.select(d).select(ykey).text()); 
-		})
-		];
+	if(d3.select("#xrangeauto").node().checked){
+		xDomain = [
+			d3.min(planets, function(d) { 
+				return	parseFloat(d3.select(d).select(xkey).text()); 
+			}),
+			d3.max(planets, function(d) { 
+				return	parseFloat(d3.select(d).select(xkey).text()); 
+			})
+			];
+		d3.select("[name=xrangel]").node().value = xDomain[0];
+		d3.select("[name=xranger]").node().value = xDomain[1];
+	}
+
+	if(d3.select("#yrangeauto").node().checked){
+		yDomain = [
+			d3.min(planets, function(d) { 
+				return	parseFloat(d3.select(d).select(ykey).text()); 
+			}),
+			d3.max(planets, function(d) { 
+				return	parseFloat(d3.select(d).select(ykey).text()); 
+			})
+			];
+		d3.select("[name=yrangel]").node().value = yDomain[0];
+		d3.select("[name=yranger]").node().value = yDomain[1];
+	}
+
 	var colorDomain = [
 		d3.min(planets, function(d) { 
 			return getColor(d);
@@ -280,6 +324,7 @@ var updatePlot = function(){
 		xScale = d3.scale.linear();
 	}
 	xScale.domain(xDomain)
+		.clamp(true)
 		.range([paddingl, width-paddingl-paddingr]);
 	var yScale;
 	if (logscaley){
@@ -288,6 +333,7 @@ var updatePlot = function(){
 		yScale = d3.scale.linear();
 	}
 	yScale.domain(yDomain)
+		.clamp(true)
 		.range([height - paddingb-paddingt,paddingt]);
 	colorScale = d3.scale.linear()
 		.domain(colorDomain)

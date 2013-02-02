@@ -1,0 +1,183 @@
+th{
+	font-weight:	normal;
+	background: none;
+}
+
+
+th.nobg {
+	background: none;
+	text-align: left;
+	padding: 6px 6px 6px 12px;
+	border-top: 0;
+	border-left: 0;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+}
+th.spec {
+	border-left: 1px solid #c1dad7;
+	text-align: left;
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 0;
+}
+th.specalt {
+	border-left: 1px solid #c1dad7;
+	text-align: left;
+	padding: 4px 6px 4px 12px;
+	background: #f5fafa;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 0;
+}
+th.thname {
+	text-align: left;
+	background: #f5fafa url("/img/bullet2.gif") no-repeat;
+	padding: 6px 12px 6px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 1px solid #C1DAD7;
+}
+th.thnamehigh {
+	text-align: left;
+	background: #ffae7b url("/img/bullet1.png") no-repeat;
+	padding: 6px 12px 6px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 1px solid #C1DAD7;
+}
+
+th.thnamel {
+	text-align: left;
+	background: #f5fafa url("/img/bullet2.gif") no-repeat;
+	padding: 6px 12px 6px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 1px solid #C1DAD7;
+	border-left: 1px solid #C1DAD7;
+}
+
+td.data {
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	background: #fff;
+	text-align: left;
+}
+td.datal {
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	background: #fff;
+	text-align: left;
+}
+
+td.dataalt {
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	background: #f5fafa;
+	text-align: left;
+}
+
+td.datahigh {
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	text-align: left;
+	background: #ffecdc;
+}
+
+td.dataalthigh {
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	background: #fae0d0;
+	text-align: left;
+}
+/* TABLESORTER */
+
+.leftsorter {
+	border-left: 1px solid #C1DAD7;
+}
+.headersorter {
+	background: #f5fafa url("/img/bg.gif") no-repeat;
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+	text-align: left;
+	padding: 6px 18px 6px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 1px solid #C1DAD7;
+
+}
+.headersorter:hover {
+	background-color: #ffae74;
+}
+
+.headerSortUp {
+	background-color: #8dbdd8;
+	background-image: url(/img/asc.gif);
+}
+.headerSortDown {
+	background-color: #8dbdd8;
+	background-image: url(/img/desc.gif);
+}
+
+table.tablesorter tbody td, table.tablesorter tbody th {
+	border-left: 1px solid #c1dad7;
+	text-align: left;
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 0;
+
+}
+table.tablesorter tbody td, table.tablesorter tbody td {
+	padding: 4px 6px 4px 12px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-left: 0px;
+	text-align: left;
+
+}
+
+table.tablesorter tbody tr.odd td, table.tablesorter tbody tr.odd th {
+	background: #f5fafa;
+}
+table.tablesorter tbody tr.even td, table.tablesorter tbody tr.even th {
+	background: #fff;
+}
+
+/* *********************** *
+ *  CHECKBOX TABLES        *
+ * *********************** */
+
+td.checkboxcell, td.checkboxcell_l  {
+	text-align: left;
+	padding: 4px 4px 4px 4px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	border-top: 0;
+	vertical-align:top;
+}
+td.checkboxcell_l  {
+	border-left: 1px solid #c1dad7;
+}
+
+td.checkboxtextcell, td.checkboxtextcell_l  {
+	padding: 4px 6px 4px 6px;
+	border-right: 1px solid #C1DAD7;
+	border-bottom: 1px solid #C1DAD7;
+	text-align: left;
+	vertical-align:top;
+}
+td.checkboxtextcell_l  {
+	border-left: 1px solid #c1dad7;
+}
+
+.checkboxcellnowrap {
+	white-space: nowrap;
+}
+
