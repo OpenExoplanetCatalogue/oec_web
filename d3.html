@@ -3,12 +3,11 @@ include "./.inc/header.php";
 </script>
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="kig" />Correlation diagrams</h2>
-<p>This site is work in progress. 
+<p>This page is currently being updated. 
 It uses the d3 javascript library to render correlation plots directly in your browser. 
 The plots shows a scatter plot of all discovered planets.
-The color illustrates the planet's eccentricity. 
-The points fade in over time in chronological order of the discovery.
 You can hover over the points to identify the planet.
+You can click on each point to go to the system's page.
 </p>
 
 
@@ -18,47 +17,136 @@ label{
 	display: inline-block;
 	float: left;
 	clear: left;
-	width: 10em;
+	width: 15em;
 	text-align: right;
-	padding-right:1em;
+	padding-right: 1em;
 }
 select, input {
 	display: inline-block;
 	float: left;
 }
 </style>
-<div>
-	<label>x-Axis</label>
-		<select name="xaxis">
+<table cellspacing="0" summary="Settings">
+<tr>
+	<th scope="row">
+		<label>x-Axis</label>
+	</th>
+	<td>
+		<select name="xaxis" onChange="updatePlot()">
 		<option selected value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option value="radius">Radius [RJup]</option>
 		<option value="period">Period [days]</option>
-		<option value="distance">Distance from Earth [parsec]</option>
-		<option value="discoveryyear">Discovery year [yyyy]</option>
+		<option value="eccentricity">Eccentricity</option>
 		<option value="temperature">Temperature [K]</option>
 		<option value="inclination">Inclination [deg]</option>
 		</select>
-	<label>y-Axis</label>
-		<select name="yaxis">
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label>y-Axis</label>
+	</th>
+	<td>
+		<select name="yaxis" onChange="updatePlot()">
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option selected value="mass">Mass [MJup]</option>
 		<option value="radius">Radius [RJup]</option>
+		<option value="eccentricity">Eccentricity</option>
 		<option value="period">Period [days]</option>
-		<option value="distance">Distance from Earth [parsec]</option>
-		<option value="discoveryyear">Discovery year [yyyy]</option>
 		<option value="temperature">Temperature [K]</option>
 		<option value="inclination">Inclination [deg]</option>
 		</select>
-	<label>Update plot</label>
-		<input name="updateButton" type="button" value="Update plot now" onclick="updatePlot()" />
-</div>
-<div style="clear:both;">&nbsp;</div>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label>Color</label>
+	</th>
+	<td>
+		<select name="coloraxis" onChange="updatePlot()">
+		<option value="none" checked>None</option>
+		<option value="semimajoraxis">Semi-major axis [AU]</option>
+		<option value="mass">Mass [MJup]</option>
+		<option selected value="radius">Radius [RJup]</option>
+		<option value="eccentricity">Eccentricity</option>
+		<option value="period">Period [days]</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="filter_transit">Transiting planets</label>
+	</th>
+	<td>
+		<input checked name="discoveryfilter" type="checkbox" value="transit" id="filter_transit" onClick="updatePlot()"/>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="filter_rv">Radial velocity planets</label>
+	</th>
+	<td>
+		<input checked name="discoveryfilter" type="checkbox" value="RV" id="filter_rv" onClick="updatePlot()"/>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="filter_microlensing">Microlensing planets</label>
+	</th>
+	<td>
+		<input checked name="discoveryfilter" type="checkbox" value="microlensing" id="filter_microlensing" onClick="updatePlot()"/>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="filter_imaged">Directly imaged planets</label>
+	</th>
+	<td>
+		<input checked name="discoveryfilter" type="checkbox" value="imaging" id="filter_imaged" onClick="updatePlot()"/>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="filter_timing">Planets found by pulsar timing</label>
+	</th>
+	<td>
+		<input checked name="discoveryfilter" type="checkbox" value="timing" id="filter_timing" onClick="updatePlot()"/>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="filter_other">Planets found by other methods</label>
+	</th>
+	<td>
+		<input checked name="discoveryfilter" type="checkbox" value="" id="filter_other" onClick="updatePlot()"/>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="logscalex">Log scale x</label>
+	</th>
+	<td>
+		<input checked name="logscale" type="checkbox" value="x" id="logscalex" onClick="updatePlot()"/>
+	</td>
+</tr>
+<tr>
+	<th scope="row">
+		<label for="logscaley">Log scale y</label>
+	</th>
+	<td>
+		<input checked name="logscale" type="checkbox" value="y" id="logscaley" onClick="updatePlot()"/>
+	</td>
+</tr>
+</table>
+<p>The plot updates automatically when the above parameters are changed</p>
 <!-- ########################### -->
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <div id="viz"></div>
 <div style="height:200px;" class="infobox">
-<p><b id="viztitle">Hover over a circle to see to which planet is corresponds.</b></p>
+<p><b id="viztitle">Hover over a circle to see to which planet it corresponds.</b></p>
 <p id="vizdesc"></p>
 </div>
 <style>
@@ -66,7 +154,6 @@ select, input {
 .axis line {
     fill: none;
     stroke: black;
-    shape-rendering: crispEdges;
 }
 #viz, .infobox {
     font-family: sans-serif;
@@ -78,13 +165,15 @@ select, input {
 }
 </style>
 <script type="text/javascript">
-var planetsxml;
 var width 	= 600;
 var height 	= 500;
 var paddingt 	= 10;
 var paddingb 	= 45;
 var paddingl 	= 65;
 var paddingr 	= 10;
+
+var first 	= true;
+var planetsxml	= null;
 var viz = d3.select("#viz")
 	.append("svg")
 	.attr("width", width)
@@ -110,19 +199,53 @@ var gyaxislabel = viz.append("text")
 	.attr("transform", "rotate(-90)")
 	;
 
+var colorkey;
+var colorScale;
+
+function getColor(d){
+	var elem = d3.select(d).select(colorkey);
+	if (elem.empty()) return undefined;
+	return	parseFloat(elem.text()); 
+}
+function color(d){
+	var elem = d3.select(d).select(colorkey);
+	if (elem.empty()) return "gray";
+	return d3.hsl(120.-colorScale(parseFloat(elem.text())), 1, 0.5);
+}
+
 var updatePlot = function(){ 
+	var discoveryfilter = d3.selectAll("input[name=discoveryfilter]:checked");
 	var xkey = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].value;
 	var ykey = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].value;
-	console.log(xkey);
-	var planets = planetsxml.filter(function(d) {
-		var value = d3.select(d).select(xkey);
-		if ((value[0][0] === null)){
+	colorkey = d3.select("select[name=coloraxis]").node().options[d3.select("select[name=coloraxis]").node().selectedIndex].value;
+
+	var logscalex = d3.select("#logscalex").node().checked;
+	var logscaley = d3.select("#logscaley").node().checked;
+
+	
+	var planets = planetsxml.filter(function(d,i) {
+		//if (i>10) return false;
+
+		var discoverymethod = d3.select(d).select("discoverymethod");
+		if (discoverymethod.empty()){
+			discoverymethod = "";
+		}else{
+			discoverymethod = discoverymethod.text();
+		}
+		var isInSelection = false;
+		discoveryfilter[0].forEach(function(d){
+			if(d.value==discoverymethod){
+				isInSelection = true;
+			}
+		});
+		if (!isInSelection){
 			return false;
 		}
-		var value = d3.select(d).select(ykey);
-		if ((value[0][0] === null)){
-			 return false;
-		}
+
+		if(d3.select(d).select(xkey).empty()) return false;
+		if(d3.select(d).select(ykey).empty()) return false;
+		if(logscalex && d3.select(d).select(xkey).text()<=0.) return false;
+		if(logscaley && d3.select(d).select(ykey).text()<=0.) return false;
 		return true;
 	});
 	var xDomain = [
@@ -141,13 +264,34 @@ var updatePlot = function(){
 			return	parseFloat(d3.select(d).select(ykey).text()); 
 		})
 		];
+	var colorDomain = [
+		d3.min(planets, function(d) { 
+			return getColor(d);
+		}),
+		d3.max(planets, function(d) { 
+			return getColor(d);
+		})
+		];
 
-	var xScale = d3.scale.log()
-		.domain(xDomain)
+	var xScale;
+	if (logscalex){
+		xScale = d3.scale.log();
+	}else{
+		xScale = d3.scale.linear();
+	}
+	xScale.domain(xDomain)
 		.range([paddingl, width-paddingl-paddingr]);
-	var yScale = d3.scale.log()
-		.domain(yDomain)
+	var yScale;
+	if (logscaley){
+		yScale = d3.scale.log();
+	}else{
+		yScale = d3.scale.linear();
+	}
+	yScale.domain(yDomain)
 		.range([height - paddingb-paddingt,paddingt]);
+	colorScale = d3.scale.linear()
+		.domain(colorDomain)
+		.range([0,120]);
 
 
   	var circle = viz.selectAll("circle")
@@ -156,29 +300,26 @@ var updatePlot = function(){
 	circle
 		.enter().insert("circle")
 		.attr("r", 4.)
-		.style("opacity", 0)
-		.style("fill", "gray")
 		.style("stroke", "black")
+		.attr("opacity",0)
 		.attr("cx", function(d) { return xScale(d3.select(d).select(xkey).text()); })
 		.attr("cy", function(d) { return yScale(d3.select(d).select(ykey).text()); })
+		.on("click", function(d) {
+			document.location.href = "/system.php?id=" + d3.select(d).select("name").text();
+		})
 		.on("mouseover", function(d){
-			var value = d3.select(d).selectAll("name")[0][0];
-			d3.select(".infobox").select("#viztitle").text(value.textContent);
-			var value = d3.select(d).selectAll("description")[0][0];
-			if (value){
-				d3.select(".infobox").select("#vizdesc").text(value.textContent);
+			var name = d3.select(d).selectAll("name")[0][0];
+			d3.select(".infobox").select("#viztitle").text(name.textContent);
+			var description = d3.select(d).selectAll("description")[0][0];
+			if (description){
+				d3.select(".infobox").select("#vizdesc").text(description.textContent);
 			}else{
 				d3.select(".infobox").select("#vizdesc").text("");
 			}
 		})
-	//	.style("fill", function(d) {
-	//		var value = d3.select(d).selectAll("eccentricity")[0][0];
-	//		var ecc = 0.;
-	//		if (value){
-	//			ecc = parseFloat(value.textContent);
-	//		}
-	//		return d3.hsl(120.-ecc*120., 1, 0.5);
-	//	})
+		.style("fill", function(d) {
+			return color(d);
+		})
 		;
 
   	circle = viz.selectAll("circle")
@@ -186,16 +327,19 @@ var updatePlot = function(){
 	
 	circle
 		.transition()
-		.duration(2000)
-		.style("opacity", 1)
+		.attr("opacity",1)
 		.attr("cx", function(d) { return xScale(d3.select(d).select(xkey).text()); })
 		.attr("cy", function(d) { return yScale(d3.select(d).select(ykey).text()); })
+		.style("fill", function(d) {
+			return color(d);
+		})
 		;
 
 	circle.exit()
+		.transition()
+		.attr("opacity",0)
 		.remove();
 
-	console.log("here");
 
 	var xlabel = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].text;
 	var ylabel = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].text;
@@ -208,12 +352,20 @@ var updatePlot = function(){
 		.scale(yScale)
 		.ticks(5)
 		.orient("left");
-	
-	gxaxis.call(xAxis);
-	gyaxis.call(yAxis);
+
+	if (first){
+		gxaxis.call(xAxis);
+		gyaxis.call(yAxis);
+	}else{
+		gxaxis.transition().call(xAxis);
+		gyaxis.transition().call(yAxis);
+	}
+			
 	gxaxislabel.text(xlabel);
 	gyaxislabel.text(ylabel);
-}
+
+	first = false;
+};
 
 d3.xml("xml.php", "application/xml", function(xml) {
 	planetsxml = d3.select(xml).selectAll("planet")[0];
