@@ -1,0 +1,227 @@
+<script language="php">
+include "./.inc/header.php";
+</script>
+<!-- ########################### -->
+<h2><img src="./img/kig.png" alt="kig" />Correlation diagrams</h2>
+<p>This site is work in progress. 
+It uses the d3 javascript library to render correlation plots directly in your browser. 
+The plots shows a scatter plot of all discovered planets.
+The color illustrates the planet's eccentricity. 
+The points fade in over time in chronological order of the discovery.
+You can hover over the points to identify the planet.
+</p>
+
+
+<!-- ########################### -->
+<style>
+label{
+	display: inline-block;
+	float: left;
+	clear: left;
+	width: 10em;
+	text-align: right;
+	padding-right:1em;
+}
+select, input {
+	display: inline-block;
+	float: left;
+}
+</style>
+<div>
+	<label>x-Axis</label>
+		<select name="xaxis">
+		<option selected value="semimajoraxis">Semi-major axis [AU]</option>
+		<option value="mass">Mass [MJup]</option>
+		<option value="radius">Radius [RJup]</option>
+		<option value="period">Period [days]</option>
+		<option value="distance">Distance from Earth [parsec]</option>
+		<option value="discoveryyear">Discovery year [yyyy]</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		</select>
+	<label>y-Axis</label>
+		<select name="yaxis">
+		<option value="semimajoraxis">Semi-major axis [AU]</option>
+		<option selected value="mass">Mass [MJup]</option>
+		<option value="radius">Radius [RJup]</option>
+		<option value="period">Period [days]</option>
+		<option value="distance">Distance from Earth [parsec]</option>
+		<option value="discoveryyear">Discovery year [yyyy]</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		</select>
+	<label>Update plot</label>
+		<input name="updateButton" type="button" value="Update plot now" onclick="updatePlot()" />
+</div>
+<div style="clear:both;">&nbsp;</div>
+<!-- ########################### -->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<div id="viz"></div>
+<div style="height:200px;" class="infobox">
+<p><b id="viztitle">Hover over a circle to see to which planet is corresponds.</b></p>
+<p id="vizdesc"></p>
+</div>
+<style>
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+#viz, .infobox {
+    font-family: sans-serif;
+}
+
+#viz text {
+    font-family: sans-serif;
+    font-size: 12px;
+}
+</style>
+<script type="text/javascript">
+var planetsxml;
+var width 	= 600;
+var height 	= 500;
+var paddingt 	= 10;
+var paddingb 	= 45;
+var paddingl 	= 65;
+var paddingr 	= 10;
+var viz = d3.select("#viz")
+	.append("svg")
+	.attr("width", width)
+	.attr("height", height)
+	;    
+var gxaxis = viz.append("g")
+	.attr("class", "axis")
+	.attr("transform", "translate(0," + (height - paddingb-paddingt) + ")");
+	;
+var gyaxis = viz.append("g")
+	.attr("class", "axis")
+	.attr("transform", "translate(" + paddingl + ", 0)")
+	;
+var gxaxislabel = viz.append("text")
+	.attr("text-anchor", "middle")
+	.attr("x", width/2.)
+	.attr("y", height - 6)
+	;
+var gyaxislabel = viz.append("text")
+	.attr("text-anchor", "middle")
+	.attr("x", -height/2.)
+	.attr("y", 12)
+	.attr("transform", "rotate(-90)")
+	;
+
+var updatePlot = function(){ 
+	var xkey = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].value;
+	var ykey = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].value;
+	console.log(xkey);
+	var planets = planetsxml.filter(function(d) {
+		var value = d3.select(d).select(xkey);
+		if ((value[0][0] === null)){
+			return false;
+		}
+		var value = d3.select(d).select(ykey);
+		if ((value[0][0] === null)){
+			 return false;
+		}
+		return true;
+	});
+	var xDomain = [
+		d3.min(planets, function(d) { 
+			return	parseFloat(d3.select(d).select(xkey).text()); 
+		}),
+		d3.max(planets, function(d) { 
+			return	parseFloat(d3.select(d).select(xkey).text()); 
+		})
+		];
+	var yDomain = [
+		d3.min(planets, function(d) { 
+			return	parseFloat(d3.select(d).select(ykey).text()); 
+		}),
+		d3.max(planets, function(d) { 
+			return	parseFloat(d3.select(d).select(ykey).text()); 
+		})
+		];
+
+	var xScale = d3.scale.log()
+		.domain(xDomain)
+		.range([paddingl, width-paddingl-paddingr]);
+	var yScale = d3.scale.log()
+		.domain(yDomain)
+		.range([height - paddingb-paddingt,paddingt]);
+
+
+  	var circle = viz.selectAll("circle")
+		.data(planets,function(d) { return d3.select(d).select("name").text(); });
+
+	circle
+		.enter().insert("circle")
+		.attr("r", 4.)
+		.style("opacity", 0)
+		.style("fill", "gray")
+		.style("stroke", "black")
+		.attr("cx", function(d) { return xScale(d3.select(d).select(xkey).text()); })
+		.attr("cy", function(d) { return yScale(d3.select(d).select(ykey).text()); })
+		.on("mouseover", function(d){
+			var value = d3.select(d).selectAll("name")[0][0];
+			d3.select(".infobox").select("#viztitle").text(value.textContent);
+			var value = d3.select(d).selectAll("description")[0][0];
+			if (value){
+				d3.select(".infobox").select("#vizdesc").text(value.textContent);
+			}else{
+				d3.select(".infobox").select("#vizdesc").text("");
+			}
+		})
+	//	.style("fill", function(d) {
+	//		var value = d3.select(d).selectAll("eccentricity")[0][0];
+	//		var ecc = 0.;
+	//		if (value){
+	//			ecc = parseFloat(value.textContent);
+	//		}
+	//		return d3.hsl(120.-ecc*120., 1, 0.5);
+	//	})
+		;
+
+  	circle = viz.selectAll("circle")
+		.data(planets,function(d) { return d3.select(d).select("name").text(); });
+	
+	circle
+		.transition()
+		.duration(2000)
+		.style("opacity", 1)
+		.attr("cx", function(d) { return xScale(d3.select(d).select(xkey).text()); })
+		.attr("cy", function(d) { return yScale(d3.select(d).select(ykey).text()); })
+		;
+
+	circle.exit()
+		.remove();
+
+	console.log("here");
+
+	var xlabel = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].text;
+	var ylabel = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].text;
+	
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.ticks(5)
+		.orient("bottom");
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.ticks(5)
+		.orient("left");
+	
+	gxaxis.call(xAxis);
+	gyaxis.call(yAxis);
+	gxaxislabel.text(xlabel);
+	gyaxislabel.text(ylabel);
+}
+
+d3.xml("xml.php", "application/xml", function(xml) {
+	planetsxml = d3.select(xml).selectAll("planet")[0];
+	updatePlot();	
+});
+
+    
+</script>
+<?
+include "./.inc/footer.php";
+?>
