@@ -413,7 +413,7 @@ var updatePlot = function(){
 	first = false;
 };
 
-d3.xml("xml.php", "application/xml", function(xml) {
+d3.xml("systems.xml", "application/xml", function(xml) {
 	planetsxml = d3.select(xml).selectAll("planet")[0];
 	updatePlot();	
 });
