@@ -8,8 +8,7 @@ include "./.inc/header.php";
 <p>This page is currently under development. 
 It uses the d3 javascript library to render correlation plots directly in your browser. 
 The plots shows a scatter plot of all discovered planets.
-You can hover over the points to identify the planet.
-You can click on each point to go to the system's page.
+Hover over a circle to see to which planet it corresponds. Click on it to view the planet's page.
 </p>
 
 
@@ -145,17 +144,11 @@ label input {
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <div id="viz"></div>
-<div style="height:200px;" class="infobox">
-<p><b id="viztitle">Hover over a circle to see to which planet it corresponds. Click on it to view the planet's page.</b></p>
-</div>
 <style>
 .axis path,
 .axis line {
     fill: none;
     stroke: black;
-}
-#viz, .infobox {
-    font-family: sans-serif;
 }
 
 #viz text {
@@ -462,6 +455,12 @@ d3.xml("systems.xml", "application/xml", function(xml) {
 
     
 </script>
+
+<!-- ########################### -->
+<h2><img src="./img/xml.png" alt="star" />Data download</h2>
+<p>
+The data presented in this plot is taken from the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page is directly generated from the XML files in the catalogue. If you are interested in how, look at the source code. You can download the entire catalogue on <a href="https://github.com/hannorein/open_exoplanet_catalogue/">github</a>. You can also find ASCII tables of the same catalogue <a href="https://github.com/hannorein/oec_tables/">in a separate repository</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+</p>
 <?
 include "./.inc/footer.php";
 ?>
