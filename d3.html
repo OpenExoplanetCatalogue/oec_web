@@ -5,7 +5,7 @@ include "./.inc/header.php";
 <link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="kig" />Correlation diagrams</h2>
-<p>This page is currently being updated. 
+<p>This page is currently under development. 
 It uses the d3 javascript library to render correlation plots directly in your browser. 
 The plots shows a scatter plot of all discovered planets.
 You can hover over the points to identify the planet.
@@ -22,7 +22,7 @@ label input {
 <table cellspacing="0" summary="Settings">
 <tr>
 	<th scope="column" class="nobg"> </th>
-	<th scope="column" class="thname">Options</th>
+	<th scope="column" class="thname">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
 </tr>
 <tr>
 	<th rowspan=4 scope="row" class="spec">
@@ -96,6 +96,7 @@ label input {
 	<td class="data">
 		<select name="coloraxis" onChange="updatePlot()">
 		<option value="none" checked>None</option>
+		<option value="discoverymethod">Discoverymethod</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option selected value="radius">Radius [RJup]</option>
@@ -140,13 +141,12 @@ label input {
 	</td>
 </tr>
 </table>
-<p>The plot updates automatically when the above parameters are changed</p>
 <!-- ########################### -->
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <div id="viz"></div>
 <div style="height:200px;" class="infobox">
-<p><b id="viztitle">Hover over a circle to see to which planet it corresponds.</b></p>
-<p id="vizdesc"></p>
+<p><b id="viztitle">Hover over a circle to see to which planet it corresponds. Click on it to view the planet's page.</b></p>
 </div>
 <style>
 .axis path,
@@ -162,7 +162,34 @@ label input {
     font-family: sans-serif;
     font-size: 12px;
 }
+div#pop-up {
+	display: none;
+	position:absolute;
+	color: white;
+	font-size: 14px;
+	background: rgba(0,0,0,0.6);
+	padding: 5px 10px 5px 10px;
+	-moz-border-radius: 8px 8px;
+	border-radius: 8px 8px;
+	width: 15em;
+}
+div#pop-up-title {
+	font-size: 15px;
+	width:200px;
+	margin-bottom: 4px;
+	font-weight: bolder;
+}
+div#pop-up-content {
+	font-size: 12px;
+}
 </style>
+
+<div id="pop-up">
+        <div id="pop-up-title">Title</div>
+        <div id="pop-up-content">Description</div>
+</div>
+
+
 <script type="text/javascript">
 var width 	= 600;
 var height 	= 500;
@@ -244,7 +271,15 @@ function getColor(d){
 function color(d){
 	var elem = d3.select(d).select(colorkey);
 	if (elem.empty()) return "gray";
-	return d3.hsl(120.-colorScale(parseFloat(elem.text())), 1, 0.5);
+	if (colorkey=="discoverymethod"){
+		if (elem.text()=="RV") return "red";
+		if (elem.text()=="transit") return "green";
+		if (elem.text()=="imaging") return "blue";
+		if (elem.text()=="timing") return "yellow";
+		if (elem.text()=="microlensing") return "purple";
+	}else{
+		return d3.hsl(120.-colorScale(parseFloat(elem.text())), 1, 0.5);
+	}
 }
 
 var updatePlot = function(){ 
@@ -353,14 +388,21 @@ var updatePlot = function(){
 		.on("click", function(d) {
 			document.location.href = "/system.php?id=" + d3.select(d).select("name").text();
 		})
+		.on("mouseout", function(d){
+			d3.select("#pop-up").style("display","none");
+		})
+		.on("mousemove", function(){
+			d3.select("#pop-up").style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+		})
 		.on("mouseover", function(d){
 			var name = d3.select(d).selectAll("name")[0][0];
-			d3.select(".infobox").select("#viztitle").text(name.textContent);
 			var description = d3.select(d).selectAll("description")[0][0];
+			d3.select("#pop-up").style("display","inline");
+			d3.select("#pop-up-title").html(name.textContent);
 			if (description){
-				d3.select(".infobox").select("#vizdesc").text(description.textContent);
+				d3.select("#pop-up-content").html(description.textContent);
 			}else{
-				d3.select(".infobox").select("#vizdesc").text("");
+				d3.select("#pop-up-content").html("");
 			}
 		})
 		.style("fill", function(d) {
