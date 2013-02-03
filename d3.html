@@ -141,9 +141,12 @@ label input {
 </tr>
 </table>
 <!-- ########################### -->
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <div id="viz"></div>
+<p><small><a href="javascript:void(0)" onclick="saveaspng()">Save plot as png file</a> (experimental).</small></p>
 <style>
 .axis path,
 .axis line {
@@ -218,6 +221,17 @@ var gyaxislabel = viz.append("text")
 	.attr("transform", "rotate(-90)")
 	;
 	
+function saveaspng(){
+	d3.select("body").append("canvas")
+		.attr("width",width)	
+		.attr("height",height)	
+		.attr("id","canvas")
+		.style("display","none")
+		;	
+	canvg('canvas', $("#viz").html());
+	var canvas = document.getElementById("canvas");
+	window.location = canvas.toDataURL("image/png");
+}
 	
 var xDomain;
 var yDomain;
