@@ -43,21 +43,21 @@ div#pop-up-content {
 }
 </style>
 <!-- ########################### -->
-<div id="viz"></div>
+<div id="viz" style="float:left"></div>
 <div id="pop-up">
         <div id="pop-up-title">Title</div>
         <div id="pop-up-content">Description</div>
 </div>
 <!-- ########################### -->
 <div class="spacer"></div>
-<table cellspacing="0" summary="Settings">
+<table cellspacing="0" summary="Settings" style="float:left">
 <tr>
 	<th scope="column" class="nobg"> </th>
 	<th scope="column" class="thname">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
 </tr>
 <tr>
 	<th rowspan=4 scope="row" class="spec">
-		<label>x-Axis</label>
+		<label>x-axis</label>
 	</th>
 	<td class="data">
 		<select name="xaxis" onChange="updatePlot()">
@@ -91,7 +91,7 @@ div#pop-up-content {
 </tr>
 <tr>
 	<th rowspan=4 class="spec" scope="row">
-		<label>y-Axis</label>
+		<label>y-axis</label>
 	</th>
 	<td class="data">
 		<select name="yaxis" onChange="updatePlot()">
@@ -123,12 +123,12 @@ div#pop-up-content {
 	</td>
 </tr>
 <tr>
-	<th class="spec" scope="row">
+	<th rowspan=4 class="spec" scope="row">
 		<label>Color</label>
 	</th>
 	<td class="data">
 		<select name="coloraxis" onChange="updatePlot()">
-		<option value="none" checked>None</option>
+		<option value="none">Constant</option>
 		<option value="discoverymethod">Discoverymethod</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
@@ -139,6 +139,64 @@ div#pop-up-content {
 		<option value="inclination">Inclination [deg]</option>
 		<option value="discoveryyear">Discoveryyear</option>
 		</select>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="logscalecolor"><input name="logscalecolor" type="checkbox" value="color" id="logscalecolor" onClick="updatePlot()"/>Logarithmic scale</label>
+
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="colorrangeauto"><input checked name="colorrangeauto" type="checkbox" value="a" id="colorrangeauto" onClick="colorrangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		range = [<input type="text" name="colorrangel" size=8 value="0" disabled onKeyUp="colorrangeUpdate()"/>,
+		<input type="text" name="colorranger" size=8 value="0" disabled onKeyUp="colorrangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<th rowspan=5 class="spec" scope="row">
+		<label>Point size</label>
+	</th>
+	<td class="data">
+		<select name="sizeaxis" onChange="updatePlot()">
+		<option selected value="none">Constant</option>
+		<option value="semimajoraxis">Semi-major axis [AU]</option>
+		<option value="mass">Mass [MJup]</option>
+		<option value="radius">Radius [RJup]</option>
+		<option value="eccentricity">Eccentricity</option>
+		<option value="period">Period [days]</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		<option value="discoveryyear">Discoveryyear</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="logscalesize"><input name="logscalesize" type="checkbox" value="size" id="logscalesize" onClick="updatePlot()"/>Logarithmic scale</label>
+
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="sizerangeauto"><input checked name="sizerangeauto" type="checkbox" value="a" id="sizerangeauto" onClick="sizerangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		range = [<input type="text" name="sizerangel" size=8 value="0" disabled onKeyUp="sizerangeUpdate()"/>,
+		<input type="text" name="sizeranger" size=8 value="0" disabled onKeyUp="sizerangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="sizemax">Maximum point size = <input type="text" name="sizemax" size=3 value="4" onKeyUp="sizerangeUpdate()"/></label>
+		
 	</td>
 </tr>
 <tr>
@@ -235,6 +293,9 @@ function saveaspng(){
 	
 var xDomain;
 var yDomain;
+var colorDomain;
+var sizeDomain;  
+var sizemax;
 
 function xrangeUpdate(){
 	if(d3.select("#xrangeauto").node().checked){
@@ -266,9 +327,45 @@ function yrangeUpdate(){
 		}
 	}
 }
+function colorrangeUpdate(){
+	if(d3.select("#colorrangeauto").node().checked){
+		d3.select("[name=colorrangel]").attr("disabled",true);
+		d3.select("[name=colorranger]").attr("disabled",true);
+		updatePlot();
+	}else{
+		d3.select("[name=colorrangel]").attr("disabled",null);
+		d3.select("[name=colorranger]").attr("disabled",null);
+		var newcolorDomain = [ parseFloat(d3.select("[name=colorrangel]").node().value), parseFloat(d3.select("[name=colorranger]").node().value) ];
+		if (newcolorDomain[0]!=colorDomain[0] || newcolorDomain[1]!=colorDomain[1]){
+			colorDomain = newcolorDomain;
+			updatePlot();
+		}
+	}
+}
+
+function sizerangeUpdate(){
+	if(d3.select("#sizerangeauto").node().checked){
+		d3.select("[name=sizerangel]").attr("disabled",true);
+		d3.select("[name=sizeranger]").attr("disabled",true);
+		updatePlot();
+	}else{
+		d3.select("[name=sizerangel]").attr("disabled",null);
+		d3.select("[name=sizeranger]").attr("disabled",null);
+		var newsizeDomain = [ parseFloat(d3.select("[name=sizerangel]").node().value), parseFloat(d3.select("[name=sizeranger]").node().value) ];
+		var newsizemax = parseFloat(d3.select("[name=sizemax]").node().value);
+		if (newsizeDomain[0]!=sizeDomain[0] || newsizeDomain[1]!=sizeDomain[1] || newsizemax!=sizemax){
+			sizeDomain = newsizeDomain;
+			sizemax = newsizemax;
+			updatePlot();
+		}
+	}
+}
 
 var colorkey;
 var colorScale;
+var sizekey;
+var sizeScale;
+var logscalesize;
 
 function getColor(d){
 	var elem = d.getElementsByTagName(colorkey);
@@ -290,14 +387,38 @@ function color(d){
 	}
 }
 
+function getSize(d){
+	if (sizekey=="none") return 1;
+	var elem = d.getElementsByTagName(sizekey);
+	if (!elem.length) return undefined;
+	var text = $(elem[0]).text();
+	var f = parseFloat(text);
+	if (logscalesize && f<=0.) return null;
+	return f;
+}
+function size(d){
+	if (sizekey=="none") return sizemax;
+	var elem = d.getElementsByTagName(sizekey);
+	if (!elem.length) return null;
+	var text = $(elem[0]).text();
+	var f = parseFloat(text);
+	if (logscalesize && f<=0.) return null;
+	return sizeScale(f);
+}
+
 var updatePlot = function(){ 
 	var discoveryfilter = d3.selectAll("input[name=discoveryfilter]:checked");
 	var xkey = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].value;
 	var ykey = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].value;
 	colorkey = d3.select("select[name=coloraxis]").node().options[d3.select("select[name=coloraxis]").node().selectedIndex].value;
+	sizekey = d3.select("select[name=sizeaxis]").node().options[d3.select("select[name=sizeaxis]").node().selectedIndex].value;
 
 	var logscalex = d3.select("#logscalex").node().checked;
 	var logscaley = d3.select("#logscaley").node().checked;
+	var logscalecolor = d3.select("#logscalecolor").node().checked;
+	logscalesize = d3.select("#logscalesize").node().checked;
+
+	sizemax = parseFloat(d3.select("[name=sizemax]").node().value);
 
 	
 	var planets = planetsxml.filter(function(d,i) {
@@ -333,22 +454,26 @@ var updatePlot = function(){
 	}
 
 	if(d3.select("#yrangeauto").node().checked){
-		yDomain = 
-			d3.extent(planets, function(d) { 
+		yDomain = d3.extent(planets, function(d) { 
 				return	parseFloat($(d.getElementsByTagName(ykey)[0]).text()); 
 			});
 		d3.select("[name=yrangel]").node().value = yDomain[0];
 		d3.select("[name=yranger]").node().value = yDomain[1];
 	}
-
-	var colorDomain = [
-		d3.min(planets, function(d) { 
-			return getColor(d);
-		}),
-		d3.max(planets, function(d) { 
-			return getColor(d);
-		})
-		];
+	if(d3.select("#colorrangeauto").node().checked){
+		colorDomain = d3.extent(planets, function(d) { 
+				return getColor(d); 
+			});
+		d3.select("[name=colorrangel]").node().value = colorDomain[0];
+		d3.select("[name=colorranger]").node().value = colorDomain[1];
+	}
+	if(d3.select("#sizerangeauto").node().checked){
+		sizeDomain = d3.extent(planets, function(d) { 
+				return getSize(d); 
+			});
+		d3.select("[name=sizerangel]").node().value = sizeDomain[0];
+		d3.select("[name=sizeranger]").node().value = sizeDomain[1];
+	}
 
 	var xScale;
 	if (logscalex){
@@ -368,20 +493,33 @@ var updatePlot = function(){
 	yScale.domain(yDomain)
 		.clamp(true)
 		.range([height - paddingb-paddingt,paddingt]);
-	colorScale = d3.scale.linear()
-		.domain(colorDomain)
+	if (logscalecolor){
+		colorScale = d3.scale.log();
+	}else{
+		colorScale = d3.scale.linear();
+	}
+	colorScale.domain(colorDomain)
+		.clamp(true)
 		.range([0,120]);
+	if (logscalesize){
+		sizeScale = d3.scale.log();
+	}else{
+		sizeScale = d3.scale.linear();
+	}
+	sizeScale.domain(sizeDomain)
+		.clamp(true)
+		.range([0,sizemax]);
 
 
   	var circle = viz.selectAll("circle")
 		.data(planets,function(d) {return $(d.getElementsByTagName("name")[0]).text(); });
 
 	circle.enter().append("circle")
-		.attr("r", 4.)
 		.style("stroke", "black")
 		.style("opacity",0)
 		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
 		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
+		.attr("r", function(d) {return size(d); })
 		.style("fill", function(d) { return color(d); })
 		.on("click", function(d) {
 			document.location.href = "/system.php?id=" + $(d.getElementsByTagName("name")[0]).text();
@@ -410,6 +548,7 @@ var updatePlot = function(){
 		.transition()
 		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
 		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
+		.attr("r", function(d) {return size(d); })
 		.style("fill", function(d) { return color(d); })
 		.style("opacity",1)
 		;
@@ -459,6 +598,7 @@ d3.xml("systems.xml", "application/xml", function(xml) {
 
     
 </script>
+<div class="spacer" style="clear:left"></div>
 
 <!-- ########################### -->
 <h2><img src="./img/xml.png" alt="star" />Data download</h2>
