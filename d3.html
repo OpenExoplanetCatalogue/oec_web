@@ -7,6 +7,7 @@ include "./.inc/header.php";
 <h2><img src="./img/kig.png" alt="kig" />Correlation diagrams</h2>
 <p>This page is currently under development. 
 It uses the d3 javascript library to render correlation plots directly in your browser. 
+Once you've loaded this page, you can change the plot even without an internet connection.
 The plots shows a scatter plot of all discovered planets.
 Hover over a circle to see to which planet it corresponds. Click on it to view the planet's page.
 </p>
@@ -15,38 +16,42 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 <!-- ########################### -->
 <style type="text/css">
 label input {
-	margin-right:0.5em;
+	margin-right:	0.5em;
 }
 #viz text {
-    font-family: sans-serif;
-    font-size: 12px;
+	font-family: 	sans-serif;
+	font-size: 	12px;
 }
 div#pop-up {
-	display: none;
-	position:absolute;
-	color: white;
-	font-size: 14px;
-	background: rgba(0,0,0,0.6);
-	padding: 5px 10px 5px 10px;
+	display: 	none;
+	position:	absolute;
+	color: 		white;
+	font-size: 	14px;
+	background: 	rgba(0,0,0,0.6);
+	padding: 	5px 10px 5px 10px;
 	-moz-border-radius: 8px 8px;
-	border-radius: 8px 8px;
-	width: 15em;
+	border-radius:	8px 8px;
+	width: 		16em;
 }
 div#pop-up-title {
-	font-size: 15px;
-	width:200px;
-	margin-bottom: 4px;
-	font-weight: bolder;
+	font-size: 	15px;
+	width:		16em;
+	margin-bottom:	4px;
+	font-weight: 	bolder;
 }
 div#pop-up-content {
-	font-size: 12px;
+	font-size: 	12px;
 }
 div#pop-up-values {
-	padding-top: 8px;
-	font-size: 12px;
+	padding-top: 	8px;
+	font-size: 	12px;
+}
+div#pop-up-values span{
+	display: 	inline-block;
+	width: 		10.5em;
 }
 .spec{
-	vertical-align: top;
+	vertical-align:	top;
 }
 </style>
 <!-- ########################### -->
@@ -68,7 +73,7 @@ div#pop-up-values {
 		<label>x-axis</label>
 	</th>
 	<td class="data">
-		<select name="xaxis" onchange="updatePlot()">
+		<select name="xaxis" id="xaxis" onchange="updatePlot()">
 		<option selected="selected" value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option value="radius">Radius [RJup]</option>
@@ -102,7 +107,7 @@ div#pop-up-values {
 		<label>y-axis</label>
 	</th>
 	<td class="data">
-		<select name="yaxis" onchange="updatePlot()">
+		<select name="yaxis" id="yaxis" onchange="updatePlot()">
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option selected="selected" value="mass">Mass [MJup]</option>
 		<option value="radius">Radius [RJup]</option>
@@ -135,7 +140,7 @@ div#pop-up-values {
 		<label>Color</label>
 	</th>
 	<td class="data">
-		<select name="coloraxis" onchange="updatePlot()">
+		<select name="coloraxis" id="coloraxis" onchange="updatePlot();colorrangeUpdate();">
 		<option value="none">Constant</option>
 		<option value="discoverymethod">Discoverymethod</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
@@ -150,13 +155,13 @@ div#pop-up-values {
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="logscalecolorrow">
 		<label for="logscalecolor"><input name="logscalecolor" type="checkbox" value="color" id="logscalecolor" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="colorrangeautorow">
 		<label for="colorrangeauto"><input checked="checked" name="colorrangeauto" type="checkbox" value="a" id="colorrangeauto" onclick="colorrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
@@ -171,7 +176,7 @@ div#pop-up-values {
 		<label>Point size</label>
 	</th>
 	<td class="data">
-		<select name="sizeaxis" onchange="updatePlot()">
+		<select name="sizeaxis" id="sizeaxis" onchange="updatePlot();sizerangeUpdate();">
 		<option selected="selected" value="none">Constant</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
@@ -185,13 +190,13 @@ div#pop-up-values {
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="logscalesizerow" style="display:none;">
 		<label for="logscalesize"><input name="logscalesize" type="checkbox" value="size" id="logscalesize" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="sizerangeautorow" style="display:none;">
 		<label for="sizerangeauto"><input checked="checked" name="sizerangeauto" type="checkbox" value="a" id="sizerangeauto" onclick="sizerangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
@@ -241,7 +246,25 @@ div#pop-up-values {
 	</td>
 </tr>
 <tr>
-	<th rowspan="6" class="spec" scope="row">
+	<th rowspan="3" class="spec" scope="row">
+	Stellar multiplicity
+	</th>
+	<td class="data">
+		<label for="stellarmultiplicity_all"><input checked="checked" name="stellarmultiplicity" type="radio" value="all" id="stellarmultiplicity_all" onclick="updatePlot()"/>All planets</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="stellarmultiplicity_ptype"><input name="stellarmultiplicity" type="radio" value="ptype" id="stellarmultiplicity_circumbinary" onclick="updatePlot()"/>Only circumbinary planets, P-type</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="stellarmultiplicity_stype"><input name="stellarmultiplicity" type="radio" value="stype" id="stellarmultiplicity_stype" onclick="updatePlot()"/>Only planets around stars with<br />a wide binary companion, S-type</label>
+	</td>
+</tr>
+<tr>
+	<th rowspan="1" class="spec" scope="row">
 	Export
 	</th>
 	<td class="data">
@@ -258,12 +281,11 @@ div#pop-up-values {
 var width 	= 600;
 var height 	= 500;
 var paddingt 	= 10;
-var paddingb 	= 45;
+var paddingb 	= 35;
 var paddingl 	= 65;
 var paddingr 	= 10;
 
 var first 	= true;
-var planetsxml	= null;
 var viz = d3.select("#viz")
 	.append("svg")
 	.attr("width", width)
@@ -332,6 +354,13 @@ function yrangeUpdate(){
 	}
 }
 function colorrangeUpdate(){
+	if(colorkey=="none"){
+		$("#colorrangeautorow").hide();
+		$("#logscalecolorrow").hide();
+	}else{
+		$("#colorrangeautorow").show();
+		$("#logscalecolorrow").show();
+	}
 	if(d3.select("#colorrangeauto").node().checked){
 		$("#colorrangerow").hide();
 		updatePlot();
@@ -346,6 +375,13 @@ function colorrangeUpdate(){
 }
 
 function sizerangeUpdate(){
+	if(sizekey=="none"){
+		$("#sizerangeautorow").hide();
+		$("#logscalesizerow").hide();
+	}else{
+		$("#sizerangeautorow").show();
+		$("#logscalesizerow").show();
+	}
 	if(d3.select("#sizerangeauto").node().checked){
 		$("#sizerangerow").hide();
 		updatePlot();
@@ -413,24 +449,38 @@ function size(d){
 
 var updatePlot = function(){ 
 	var discoveryfilter = d3.selectAll("input[name=discoveryfilter]:checked");
-	var xkey = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].value;
-	var ykey = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].value;
-	colorkey = d3.select("select[name=coloraxis]").node().options[d3.select("select[name=coloraxis]").node().selectedIndex].value;
-	sizekey = d3.select("select[name=sizeaxis]").node().options[d3.select("select[name=sizeaxis]").node().selectedIndex].value;
+	var stellarmultiplicity = $("input:radio[name=stellarmultiplicity]:checked").val();
 
-	var logscalex = d3.select("#logscalex").node().checked;
-	var logscaley = d3.select("#logscaley").node().checked;
-	logscalecolor = d3.select("#logscalecolor").node().checked;
-	logscalesize = d3.select("#logscalesize").node().checked;
+	var xkey 	= $("#xaxis option:selected").val();
+	var ykey 	= $("#yaxis option:selected").val();
+	colorkey 	= $("#coloraxis option:selected").val();
+	sizekey  	= $("#sizeaxis option:selected").val();
+
+	var xlabel 	= $("#xaxis option:selected").text();
+	var ylabel    	= $("#yaxis option:selected").text();
+	var colorlabel	= $("#coloraxis option:selected").text();
+	var sizelabel 	= $("#sizeaxis option:selected").text();
+
+	var logscalex 	= $("#logscalex").is(":checked");
+	var logscaley 	= $("#logscaley").is(":checked");
+	logscalecolor 	= $("#logscalecolor").is(":checked");
+	logscalesize  	= $("#logscalesize").is(":checked");
 
 	sizemax = parseFloat($("#sizemax").val());
 
-	var xlabel = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].text;
-	var ylabel = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].text;
-	var colorlabel = d3.select("select[name=coloraxis]").node().options[d3.select("select[name=coloraxis]").node().selectedIndex].text;
-	var sizelabel = d3.select("select[name=sizeaxis]").node().options[d3.select("select[name=sizeaxis]").node().selectedIndex].text;
-	
-	var planets = planetsxml.filter(function(d,i) {
+	var planetsxml;
+	switch(stellarmultiplicity){
+		case "all":
+			planetsxml = d3.select(xmldata).selectAll("planet")[0];
+			break;
+		case "ptype":
+			planetsxml = d3.select(xmldata).selectAll("binary > planet")[0];
+			break;
+		case "stype":
+			planetsxml = d3.select(xmldata).selectAll("binary star planet")[0];
+			break;
+	}
+	var planets = planetsxml.filter(function(d) {
 		var discoverymethod = d.getElementsByTagName("discoverymethod");
 		if (!discoverymethod.length){
 			discoverymethod = "";
@@ -524,12 +574,12 @@ var updatePlot = function(){
 		.data(planets,function(d) {return $(d.getElementsByTagName("name")[0]).text(); });
 
 	circle.enter().append("circle")
-		.style("stroke", "black")
-		.style("opacity",0)
 		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
 		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
 		.attr("r", function(d) {return size(d); })
 		.style("fill", function(d) { return color(d); })
+		.style("stroke", "black")
+		.style("opacity",(first?1:0))
 		.on("click", function(d) {
 			document.location.href = "/system.php?id=" + $(d.getElementsByTagName("name")[0]).text();
 		})
@@ -554,20 +604,20 @@ var updatePlot = function(){
 				d3.select("#pop-up-content").html("");
 			}
 			var values = "";
-			values += 			xlabel + ": " + $(d.getElementsByTagName(xkey)[0]).text()
-					+ "<br />" +	ylabel + ": " + $(d.getElementsByTagName(ykey)[0]).text();
+			values += 		 "<span>" +	xlabel + ":</span>" + $(d.getElementsByTagName(xkey)[0]).text()
+					+  "<br /><span>" +	ylabel + ":</span>" + $(d.getElementsByTagName(ykey)[0]).text();
 			if (colorkey!="none"&&getColor(d)){
-				values +=  "<br />" +	colorlabel + ": " + $(d.getElementsByTagName(colorkey)[0]).text();
+				values +=  "<br /><span>" +	colorlabel + ":</span>" + $(d.getElementsByTagName(colorkey)[0]).text();
 			}
 			if (sizekey!="none"&&size(d)){
-				values +=  "<br />" +	sizelabel + ": " + $(d.getElementsByTagName(sizekey)[0]).text();
+				values +=  "<br /><span>" +	sizelabel + ":</span>" + $(d.getElementsByTagName(sizekey)[0]).text();
 			}
 
 			$("#pop-up-values").html(values);
 
 		})
 		.transition()
-		.duration(500)
+		.duration( (first?0:500) )
 		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
 		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
 		.attr("r", function(d) {return size(d); })
@@ -611,8 +661,10 @@ var updatePlot = function(){
 	first = false;
 };
 
+var xmldata = null;
+
 d3.xml("systems.xml", "application/xml", function(xml) {
-	planetsxml = d3.select(xml).selectAll("planet")[0];
+	xmldata = xml;
 	updatePlot();	
 });
 
