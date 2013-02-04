@@ -13,7 +13,7 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 
 
 <!-- ########################### -->
-<style>
+<style type="text/css">
 label input {
 	margin-right:0.5em;
 }
@@ -60,16 +60,16 @@ div#pop-up-values {
 <div class="spacer"></div>
 <table cellspacing="0" summary="Settings" style="float:left">
 <tr>
-	<th scope="column" class="nobg"> </th>
-	<th scope="column" class="thname">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
+	<th scope="col" class="nobg"> </th>
+	<th scope="col" class="thname">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
 </tr>
 <tr>
-	<th rowspan=4 scope="row" class="spec">
+	<th rowspan="4" scope="row" class="spec">
 		<label>x-axis</label>
 	</th>
 	<td class="data">
-		<select name="xaxis" onChange="updatePlot()">
-		<option selected value="semimajoraxis">Semi-major axis [AU]</option>
+		<select name="xaxis" onchange="updatePlot()">
+		<option selected="selected" value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option value="radius">Radius [RJup]</option>
 		<option value="period">Period [days]</option>
@@ -82,29 +82,29 @@ div#pop-up-values {
 </tr>
 <tr>
 	<td class="data">
-		<label for="logscalex"><input checked name="logscale" type="checkbox" value="x" id="logscalex" onClick="updatePlot()"/>Logarithmic scale</label>
+		<label for="logscalex"><input checked="checked" name="logscale" type="checkbox" value="x" id="logscalex" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="xrangeauto"><input checked name="xrangeauto" type="checkbox" value="a" id="xrangeauto" onClick="xrangeUpdate()"/>Automatic range</label>
+		<label for="xrangeauto"><input checked="checked" name="xrangeauto" type="checkbox" value="a" id="xrangeauto" onclick="xrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
 	<td class="data" id="xrangerow" style="display:none;">
-		range = [<input type="text" name="xrangel" size=8 value="0" disabled onKeyUp="xrangeUpdate()"/>,
-		<input type="text" name="xranger" size=8 value="0" disabled onKeyUp="xrangeUpdate()"/>]
+		range = [<input type="text" name="xrangel" size="8" value="0" onkeyup="xrangeUpdate()"/>,
+		<input type="text" name="xranger" size="8" value="0" onkeyup="xrangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
-	<th rowspan=4 class="spec" scope="row">
+	<th rowspan="4" class="spec" scope="row">
 		<label>y-axis</label>
 	</th>
 	<td class="data">
-		<select name="yaxis" onChange="updatePlot()">
+		<select name="yaxis" onchange="updatePlot()">
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
-		<option selected value="mass">Mass [MJup]</option>
+		<option selected="selected" value="mass">Mass [MJup]</option>
 		<option value="radius">Radius [RJup]</option>
 		<option value="eccentricity">Eccentricity</option>
 		<option value="period">Period [days]</option>
@@ -116,31 +116,31 @@ div#pop-up-values {
 </tr>
 <tr>
 	<td class="data">
-		<label for="logscaley"><input checked name="logscale" type="checkbox" value="y" id="logscaley" onClick="updatePlot()"/>Logarithmic scale</label>
+		<label for="logscaley"><input checked="checked" name="logscale" type="checkbox" value="y" id="logscaley" onclick="updatePlot()"/>Logarithmic scale</label>
+	</td>
+</tr>
+<tr>
+	<td class="data">
+		<label for="yrangeauto"><input checked="checked" name="yrangeauto" type="checkbox" value="a" id="yrangeauto" onclick="yrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
 	<td class="data" id="yrangerow" style="display:none;">
-		<label for="yrangeauto"><input checked name="yrangeauto" type="checkbox" value="a" id="yrangeauto" onClick="yrangeUpdate()"/>Automatic range</label>
+		range = [<input type="text" name="yrangel" size="8" value="0" onkeyup="yrangeUpdate()"/>,
+		<input type="text" name="yranger" size="8" value="0" onkeyup="yrangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
-	<td class="data">
-		range = [<input type="text" name="yrangel" size=8 value="0" disabled onKeyUp="yrangeUpdate()"/>,
-		<input type="text" name="yranger" size=8 value="0" disabled onKeyUp="yrangeUpdate()"/>]
-	</td>
-</tr>
-<tr>
-	<th rowspan=4 class="spec" scope="row">
+	<th rowspan="4" class="spec" scope="row">
 		<label>Color</label>
 	</th>
 	<td class="data">
-		<select name="coloraxis" onChange="updatePlot()">
+		<select name="coloraxis" onchange="updatePlot()">
 		<option value="none">Constant</option>
 		<option value="discoverymethod">Discoverymethod</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
-		<option selected value="radius">Radius [RJup]</option>
+		<option selected="selected" value="radius">Radius [RJup]</option>
 		<option value="eccentricity">Eccentricity</option>
 		<option value="period">Period [days]</option>
 		<option value="temperature">Temperature [K]</option>
@@ -151,28 +151,28 @@ div#pop-up-values {
 </tr>
 <tr>
 	<td class="data">
-		<label for="logscalecolor"><input name="logscalecolor" type="checkbox" value="color" id="logscalecolor" onClick="updatePlot()"/>Logarithmic scale</label>
+		<label for="logscalecolor"><input name="logscalecolor" type="checkbox" value="color" id="logscalecolor" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="colorrangeauto"><input checked name="colorrangeauto" type="checkbox" value="a" id="colorrangeauto" onClick="colorrangeUpdate()"/>Automatic range</label>
+		<label for="colorrangeauto"><input checked="checked" name="colorrangeauto" type="checkbox" value="a" id="colorrangeauto" onclick="colorrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
 	<td class="data" id="colorrangerow" style="display:none;">
-		range = [<input type="text" name="colorrangel" size=8 value="0" disabled onKeyUp="colorrangeUpdate()"/>,
-		<input type="text" name="colorranger" size=8 value="0" disabled onKeyUp="colorrangeUpdate()"/>]
+		range = [<input type="text" name="colorrangel" size="8" value="0" onkeyup="colorrangeUpdate()"/>,
+		<input type="text" name="colorranger" size="8" value="0" onkeyup="colorrangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
-	<th rowspan=5 class="spec" scope="row">
+	<th rowspan="5" class="spec" scope="row">
 		<label>Point size</label>
 	</th>
 	<td class="data">
-		<select name="sizeaxis" onChange="updatePlot()">
-		<option selected value="none">Constant</option>
+		<select name="sizeaxis" onchange="updatePlot()">
+		<option selected="selected" value="none">Constant</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option value="radius">Radius [RJup]</option>
@@ -186,66 +186,66 @@ div#pop-up-values {
 </tr>
 <tr>
 	<td class="data">
-		<label for="logscalesize"><input name="logscalesize" type="checkbox" value="size" id="logscalesize" onClick="updatePlot()"/>Logarithmic scale</label>
+		<label for="logscalesize"><input name="logscalesize" type="checkbox" value="size" id="logscalesize" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="sizerangeauto"><input checked name="sizerangeauto" type="checkbox" value="a" id="sizerangeauto" onClick="sizerangeUpdate()"/>Automatic range</label>
+		<label for="sizerangeauto"><input checked="checked" name="sizerangeauto" type="checkbox" value="a" id="sizerangeauto" onclick="sizerangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
 	<td class="data" id="sizerangerow" style="display:none;">
-		range = [<input type="text" name="sizerangel" size=8 value="0" disabled onKeyUp="sizerangeUpdate()"/>,
-		<input type="text" name="sizeranger" size=8 value="0" disabled onKeyUp="sizerangeUpdate()"/>]
+		range = [<input type="text" name="sizerangel" size="8" value="0" onkeyup="sizerangeUpdate()"/>,
+		<input type="text" name="sizeranger" size="8" value="0" onkeyup="sizerangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="sizemax">Maximum point size = <input type="text" name="sizemax" size=3 value="4" onKeyUp="sizerangeUpdate()"/></label>
+		<label for="sizemax">Maximum point size = <input type="text" name="sizemax" id="sizemax" size="3" value="4" onkeyup="sizerangeUpdate()"/></label>
 		
 	</td>
 </tr>
 <tr>
-	<th rowspan=6 class="spec" scope="row">
+	<th rowspan="6" class="spec" scope="row">
 	Detection methods
 	</th>
 	<td class="data">
-		<label for="filter_transit"><input checked name="discoveryfilter" type="checkbox" value="transit" id="filter_transit" onClick="updatePlot()"/>Transiting planets</label>
+		<label for="filter_transit"><input checked="checked" name="discoveryfilter" type="checkbox" value="transit" id="filter_transit" onclick="updatePlot()"/>Transiting planets</label>
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="filter_rv"><input checked name="discoveryfilter" type="checkbox" value="RV" id="filter_rv" onClick="updatePlot()"/>Radial velocity planets</label>
+		<label for="filter_rv"><input checked="checked" name="discoveryfilter" type="checkbox" value="RV" id="filter_rv" onclick="updatePlot()"/>Radial velocity planets</label>
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="filter_microlensing"><input checked name="discoveryfilter" type="checkbox" value="microlensing" id="filter_microlensing" onClick="updatePlot()"/>Microlensing planets</label>
+		<label for="filter_microlensing"><input checked="checked" name="discoveryfilter" type="checkbox" value="microlensing" id="filter_microlensing" onclick="updatePlot()"/>Microlensing planets</label>
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="filter_imaged"><input checked name="discoveryfilter" type="checkbox" value="imaging" id="filter_imaged" onClick="updatePlot()"/>Directly imaged planets</label>
+		<label for="filter_imaged"><input checked="checked" name="discoveryfilter" type="checkbox" value="imaging" id="filter_imaged" onclick="updatePlot()"/>Directly imaged planets</label>
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="filter_timing"><input checked name="discoveryfilter" type="checkbox" value="timing" id="filter_timing" onClick="updatePlot()"/>Planets found by pulsar timing</label>
+		<label for="filter_timing"><input checked="checked" name="discoveryfilter" type="checkbox" value="timing" id="filter_timing" onclick="updatePlot()"/>Planets found by pulsar timing</label>
 	</td>
 </tr>
 <tr>
 	<td class="data">
-		<label for="filter_other"><input checked name="discoveryfilter" type="checkbox" value="" id="filter_other" onClick="updatePlot()"/>Planets found by other methods</label>
+		<label for="filter_other"><input checked="checked" name="discoveryfilter" type="checkbox" value="" id="filter_other" onclick="updatePlot()"/>Planets found by other methods</label>
 	</td>
 </tr>
 <tr>
-	<th rowspan=6 class="spec" scope="row">
+	<th rowspan="6" class="spec" scope="row">
 	Export
 	</th>
 	<td class="data">
-		<input type="button" onClick="saveaspng()" value="Save plot as png file" />
+		<input type="button" onclick="saveaspng()" value="Save plot as png file" />
 	</td>
 </tr>
 </table>
@@ -307,13 +307,9 @@ var sizemax;
 
 function xrangeUpdate(){
 	if(d3.select("#xrangeauto").node().checked){
-		d3.select("[name=xrangel]").attr("disabled",true);
-		d3.select("[name=xranger]").attr("disabled",true);
 		$("#xrangerow").hide();
 		updatePlot();
 	}else{
-		d3.select("[name=xrangel]").attr("disabled",null);
-		d3.select("[name=xranger]").attr("disabled",null);
 		$("#xrangerow").show();
 		var newxDomain = [ parseFloat(d3.select("[name=xrangel]").node().value), parseFloat(d3.select("[name=xranger]").node().value) ];
 		if (newxDomain[0]!=xDomain[0] || newxDomain[1]!=xDomain[1]){
@@ -324,13 +320,9 @@ function xrangeUpdate(){
 }
 function yrangeUpdate(){
 	if(d3.select("#yrangeauto").node().checked){
-		d3.select("[name=yrangel]").attr("disabled",true);
-		d3.select("[name=yranger]").attr("disabled",true);
 		$("#yrangerow").hide();
 		updatePlot();
 	}else{
-		d3.select("[name=yrangel]").attr("disabled",null);
-		d3.select("[name=yranger]").attr("disabled",null);
 		$("#yrangerow").show();
 		var newyDomain = [ parseFloat(d3.select("[name=yrangel]").node().value), parseFloat(d3.select("[name=yranger]").node().value) ];
 		if (newyDomain[0]!=yDomain[0] || newyDomain[1]!=yDomain[1]){
@@ -341,14 +333,10 @@ function yrangeUpdate(){
 }
 function colorrangeUpdate(){
 	if(d3.select("#colorrangeauto").node().checked){
-		d3.select("[name=colorrangel]").attr("disabled",true);
-		d3.select("[name=colorranger]").attr("disabled",true);
 		$("#colorrangerow").hide();
 		updatePlot();
 	}else{
 		$("#colorrangerow").show();
-		d3.select("[name=colorrangel]").attr("disabled",null);
-		d3.select("[name=colorranger]").attr("disabled",null);
 		var newcolorDomain = [ parseFloat(d3.select("[name=colorrangel]").node().value), parseFloat(d3.select("[name=colorranger]").node().value) ];
 		if (newcolorDomain[0]!=colorDomain[0] || newcolorDomain[1]!=colorDomain[1]){
 			colorDomain = newcolorDomain;
@@ -359,16 +347,12 @@ function colorrangeUpdate(){
 
 function sizerangeUpdate(){
 	if(d3.select("#sizerangeauto").node().checked){
-		d3.select("[name=sizerangel]").attr("disabled",true);
-		d3.select("[name=sizeranger]").attr("disabled",true);
 		$("#sizerangerow").hide();
 		updatePlot();
 	}else{
-		d3.select("[name=sizerangel]").attr("disabled",null);
-		d3.select("[name=sizeranger]").attr("disabled",null);
 		$("#sizerangerow").show();
 		var newsizeDomain = [ parseFloat(d3.select("[name=sizerangel]").node().value), parseFloat(d3.select("[name=sizeranger]").node().value) ];
-		var newsizemax = parseFloat(d3.select("[name=sizemax]").node().value);
+		var newsizemax = parseFloat($("#sizemax").val());
 		if (newsizeDomain[0]!=sizeDomain[0] || newsizeDomain[1]!=sizeDomain[1] || newsizemax!=sizemax){
 			sizeDomain = newsizeDomain;
 			updatePlot();
@@ -439,7 +423,7 @@ var updatePlot = function(){
 	logscalecolor = d3.select("#logscalecolor").node().checked;
 	logscalesize = d3.select("#logscalesize").node().checked;
 
-	sizemax = parseFloat(d3.select("[name=sizemax]").node().value);
+	sizemax = parseFloat($("#sizemax").val());
 
 	var xlabel = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].text;
 	var ylabel = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].text;
@@ -583,6 +567,7 @@ var updatePlot = function(){
 
 		})
 		.transition()
+		.duration(500)
 		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
 		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
 		.attr("r", function(d) {return size(d); })
