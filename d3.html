@@ -146,14 +146,8 @@ label input {
 <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <div id="viz"></div>
-<p><small><a href="javascript:void(0)" onclick="saveaspng()">Save plot as png file</a> (experimental).</small></p>
+<p><small><a href="javascript:void(0)" onclick="saveaspng()">Click here</a> to save the file as a png file.</small></p>
 <style>
-.axis path,
-.axis line {
-    fill: none;
-    stroke: black;
-}
-
 #viz text {
     font-family: sans-serif;
     font-size: 12px;
@@ -202,11 +196,9 @@ var viz = d3.select("#viz")
 	.attr("height", height)
 	;    
 var gxaxis = viz.append("g")
-	.attr("class", "axis")
 	.attr("transform", "translate(0," + (height - paddingb-paddingt) + ")");
 	;
 var gyaxis = viz.append("g")
-	.attr("class", "axis")
 	.attr("transform", "translate(" + paddingl + ", 0)")
 	;
 var gxaxislabel = viz.append("text")
@@ -455,6 +447,12 @@ var updatePlot = function(){
 		gxaxis.transition().call(xAxis);
 		gyaxis.transition().call(yAxis);
 	}
+	gxaxis.selectAll("path,line")
+		.style("fill","none")
+		.style("stroke","black");
+	gyaxis.selectAll("path,line")
+		.style("fill","none")
+		.style("stroke","black");
 			
 	gxaxislabel.text(xlabel);
 	gyaxislabel.text(ylabel);
