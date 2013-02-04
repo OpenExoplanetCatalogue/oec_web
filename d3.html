@@ -41,12 +41,20 @@ div#pop-up-title {
 div#pop-up-content {
 	font-size: 12px;
 }
+div#pop-up-values {
+	padding-top: 8px;
+	font-size: 12px;
+}
+.spec{
+	vertical-align: top;
+}
 </style>
 <!-- ########################### -->
 <div id="viz" style="float:left"></div>
 <div id="pop-up">
         <div id="pop-up-title">Title</div>
         <div id="pop-up-content">Description</div>
+        <div id="pop-up-values">Values</div>
 </div>
 <!-- ########################### -->
 <div class="spacer"></div>
@@ -84,7 +92,7 @@ div#pop-up-content {
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="xrangerow" style="display:none;">
 		range = [<input type="text" name="xrangel" size=8 value="0" disabled onKeyUp="xrangeUpdate()"/>,
 		<input type="text" name="xranger" size=8 value="0" disabled onKeyUp="xrangeUpdate()"/>]
 	</td>
@@ -112,7 +120,7 @@ div#pop-up-content {
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="yrangerow" style="display:none;">
 		<label for="yrangeauto"><input checked name="yrangeauto" type="checkbox" value="a" id="yrangeauto" onClick="yrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
@@ -153,7 +161,7 @@ div#pop-up-content {
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="colorrangerow" style="display:none;">
 		range = [<input type="text" name="colorrangel" size=8 value="0" disabled onKeyUp="colorrangeUpdate()"/>,
 		<input type="text" name="colorranger" size=8 value="0" disabled onKeyUp="colorrangeUpdate()"/>]
 	</td>
@@ -188,7 +196,7 @@ div#pop-up-content {
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td class="data" id="sizerangerow" style="display:none;">
 		range = [<input type="text" name="sizerangel" size=8 value="0" disabled onKeyUp="sizerangeUpdate()"/>,
 		<input type="text" name="sizeranger" size=8 value="0" disabled onKeyUp="sizerangeUpdate()"/>]
 	</td>
@@ -301,10 +309,12 @@ function xrangeUpdate(){
 	if(d3.select("#xrangeauto").node().checked){
 		d3.select("[name=xrangel]").attr("disabled",true);
 		d3.select("[name=xranger]").attr("disabled",true);
+		$("#xrangerow").hide();
 		updatePlot();
 	}else{
 		d3.select("[name=xrangel]").attr("disabled",null);
 		d3.select("[name=xranger]").attr("disabled",null);
+		$("#xrangerow").show();
 		var newxDomain = [ parseFloat(d3.select("[name=xrangel]").node().value), parseFloat(d3.select("[name=xranger]").node().value) ];
 		if (newxDomain[0]!=xDomain[0] || newxDomain[1]!=xDomain[1]){
 			xDomain = newxDomain;
@@ -316,10 +326,12 @@ function yrangeUpdate(){
 	if(d3.select("#yrangeauto").node().checked){
 		d3.select("[name=yrangel]").attr("disabled",true);
 		d3.select("[name=yranger]").attr("disabled",true);
+		$("#yrangerow").hide();
 		updatePlot();
 	}else{
 		d3.select("[name=yrangel]").attr("disabled",null);
 		d3.select("[name=yranger]").attr("disabled",null);
+		$("#yrangerow").show();
 		var newyDomain = [ parseFloat(d3.select("[name=yrangel]").node().value), parseFloat(d3.select("[name=yranger]").node().value) ];
 		if (newyDomain[0]!=yDomain[0] || newyDomain[1]!=yDomain[1]){
 			yDomain = newyDomain;
@@ -331,8 +343,10 @@ function colorrangeUpdate(){
 	if(d3.select("#colorrangeauto").node().checked){
 		d3.select("[name=colorrangel]").attr("disabled",true);
 		d3.select("[name=colorranger]").attr("disabled",true);
+		$("#colorrangerow").hide();
 		updatePlot();
 	}else{
+		$("#colorrangerow").show();
 		d3.select("[name=colorrangel]").attr("disabled",null);
 		d3.select("[name=colorranger]").attr("disabled",null);
 		var newcolorDomain = [ parseFloat(d3.select("[name=colorrangel]").node().value), parseFloat(d3.select("[name=colorranger]").node().value) ];
@@ -347,15 +361,16 @@ function sizerangeUpdate(){
 	if(d3.select("#sizerangeauto").node().checked){
 		d3.select("[name=sizerangel]").attr("disabled",true);
 		d3.select("[name=sizeranger]").attr("disabled",true);
+		$("#sizerangerow").hide();
 		updatePlot();
 	}else{
 		d3.select("[name=sizerangel]").attr("disabled",null);
 		d3.select("[name=sizeranger]").attr("disabled",null);
+		$("#sizerangerow").show();
 		var newsizeDomain = [ parseFloat(d3.select("[name=sizerangel]").node().value), parseFloat(d3.select("[name=sizeranger]").node().value) ];
 		var newsizemax = parseFloat(d3.select("[name=sizemax]").node().value);
 		if (newsizeDomain[0]!=sizeDomain[0] || newsizeDomain[1]!=sizeDomain[1] || newsizemax!=sizemax){
 			sizeDomain = newsizeDomain;
-			sizemax = newsizemax;
 			updatePlot();
 		}
 	}
@@ -366,11 +381,15 @@ var colorScale;
 var sizekey;
 var sizeScale;
 var logscalesize;
+var logscalecolor;
 
 function getColor(d){
 	var elem = d.getElementsByTagName(colorkey);
-	if (!elem.length) return undefined;
-	return	parseFloat($(elem).text()); 
+	if (!elem.length) return null;
+	var text = $(elem[0]).text();
+	var f = parseFloat(text);
+	if (logscalecolor && f<=0.) return null;
+	return	f; 
 }
 function color(d){
 	var elem = d.getElementsByTagName(colorkey);
@@ -383,7 +402,9 @@ function color(d){
 		if (text=="timing") return "yellow";
 		if (text=="microlensing") return "purple";
 	}else{
-		return d3.hsl(120.-colorScale(parseFloat(text)), 1, 0.5);
+		var f = parseFloat(text);
+		if (logscalecolor && f<=0.) return "#4D4D4D";
+		return d3.hsl(120.-colorScale(f), 1, 0.5);
 	}
 }
 
@@ -415,11 +436,15 @@ var updatePlot = function(){
 
 	var logscalex = d3.select("#logscalex").node().checked;
 	var logscaley = d3.select("#logscaley").node().checked;
-	var logscalecolor = d3.select("#logscalecolor").node().checked;
+	logscalecolor = d3.select("#logscalecolor").node().checked;
 	logscalesize = d3.select("#logscalesize").node().checked;
 
 	sizemax = parseFloat(d3.select("[name=sizemax]").node().value);
 
+	var xlabel = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].text;
+	var ylabel = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].text;
+	var colorlabel = d3.select("select[name=coloraxis]").node().options[d3.select("select[name=coloraxis]").node().selectedIndex].text;
+	var sizelabel = d3.select("select[name=sizeaxis]").node().options[d3.select("select[name=sizeaxis]").node().selectedIndex].text;
 	
 	var planets = planetsxml.filter(function(d,i) {
 		var discoverymethod = d.getElementsByTagName("discoverymethod");
@@ -530,6 +555,10 @@ var updatePlot = function(){
 		.on("mousemove", function(){
 			d3.select("#pop-up").style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
 		})
+		;
+
+
+	circle
 		.on("mouseover", function(d){
 			var name = $(d.getElementsByTagName("name")[0]).text();
 			var description = $(d.getElementsByTagName("description")[0]).text();
@@ -540,11 +569,19 @@ var updatePlot = function(){
 			}else{
 				d3.select("#pop-up-content").html("");
 			}
+			var values = "";
+			values += 			xlabel + ": " + $(d.getElementsByTagName(xkey)[0]).text()
+					+ "<br />" +	ylabel + ": " + $(d.getElementsByTagName(ykey)[0]).text();
+			if (colorkey!="none"&&getColor(d)){
+				values +=  "<br />" +	colorlabel + ": " + $(d.getElementsByTagName(colorkey)[0]).text();
+			}
+			if (sizekey!="none"&&size(d)){
+				values +=  "<br />" +	sizelabel + ": " + $(d.getElementsByTagName(sizekey)[0]).text();
+			}
+
+			$("#pop-up-values").html(values);
+
 		})
-		;
-
-
-	circle
 		.transition()
 		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
 		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
@@ -559,8 +596,6 @@ var updatePlot = function(){
 		.remove();
 
 
-	var xlabel = d3.select("select[name=xaxis]").node().options[d3.select("select[name=xaxis]").node().selectedIndex].text;
-	var ylabel = d3.select("select[name=yaxis]").node().options[d3.select("select[name=yaxis]").node().selectedIndex].text;
 	
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
