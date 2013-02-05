@@ -117,6 +117,7 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<select name="coloraxis" id="coloraxis" onchange="updatePlot();colorrangeUpdate();">
 		<option value="none">Constant</option>
 		<option value="discoverymethod">Discoverymethod</option>
+		<option value="numberofplanets">Number of planets in system</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option selected="selected" value="radius">Radius [RJup]</option>
@@ -402,6 +403,12 @@ var logscalesize;
 var logscalecolor;
 
 function getColorForDomain(d){
+	if (colorkey=="numberofplanets"){
+		var system = $(d).parents("system"); 
+		var f = $("planet",system).length;
+		if (logscalecolor && f<=0.) return null;
+		return f;
+	}
 	var elem = $(colorkey,d);
 	if (!elem.length) return null;
 	var text = elem.text();
@@ -410,6 +417,11 @@ function getColorForDomain(d){
 	return	f; 
 }
 function getColor(d){
+	if (colorkey=="numberofplanets"){
+		var system = $(d).parents("system"); 
+		var f = $("planet",system).length;
+		return d3.hsl(120.-colorScale(f), 1, 0.5);
+	}
 	var elem = $(colorkey,d);
 	if (!elem.length) return "gray";
 	var text = elem.text();
@@ -420,11 +432,10 @@ function getColor(d){
 		if (text=="timing") return "yellow";
 		if (text=="microlensing") return "purple";
 		return "gray";
-	}else{
-		var f = parseFloat(text);
-		if (logscalecolor && f<=0.) return "#eee";
-		return d3.hsl(120.-colorScale(f), 1, 0.5);
 	}
+	var f = parseFloat(text);
+	if (logscalecolor && f<=0.) return "#eee";
+	return d3.hsl(120.-colorScale(f), 1, 0.5);
 }
 
 function getSize(d){
