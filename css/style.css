@@ -9,10 +9,6 @@ body {
 	padding: 	0;
 }
 
-table {
-	empty-cells: show;
-}
-
 img {
 	border:			0px;
 	text-decoration:	none;
@@ -40,6 +36,10 @@ h1 img, h2 img {
 	top: 		3px;
 }
 
+label input {
+	margin-right:	0.5em;
+}
+
 .content {
 	margin-left: 	2em;
 	margin-right: 	2em;
@@ -55,9 +55,35 @@ h1 img, h2 img {
 	color:		#777;
 	font: 		0.9em;
 	margin-top: 	6px;
-	padding: 	10px 12px;
+	padding: 	10px 12px 10px 2em;
 	text-align: 	left;
 }
 .footer a {
 	text-decoration: none;
+}
+
+
+div #pop-up {
+	display: 	none;
+	position:	absolute;
+	color: 		white;
+	background: 	rgba(0,0,0,0.6);
+	padding: 	5px 10px 5px 10px;
+	-moz-border-radius: 8px 8px;
+	border-radius:	8px 8px;
+	width: 		16em;
+	font-size: 	12px;
+}
+div #pop-up-title {
+	font-size: 	15px;
+	width:		16em;
+	margin-bottom:	4px;
+	font-weight: 	bolder;
+}
+div #pop-up-description, div #pop-up-title {
+	margin-bottom:	4px;
+}
+div #pop-up-values span{
+	display: 	inline-block;
+	width: 		10.5em;
 }

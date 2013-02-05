@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<!-- If run on a server, you can include your own header that includes a navigation bar, etc -->
-<!-- ** start server side header ** -->
+<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
 <script language="php"> include "./.inc/header.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
 <head profile="http://www.w3.org/2005/10/profile">
 <link rel="icon" type="image/ico" href="favicon.ico" />
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
@@ -25,67 +25,28 @@ The plots shows a scatter plot of all discovered planets.
 Hover over a circle to see to which planet it corresponds. Click on it to view the planet's page.
 </p>
 
-
 <!-- ########################### -->
-<style type="text/css">
-label input {
-	margin-right:	0.5em;
-}
-#viz text {
-	font-family: 	sans-serif;
-	font-size: 	12px;
-}
-div#pop-up {
-	display: 	none;
-	position:	absolute;
-	color: 		white;
-	font-size: 	14px;
-	background: 	rgba(0,0,0,0.6);
-	padding: 	5px 10px 5px 10px;
-	-moz-border-radius: 8px 8px;
-	border-radius:	8px 8px;
-	width: 		16em;
-}
-div#pop-up-title {
-	font-size: 	15px;
-	width:		16em;
-	margin-bottom:	4px;
-	font-weight: 	bolder;
-}
-div#pop-up-content {
-	font-size: 	12px;
-}
-div#pop-up-values {
-	padding-top: 	8px;
-	font-size: 	12px;
-}
-div#pop-up-values span{
-	display: 	inline-block;
-	width: 		10.5em;
-}
-.spec{
-	vertical-align:	top;
-}
-</style>
-<!-- ########################### -->
-<div id="viz" style="float:left"></div>
+<div id="viz" style="float:left; font-size:12px;"></div>
 <div id="pop-up">
         <div id="pop-up-title">Title</div>
-        <div id="pop-up-content">Description</div>
+        <div id="pop-up-description">Description</div>
         <div id="pop-up-values">Values</div>
 </div>
 <!-- ########################### -->
 <div class="spacer"></div>
 <table cellspacing="0" summary="Settings" style="float:left">
+<thead>
 <tr>
 	<th scope="col" class="nobg"> </th>
-	<th scope="col" class="thname">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
+	<th scope="col">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
 </tr>
+</thead>
+<tbody>
 <tr>
-	<th rowspan="4" scope="row" class="spec">
+	<th rowspan="4" scope="row">
 		<label>x-axis</label>
 	</th>
-	<td class="data">
+	<td>
 		<select name="xaxis" id="xaxis" onchange="updatePlot()">
 		<option selected="selected" value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
@@ -99,27 +60,27 @@ div#pop-up-values span{
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="logscalex"><input checked="checked" name="logscale" type="checkbox" value="x" id="logscalex" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="xrangeauto"><input checked="checked" name="xrangeauto" type="checkbox" value="a" id="xrangeauto" onclick="xrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
-	<td class="data" id="xrangerow" style="display:none;">
+	<td id="xrangerow" style="display:none;">
 		range = [<input type="text" name="xrangel" size="8" value="0" onkeyup="xrangeUpdate()"/>,
 		<input type="text" name="xranger" size="8" value="0" onkeyup="xrangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
-	<th rowspan="4" class="spec" scope="row">
+	<th rowspan="4" scope="row">
 		<label>y-axis</label>
 	</th>
-	<td class="data">
+	<td>
 		<select name="yaxis" id="yaxis" onchange="updatePlot()">
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option selected="selected" value="mass">Mass [MJup]</option>
@@ -133,26 +94,26 @@ div#pop-up-values span{
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="logscaley"><input checked="checked" name="logscale" type="checkbox" value="y" id="logscaley" onclick="updatePlot()"/>Logarithmic scale</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="yrangeauto"><input checked="checked" name="yrangeauto" type="checkbox" value="a" id="yrangeauto" onclick="yrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
-	<td class="data" id="yrangerow" style="display:none;">
+	<td id="yrangerow" style="display:none;">
 		range = [<input type="text" name="yrangel" size="8" value="0" onkeyup="yrangeUpdate()"/>,
 		<input type="text" name="yranger" size="8" value="0" onkeyup="yrangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
-	<th rowspan="4" class="spec" scope="row">
+	<th rowspan="4" scope="row">
 		<label>Color</label>
 	</th>
-	<td class="data">
+	<td>
 		<select name="coloraxis" id="coloraxis" onchange="updatePlot();colorrangeUpdate();">
 		<option value="none">Constant</option>
 		<option value="discoverymethod">Discoverymethod</option>
@@ -168,27 +129,27 @@ div#pop-up-values span{
 	</td>
 </tr>
 <tr>
-	<td class="data" id="logscalecolorrow">
+	<td id="logscalecolorrow">
 		<label for="logscalecolor"><input name="logscalecolor" type="checkbox" value="color" id="logscalecolor" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
-	<td class="data" id="colorrangeautorow">
+	<td id="colorrangeautorow">
 		<label for="colorrangeauto"><input checked="checked" name="colorrangeauto" type="checkbox" value="a" id="colorrangeauto" onclick="colorrangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
-	<td class="data" id="colorrangerow" style="display:none;">
+	<td id="colorrangerow" style="display:none;">
 		range = [<input type="text" name="colorrangel" size="8" value="0" onkeyup="colorrangeUpdate()"/>,
 		<input type="text" name="colorranger" size="8" value="0" onkeyup="colorrangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
-	<th rowspan="5" class="spec" scope="row">
+	<th rowspan="5" scope="row">
 		<label>Point size</label>
 	</th>
-	<td class="data">
+	<td>
 		<select name="sizeaxis" id="sizeaxis" onchange="updatePlot();sizerangeUpdate();">
 		<option selected="selected" value="none">Constant</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
@@ -203,87 +164,88 @@ div#pop-up-values span{
 	</td>
 </tr>
 <tr>
-	<td class="data" id="logscalesizerow" style="display:none;">
+	<td id="logscalesizerow" style="display:none;">
 		<label for="logscalesize"><input name="logscalesize" type="checkbox" value="size" id="logscalesize" onclick="updatePlot()"/>Logarithmic scale</label>
 
 	</td>
 </tr>
 <tr>
-	<td class="data" id="sizerangeautorow" style="display:none;">
+	<td id="sizerangeautorow" style="display:none;">
 		<label for="sizerangeauto"><input checked="checked" name="sizerangeauto" type="checkbox" value="a" id="sizerangeauto" onclick="sizerangeUpdate()"/>Automatic range</label>
 	</td>
 </tr>
 <tr>
-	<td class="data" id="sizerangerow" style="display:none;">
+	<td id="sizerangerow" style="display:none;">
 		range = [<input type="text" name="sizerangel" size="8" value="0" onkeyup="sizerangeUpdate()"/>,
 		<input type="text" name="sizeranger" size="8" value="0" onkeyup="sizerangeUpdate()"/>]
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="sizemax">Maximum point size = <input type="text" name="sizemax" id="sizemax" size="3" value="4" onkeyup="sizerangeUpdate()"/></label>
 		
 	</td>
 </tr>
 <tr>
-	<th rowspan="6" class="spec" scope="row">
+	<th rowspan="6" scope="row">
 	Detection methods
 	</th>
-	<td class="data">
+	<td>
 		<label for="filter_transit"><input checked="checked" name="discoveryfilter" type="checkbox" value="transit" id="filter_transit" onclick="updatePlot()"/>Transiting planets</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="filter_rv"><input checked="checked" name="discoveryfilter" type="checkbox" value="RV" id="filter_rv" onclick="updatePlot()"/>Radial velocity planets</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="filter_microlensing"><input checked="checked" name="discoveryfilter" type="checkbox" value="microlensing" id="filter_microlensing" onclick="updatePlot()"/>Microlensing planets</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="filter_imaged"><input checked="checked" name="discoveryfilter" type="checkbox" value="imaging" id="filter_imaged" onclick="updatePlot()"/>Directly imaged planets</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="filter_timing"><input checked="checked" name="discoveryfilter" type="checkbox" value="timing" id="filter_timing" onclick="updatePlot()"/>Planets found by pulsar timing</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="filter_other"><input checked="checked" name="discoveryfilter" type="checkbox" value="" id="filter_other" onclick="updatePlot()"/>Planets found by other methods</label>
 	</td>
 </tr>
 <tr>
-	<th rowspan="3" class="spec" scope="row">
+	<th rowspan="3" scope="row">
 	Stellar multiplicity
 	</th>
-	<td class="data">
+	<td>
 		<label for="stellarmultiplicity_all"><input checked="checked" name="stellarmultiplicity" type="radio" value="all" id="stellarmultiplicity_all" onclick="updatePlot()"/>All planets</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="stellarmultiplicity_ptype"><input name="stellarmultiplicity" type="radio" value="ptype" id="stellarmultiplicity_circumbinary" onclick="updatePlot()"/>Only circumbinary planets, P-type</label>
 	</td>
 </tr>
 <tr>
-	<td class="data">
+	<td>
 		<label for="stellarmultiplicity_stype"><input name="stellarmultiplicity" type="radio" value="stype" id="stellarmultiplicity_stype" onclick="updatePlot()"/>Only planets around stars with<br />a wide binary companion, S-type</label>
 	</td>
 </tr>
 <tr>
-	<th rowspan="1" class="spec" scope="row">
+	<th rowspan="1" scope="row">
 	Export
 	</th>
-	<td class="data">
+	<td>
 		<input type="button" onclick="saveaspng()" value="Save plot as png file" />
 	</td>
 </tr>
+</tbody>
 </table>
 <!-- ########################### -->
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
@@ -291,6 +253,36 @@ div#pop-up-values span{
 <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript">
+// This specifies the data source.
+// github is fast and reliable. The file in this repository is always up-to-date.
+// github uses gzip compression which reduces the size of the entire database to only 100KB.
+// However, your browser must allow script to be loaded from other websites.
+//var source = "https://raw.github.com/hannorein/oec_iphone/master/data_iphone_9.1/systems.xml";
+// You can always load a file in the same directory. This also works with local files if you do
+// not have access to the internet. 
+var source = "systems.xml";
+
+// Load data and update plot for the first time.
+var xmldata = null;
+d3.xml(source, "application/xml", function(xml) {
+	xmldata = xml;
+	updatePlot(true);	
+});
+
+// Function to save the svg data (vector graphic) as a png file (bitmap). 
+// It draws the content to an HTML5 canvas and then redirects the bowser to a data url.
+function saveaspng(){
+	d3.select("body").append("canvas")
+		.attr("width",width)	
+		.attr("height",height)	
+		.attr("id","canvas")
+		.style("display","none")
+		;	
+	canvg('canvas', $("#viz").html());
+	window.location = document.getElementById("canvas").toDataURL("image/png");
+}
+
+// *** Setting up the SVG ***
 var width 	= 600;
 var height 	= 500;
 var paddingt 	= 10;
@@ -298,12 +290,13 @@ var paddingb 	= 35;
 var paddingl 	= 65;
 var paddingr 	= 10;
 
-var first 	= true;
 var viz = d3.select("#viz")
 	.append("svg")
 	.attr("width", width)
 	.attr("height", height)
 	;    
+
+// *** Setup Axis ***
 var gxaxis = viz.append("g")
 	.attr("transform", "translate(0," + (height - paddingb-paddingt) + ")");
 	;
@@ -322,18 +315,8 @@ var gyaxislabel = viz.append("text")
 	.attr("transform", "rotate(-90)")
 	;
 	
-function saveaspng(){
-	d3.select("body").append("canvas")
-		.attr("width",width)	
-		.attr("height",height)	
-		.attr("id","canvas")
-		.style("display","none")
-		;	
-	canvg('canvas', $("#viz").html());
-	var canvas = document.getElementById("canvas");
-	window.location = canvas.toDataURL("image/png");
-}
 	
+// *** Setup Domains ***
 var xDomain;
 var yDomain;
 var colorDomain;
@@ -341,27 +324,29 @@ var sizeDomain;
 var sizemax;
 
 function xrangeUpdate(){
-	if(d3.select("#xrangeauto").node().checked){
+	if($("#xrangeauto").is(":checked")){
 		$("#xrangerow").hide();
 		updatePlot();
 	}else{
 		$("#xrangerow").show();
-		var newxDomain = [ parseFloat(d3.select("[name=xrangel]").node().value), parseFloat(d3.select("[name=xranger]").node().value) ];
-		if (newxDomain[0]!=xDomain[0] || newxDomain[1]!=xDomain[1]){
-			xDomain = newxDomain;
+		var xrangel = $("input[name=xrangel]").val();
+		var xranger = $("input[name=xranger]").val();
+		if (xrangel!=xDomain[0] || xranger!=xDomain[1]){
+			xDomain = [xrangel,xranger];
 			updatePlot();
 		}
 	}
 }
 function yrangeUpdate(){
-	if(d3.select("#yrangeauto").node().checked){
+	if($("#yrangeauto").is(":checked")){
 		$("#yrangerow").hide();
 		updatePlot();
 	}else{
 		$("#yrangerow").show();
-		var newyDomain = [ parseFloat(d3.select("[name=yrangel]").node().value), parseFloat(d3.select("[name=yranger]").node().value) ];
-		if (newyDomain[0]!=yDomain[0] || newyDomain[1]!=yDomain[1]){
-			yDomain = newyDomain;
+		var yrangel = $("input[name=yrangel]").val();
+		var yranger = $("input[name=yranger]").val();
+		if (yrangel!=yDomain[0] || yranger!=yDomain[1]){
+			yDomain = [yrangel,yranger];
 			updatePlot();
 		}
 	}
@@ -416,27 +401,28 @@ var sizeScale;
 var logscalesize;
 var logscalecolor;
 
-function getColor(d){
-	var elem = d.getElementsByTagName(colorkey);
+function getColorForDomain(d){
+	var elem = $(colorkey,d);
 	if (!elem.length) return null;
-	var text = $(elem[0]).text();
+	var text = elem.text();
 	var f = parseFloat(text);
 	if (logscalecolor && f<=0.) return null;
 	return	f; 
 }
-function color(d){
-	var elem = d.getElementsByTagName(colorkey);
+function getColor(d){
+	var elem = $(colorkey,d);
 	if (!elem.length) return "gray";
-	var text = $(elem[0]).text();
+	var text = elem.text();
 	if (colorkey=="discoverymethod"){
 		if (text=="RV") return "red";
 		if (text=="transit") return "green";
 		if (text=="imaging") return "blue";
 		if (text=="timing") return "yellow";
 		if (text=="microlensing") return "purple";
+		return "gray";
 	}else{
 		var f = parseFloat(text);
-		if (logscalecolor && f<=0.) return "#4D4D4D";
+		if (logscalecolor && f<=0.) return "#eee";
 		return d3.hsl(120.-colorScale(f), 1, 0.5);
 	}
 }
@@ -460,7 +446,7 @@ function size(d){
 	return sizeScale(f);
 }
 
-var updatePlot = function(){ 
+var updatePlot = function(first){ 
 	var discoveryfilter = d3.selectAll("input[name=discoveryfilter]:checked");
 	var stellarmultiplicity = $("input:radio[name=stellarmultiplicity]:checked").val();
 
@@ -481,25 +467,21 @@ var updatePlot = function(){
 
 	sizemax = parseFloat($("#sizemax").val());
 
-	var planetsxml;
+	var planet;
 	switch(stellarmultiplicity){
 		case "all":
-			planetsxml = d3.select(xmldata).selectAll("planet")[0];
+			planets = $("planet",xmldata);
 			break;
 		case "ptype":
-			planetsxml = d3.select(xmldata).selectAll("binary > planet")[0];
+			planets = $("binary > planet",xmldata);
 			break;
 		case "stype":
-			planetsxml = d3.select(xmldata).selectAll("binary star planet")[0];
+			planets = $("binary > star > planet",xmldata);
 			break;
 	}
-	var planets = planetsxml.filter(function(d) {
-		var discoverymethod = d.getElementsByTagName("discoverymethod");
-		if (!discoverymethod.length){
-			discoverymethod = "";
-		}else{
-			discoverymethod = $(discoverymethod[0]).text();
-		}
+
+	var planetsFiltered = jQuery.grep(planets,function(d) {
+		var discoverymethod = $("discoverymethod",d).text();
 		var isInSelection = false;
 		discoveryfilter[0].forEach(function(d){
 			if(d.value==discoverymethod){
@@ -509,38 +491,38 @@ var updatePlot = function(){
 		if (!isInSelection){
 			return false;
 		}
-		var tagx = d.getElementsByTagName(xkey);
+		var tagx = $(xkey,d);
 		if(!tagx.length) return false;
-		if(logscalex && $(tagx[0]).text()<=0.) return false;
-		var tagy = d.getElementsByTagName(ykey);
+		if(logscalex && $(tagx).text()<=0.) return false;
+		var tagy = $(ykey,d);
 		if(!tagy.length) return false;
-		if(logscaley && $(tagy[0]).text()<=0.) return false;
+		if(logscaley && $(tagy).text()<=0.) return false;
 		return true;
 	});
-	if(d3.select("#xrangeauto").node().checked){
-		xDomain = d3.extent(planets, function(d) { 
+	if($("#xrangeauto").is(":checked")){
+		xDomain = d3.extent(planetsFiltered, function(d) { 
 				return	parseFloat($(d.getElementsByTagName(xkey)[0]).text()); 
 			});
-		d3.select("[name=xrangel]").node().value = xDomain[0];
-		d3.select("[name=xranger]").node().value = xDomain[1];
+		$("input[name=xrangel]").val(xDomain[0]);
+		$("input[name=xranger]").val(xDomain[1]);
 	}
 
-	if(d3.select("#yrangeauto").node().checked){
-		yDomain = d3.extent(planets, function(d) { 
+	if($("#yrangeauto").is(":checked")){
+		yDomain = d3.extent(planetsFiltered, function(d) { 
 				return	parseFloat($(d.getElementsByTagName(ykey)[0]).text()); 
 			});
-		d3.select("[name=yrangel]").node().value = yDomain[0];
-		d3.select("[name=yranger]").node().value = yDomain[1];
+		$("input[name=yrangel]").val(yDomain[0]);
+		$("input[name=yranger]").val(yDomain[1]);
 	}
 	if(d3.select("#colorrangeauto").node().checked){
-		colorDomain = d3.extent(planets, function(d) { 
-				return getColor(d); 
+		colorDomain = d3.extent(planetsFiltered, function(d) { 
+				return getColorForDomain(d); 
 			});
 		d3.select("[name=colorrangel]").node().value = colorDomain[0];
 		d3.select("[name=colorranger]").node().value = colorDomain[1];
 	}
 	if(d3.select("#sizerangeauto").node().checked){
-		sizeDomain = d3.extent(planets, function(d) { 
+		sizeDomain = d3.extent(planetsFiltered, function(d) { 
 				return getSize(d); 
 			});
 		d3.select("[name=sizerangel]").node().value = sizeDomain[0];
@@ -584,13 +566,13 @@ var updatePlot = function(){
 
 
   	var circle = viz.selectAll("circle")
-		.data(planets,function(d) {return $(d.getElementsByTagName("name")[0]).text(); });
+		.data(planetsFiltered,function(d) {return $("name:first",d).text(); });
 
 	circle.enter().append("circle")
-		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
-		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
+		.attr("cx", function(d) { return xScale($(xkey,d).text()); })
+		.attr("cy", function(d) { return yScale($(ykey,d).text()); })
 		.attr("r", function(d) {return size(d); })
-		.style("fill", function(d) { return color(d); })
+		.style("fill", function(d) { return getColor(d); })
 		.style("stroke", "black")
 		.style("opacity",(first?1:0))
 		.on("click", function(d) {
@@ -619,7 +601,7 @@ var updatePlot = function(){
 			var values = "";
 			values += 		 "<span>" +	xlabel + ":</span>" + $(d.getElementsByTagName(xkey)[0]).text()
 					+  "<br /><span>" +	ylabel + ":</span>" + $(d.getElementsByTagName(ykey)[0]).text();
-			if (colorkey!="none"&&getColor(d)){
+			if (colorkey!="none"&&getColorForDomain(d)){
 				values +=  "<br /><span>" +	colorlabel + ":</span>" + $(d.getElementsByTagName(colorkey)[0]).text();
 			}
 			if (sizekey!="none"&&size(d)){
@@ -631,10 +613,10 @@ var updatePlot = function(){
 		})
 		.transition()
 		.duration( (first?0:500) )
-		.attr("cx", function(d) { return xScale($(d.getElementsByTagName(xkey)[0]).text()); })
-		.attr("cy", function(d) { return yScale($(d.getElementsByTagName(ykey)[0]).text()); })
+		.attr("cx", function(d) { return xScale($(xkey,d).text()); })
+		.attr("cy", function(d) { return yScale($(ykey,d).text()); })
 		.attr("r", function(d) {return size(d); })
-		.style("fill", function(d) { return color(d); })
+		.style("fill", function(d) { return getColor(d); })
 		.style("opacity",1)
 		;
 
@@ -671,15 +653,7 @@ var updatePlot = function(){
 	gxaxislabel.text(xlabel);
 	gyaxislabel.text(ylabel);
 
-	first = false;
 };
-
-var xmldata = null;
-
-d3.xml("systems.xml", "application/xml", function(xml) {
-	xmldata = xml;
-	updatePlot();	
-});
 
     
 </script>
@@ -698,7 +672,7 @@ The data presented in this plot is taken from the <a href="https://github.com/ha
 </div> <!-- content -->
 <div class="clearer">&nbsp;</div>
 <div class="footer">
-The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself is licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
+The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself are licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
 </div> <!-- footer -->
 </div> <!-- inner container -->
 </div> <!-- outer container -->
