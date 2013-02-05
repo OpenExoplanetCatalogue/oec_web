@@ -1,0 +1,94 @@
+<script language="php">
+include "./.inc/header.php";
+</script>
+<link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
+<!-- ########################### -->
+<h2><img src="./img/database.png" alt="kig" />Correlation diagrams</h2>
+<p>This page is currently under development. 
+It uses the d3 javascript library to render correlation plots directly in your browser. 
+Once you've loaded this page, you can change the plot even without an internet connection.
+</p>
+
+
+<!-- ########################### -->
+<style type="text/css">
+label input {
+	margin-right:	0.5em;
+}
+.spec{
+	vertical-align:	top;
+}
+</style>
+<!-- ########################### -->
+<div id="viz" style="float:left"></div>
+<div id="pop-up">
+        <div id="pop-up-title">Title</div>
+        <div id="pop-up-content">Description</div>
+        <div id="pop-up-values">Values</div>
+</div>
+<!-- ########################### -->
+<div class="spacer"></div>
+<table cellspacing="0" summary="List of exoplanets" style="float:left">
+<thead>
+<tr>
+	<th scope="col" class="leftsorter">Planetary system<br /></th>
+	<th scope="col">Year of discovery</th>
+	<th scope="col">Number of<br />planets</th>
+</tr>
+</thead>
+<tbody id="systemtable">
+</tbody>
+</table>
+<!-- ########################### -->
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript">
+var first 	= true;
+
+var updateTable = function(){ 
+	var stellarmultiplicity = "all";
+	var planetsxml;
+	switch(stellarmultiplicity){
+		case "all":
+			planetsxml = $("planet",xmldata);
+			break;
+	}
+
+	var tr = d3.select("#systemtable").selectAll("tr")
+		.data(planetsxml)
+		.enter()
+		.append("tr");
+
+	tr.append("td")
+		.text(function(d,i){return $("name:first",d).text();})
+		;
+	tr.append("td")
+		.text(function(d,i){var system = $(d).parents("system"); return $("distance",system).text();})
+		;
+
+
+
+};
+
+var xmldata = null;
+
+d3.xml("systems.xml", "application/xml", function(xml) {
+	xmldata = xml;
+	updateTable();	
+});
+
+    
+</script>
+<div class="spacer" style="clear:left"></div>
+
+<!-- ########################### -->
+<h2><img src="./img/xml.png" alt="star" />Data download</h2>
+<p>
+The data presented in this plot is taken from the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page is directly generated from the XML files in the catalogue. If you are interested in how, look at the source code. You can download the entire catalogue on <a href="https://github.com/hannorein/open_exoplanet_catalogue/">github</a>. You can also find ASCII tables of the same catalogue <a href="https://github.com/hannorein/oec_tables/">in a separate repository</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+</p>
+<?
+include "./.inc/footer.php";
+?>
