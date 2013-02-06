@@ -1,5 +1,5 @@
 .header {
-	background: url('./img/header_n.jpg') no-repeat;
+	background: url('../img/header_n.jpg') no-repeat;
 	height: 250px;
 	margin-bottom: 0px;
 	text-align: right;
@@ -29,7 +29,7 @@
 .navigation {
 	padding-top: 50px;
 	padding-right: 30px;
-	background: #fff url('./img/header2.jpg') no-repeat;
+	background: #fff url('../img/header2.jpg') no-repeat;
 	float: left; 
 	width: 220px;
 }
