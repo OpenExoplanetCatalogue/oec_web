@@ -17,6 +17,10 @@ var pageTracker = _gat._getTracker("UA-6857673-3");
 pageTracker._trackPageview();
 } catch(err) {}</script>
 <!-- Google Analytics end -->
+<script type="text/javascript" src="./js/d3.v3.min.js"></script>
+<script type="text/javascript" src="./js/rgbcolor.js"></script> 
+<script type="text/javascript" src="./js/canvg.js"></script> 
+<script type="text/javascript" src="./js/jquery.min.js"></script>
 </head>
 <body>
 <div class="outer-container">
