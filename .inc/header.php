@@ -5,6 +5,7 @@
 <title>Open Exoplanet Catalogue</title>
 <link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="./css/servertyle.css" media="screen" />
 <!-- Google Analytics start -->
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
