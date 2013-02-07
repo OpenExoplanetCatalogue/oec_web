@@ -53,7 +53,10 @@ label input {
 	<th rowspan="7" scope="row">
 		<label>Available fields</label>
 	</th>
-	<td><label><input checked="checked" name="field" type="checkbox" value="name"  onclick="updateTable()"/>Planet name</label></td>
+	<td><label><input checked="checked" name="field" type="checkbox" value="name:first"  onclick="updateTable()"/>Planet name</label></td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="name" onclick="updateTable()"/>Planet name and all aliases</label> </td>
 </tr>
 <tr>
 	<td><label><input name="field" type="checkbox" value="discoveryyear" onclick="updateTable()"/>Discovery year</label> </td>
@@ -126,32 +129,23 @@ var updateTable = function(first){
 	th.exit().remove();
 
 	// Body
-	var tr = d3.select("#systemtablebody").selectAll("tr")
-		.data(planetsxml).enter().append("tr");
+	var tr = d3.select("#systemtablebody").selectAll("tr").data(planetsxml);
 
-	var tr = d3.select("#systemtablebody").selectAll("tr")
-		.data(planetsxml)
-		.each(function(planet){
-			var td = d3.select(this).selectAll("td")
-				.data(fields).enter().append("td")
-				;
-			
-			var td = d3.select(this).selectAll("td")
-				.data(fields)
-				;
+	tr.exit().remove();
+	
+	tr.enter().append("tr");
 
-			td.text(function(field){
-				return $($(field).val()+":first",planet).text();
-			})
-			;
-			td.exit()
-				.remove();
+	var td = tr.selectAll("td").data(fields);
 
-		})
-		;
+	td.exit().remove();
+	
+	td.enter().append("td");
+	
+	td	
+		.text(function(d) { 
+			return $($(d).val(), d3.select(this.parentNode).datum()).text(); 
+		});
 
-	tr.exit()
-		.remove();
 };
     
 </script>
