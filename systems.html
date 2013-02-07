@@ -1,14 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<!-- If run on a server, you can include your own header that includes a navigation bar, etc -->
-<!-- ** start server side header ** -->
+<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
 <script language="php"> include "./.inc/header.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
 <head profile="http://www.w3.org/2005/10/profile">
 <link rel="icon" type="image/ico" href="favicon.ico" />
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
 <title>Open Exoplanet Catalogue</title>
 <link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
+<script type="text/javascript" src="./js/d3.v3.min.js"></script>
+<script type="text/javascript" src="./js/rgbcolor.js"></script> 
+<script type="text/javascript" src="./js/canvg.js"></script> 
+<script type="text/javascript" src="./js/jquery.min.js"></script>
 </head>
 <body>
 <div class="outer-container">
@@ -16,7 +20,7 @@
 <div class="content">
 <!-- ** end server side header ** -->
 <script language="php"> } </script>
-
+<!-- ########################### -->
 <!-- ########################### -->
 <h2><img src="./img/database.png" alt="kig" />Correlation diagrams</h2>
 <p>
@@ -37,15 +41,48 @@ label input {
 </style>
 <!-- ########################### -->
 <div class="spacer"></div>
-<table cellspacing="0" summary="List of exoplanets">
+<table cellspacing="0" summary="Settings">
 <thead>
 <tr>
-	<th scope="col">Planetary system<br /></th>
-	<th scope="col">Year of discovery</th>
-	<th scope="col">Number of<br />planets</th>
+	<th scope="col" class="nobg"> </th>
+	<th scope="col">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
 </tr>
 </thead>
-<tbody id="systemtable">
+<tbody>
+<tr>
+	<th rowspan="7" scope="row">
+		<label>Available fields</label>
+	</th>
+	<td><label><input checked="checked" name="field" type="checkbox" value="name"  onclick="updateTable()"/>Planet name</label></td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="discoveryyear" onclick="updateTable()"/>Discovery year</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="mass" onclick="updateTable()"/>Mass [MJup]</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="radius" onclick="updateTable()"/>Radius [RJup]</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="discoverymethod" onclick="updateTable()"/>Discovery method</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="semimajoraxis" onclick="updateTable()"/>Semi-major axis [AU]</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="eccentricity" onclick="updateTable()"/>Eccentricity</label> </td>
+</tr>
+</tbody>
+</table>
+<!-- ########################### -->
+<div class="spacer">&nbsp;</div>
+<table cellspacing="0" summary="List of exoplanets">
+<thead>
+<tr id="systemtablehead">
+</tr>
+</thead>
+<tbody id="systemtablebody">
 </tbody>
 </table>
 <!-- ########################### -->
@@ -54,9 +91,22 @@ label input {
 <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript">
-var first 	= true;
+// This specifies the data source.
+// github is fast and reliable. The file in this repository is always up-to-date.
+// github uses gzip compression which reduces the size of the entire database to only 100KB.
+// However, your browser must allow script to be loaded from other websites.
+//var source = "https://raw.github.com/hannorein/oec_iphone/master/data_iphone_9.1/systems.xml";
+// You can always load a file in the same directory. This also works with local files if you do
+// not have access to the internet. 
+var source = "systems.xml";
 
-var updateTable = function(){ 
+var xmldata = null;
+d3.xml(source, "application/xml", function(xml) {
+	xmldata = xml;
+	updateTable(true);	
+});
+
+var updateTable = function(first){ 
 	var stellarmultiplicity = "all";
 	var planetsxml;
 	switch(stellarmultiplicity){
@@ -65,32 +115,48 @@ var updateTable = function(){
 			break;
 	}
 
-	var tr = d3.select("#systemtable").selectAll("tr")
+
+	var fields = $("input[name=field]:checked");
+	
+	// Header
+	var th = d3.select("#systemtablehead").selectAll("th")
+		.data(fields)
+
+	th.enter().append("th")
+		.attr("scope","column")
+		.text(function(d){
+			return $(d).parent().text();
+		});
+	th.exit().remove();
+
+	// Body
+	var tr = d3.select("#systemtablebody").selectAll("tr")
+		.data(planetsxml).enter().append("tr");
+
+	var tr = d3.select("#systemtablebody").selectAll("tr")
 		.data(planetsxml)
-		.enter()
-		.append("tr");
+		.each(function(planet){
+			var td = d3.select(this).selectAll("td")
+				.data(fields).enter().append("td")
+				;
+			
+			var td = d3.select(this).selectAll("td")
+				.data(fields)
+				;
 
-	tr.append("td")
-		.text(function(d,i){return $("name:first",d).text();})
+			td.text(function(field){
+				return $($(field).val()+":first",planet).text();
+			})
+			;
+			td.exit()
+				.remove();
+
+		})
 		;
-	tr.append("td")
-		.text(function(d,i){return $("discoveryyear",d).text();})
-		;
-	tr.append("td")
-		.text(function(d,i){var system = $(d).parents("system"); return $("planet",system).length;})
-		;
 
-
-
+	tr.exit()
+		.remove();
 };
-
-var xmldata = null;
-
-d3.xml("systems.xml", "application/xml", function(xml) {
-	xmldata = xml;
-	updateTable();	
-});
-
     
 </script>
 <div class="spacer" style="clear:left"></div>
@@ -103,14 +169,16 @@ The data presented in this plot is taken from the <a href="https://github.com/ha
 
 
 <!-- If run on a server, you can include your own footer  -->
-<!-- ** start server side header ** -->
 <script language="php"> include "./.inc/footer.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
 </div> <!-- content -->
 <div class="clearer">&nbsp;</div>
 <div class="footer">
-The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself is licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
+The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself are licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
 </div> <!-- footer -->
 </div> <!-- inner container -->
 </div> <!-- outer container -->
 </body>
 </html>
+<!-- ** end server side header ** -->
+<script language="php"> } </script> 
