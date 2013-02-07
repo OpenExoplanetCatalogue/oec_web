@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
+<script language="php"> include "./.inc/header.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+<head profile="http://www.w3.org/2005/10/profile">
+<link rel="icon" type="image/ico" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
+<title>Open Exoplanet Catalogue</title>
+<link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
+<script type="text/javascript" src="./js/d3.v3.min.js"></script>
+<script type="text/javascript" src="./js/rgbcolor.js"></script> 
+<script type="text/javascript" src="./js/canvg.js"></script> 
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+</head>
+<body>
+<div class="outer-container">
+<div class="inner-container">
+<div class="content">
+<!-- ** end server side header ** -->
+<script language="php"> } </script>
+<!-- ########################### -->
+<!-- ########################### -->
+<h2>Open Exoplanet Catalogue - HTML5 interface</h2>
+<p>
+	This page is currently under development. 
+	The following sites are already available.
+</p>
+<ul>
+	<li><a href="systems.html">systems.html</a>: An interactive tabel of all exoplanets.
+	<li><a href="correlations.html">correlations.html</a>: An interactive correlation plot.
+	<li><a href="histograms.html">histograms.html</a>: An interactive histogram plot.
+</ul>
+
+
+<!-- ########################### -->
+<h2><img src="./img/xml.png" alt="star" />Data download</h2>
+<p>
+The data presented in this plot is taken from the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page is directly generated from the XML files in the catalogue. If you are interested in how, look at the source code. You can download the entire catalogue on <a href="https://github.com/hannorein/open_exoplanet_catalogue/">github</a>. You can also find ASCII tables of the same catalogue <a href="https://github.com/hannorein/oec_tables/">in a separate repository</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+</p>
+
+
+<!-- If run on a server, you can include your own footer  -->
+<script language="php"> include "./.inc/footer.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+</div> <!-- content -->
+<div class="clearer">&nbsp;</div>
+<div class="footer">
+The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself are licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
+</div> <!-- footer -->
+</div> <!-- inner container -->
+</div> <!-- outer container -->
+</body>
+</html>
+<!-- ** end server side header ** -->
+<script language="php"> } </script> 
