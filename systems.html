@@ -50,7 +50,7 @@ label input {
 </thead>
 <tbody>
 <tr>
-	<th rowspan="7" scope="row">
+	<th rowspan="14" scope="row">
 		<label>Available fields</label>
 	</th>
 	<td><label><input checked="checked" name="field" type="checkbox" value="name:first"  onclick="updateTable()"/>Planet name</label></td>
@@ -75,6 +75,24 @@ label input {
 </tr>
 <tr>
 	<td><label><input name="field" type="checkbox" value="eccentricity" onclick="updateTable()"/>Eccentricity</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="numberofplanetsinsystem" onclick="updateTable()"/>Number of planets in system</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="numberofstarsinsystem" onclick="updateTable()"/>Number of stars in system</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="lastupdate" onclick="updateTable()"/>Last update [yy/mm/dd]</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="distance" onclick="updateTable()"/>Distance [pc]</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="rightascension" onclick="updateTable()"/>Right ascension [hh mm ss]</label> </td>
+</tr>
+<tr>
+	<td><label><input name="field" type="checkbox" value="declination" onclick="updateTable()"/>Declination [+-dd mm ss]</label> </td>
 </tr>
 </tbody>
 </table>
@@ -105,6 +123,29 @@ d3.xml(source, "application/xml", function(xml) {
 	updateTable(true);	
 });
 
+function getValueForPlanetAndKey(planet,key){
+	switch (key){
+		case "numberofplanetsinsystem":
+			var system = $(planet).parents("system");
+			return system.find("planet").length;
+		
+		case "numberofstarsinsystem":
+			var system = $(planet).parents("system");
+			return system.find("star").length;
+			
+		case "declination":
+		case "rightascension":
+		case "distance":
+			var system = $(planet).parents("system");
+			return $(key,system).text();
+
+		default:
+ 			return $(key,planet).text();
+	}
+}
+
+
+
 var updateTable = function(first){ 
 	var stellarmultiplicity = "all";
 	var planetsxml;
@@ -121,8 +162,8 @@ var updateTable = function(first){
 	var th = d3.select("#systemtablehead").selectAll("th")
 		.data(fields)
 
-	th.enter().append("th")
-		.attr("scope","column")
+	th.enter().append("th");
+	th.attr("scope","column")
 		.text(function(d){
 			return $(d).parent().text();
 		});
@@ -143,7 +184,7 @@ var updateTable = function(first){
 	
 	td	
 		.text(function(d) { 
-			return $($(d).val(), d3.select(this.parentNode).datum()).text(); 
+			return getValueForPlanetAndKey(d3.select(this.parentNode).datum(),$(d).val()); 
 		});
 
 };
