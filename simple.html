@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<script type="text/javascript" src="./js/d3.v3.min.js"></script>
+		<script type="text/javascript" src="./js/jquery.min.js"></script>
+	</head>
+	<body>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Mass [MJup]</th>
+				</tr>
+			</thead>
+			<tbody id="tablebody">
+			</tbody>
+		</table>
+		<script type="text/javascript">
+			d3.xml("systems.xml", "application/xml", function(xmldata) {
+				var planets = $("planet",xmldata);
+				var tr = d3.select("#tablebody").selectAll("tr").data(planets)
+					.enter().append("tr");
+				tr.append("td").text(function(planet){ return $("name:first",$(planet)).text(); });
+				tr.append("td").text(function(planet){ return $("mass",$(planet)).text(); });
+			});
+		</script>
+	</body>
+</html>
