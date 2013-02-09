@@ -45,7 +45,7 @@ label input {
 <thead>
 <tr>
 	<th scope="col" class="nobg"> </th>
-	<th scope="col">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
+	<th scope="col">Options<br/> <small>The table updates automatically when an option is changed.</small> </th>
 </tr>
 </thead>
 <tbody>
@@ -62,7 +62,7 @@ label input {
 	<td><label><input name="field" type="checkbox" value="discoveryyear" onclick="updateTable()"/>Discovery year</label> </td>
 </tr>
 <tr>
-	<td><label><input name="field" type="checkbox" value="mass" onclick="updateTable()"/>Mass [MJup]</label> </td>
+	<td><label><input checked="checked" name="field" type="checkbox" value="mass" onclick="updateTable()"/>Mass [MJup]</label> </td>
 </tr>
 <tr>
 	<td><label><input name="field" type="checkbox" value="radius" onclick="updateTable()"/>Radius [RJup]</label> </td>
@@ -71,7 +71,7 @@ label input {
 	<td><label><input name="field" type="checkbox" value="discoverymethod" onclick="updateTable()"/>Discovery method</label> </td>
 </tr>
 <tr>
-	<td><label><input name="field" type="checkbox" value="semimajoraxis" onclick="updateTable()"/>Semi-major axis [AU]</label> </td>
+	<td><label><input checked="checked" name="field" type="checkbox" value="semimajoraxis" onclick="updateTable()"/>Semi-major axis [AU]</label> </td>
 </tr>
 <tr>
 	<td><label><input name="field" type="checkbox" value="eccentricity" onclick="updateTable()"/>Eccentricity</label> </td>
@@ -93,6 +93,27 @@ label input {
 </tr>
 <tr>
 	<td><label><input name="field" type="checkbox" value="declination" onclick="updateTable()"/>Declination [+-dd mm ss]</label> </td>
+</tr>
+<tr>
+	<th rowspan="1" scope="row">
+		<label>Sort by</label>
+	</th>
+	<td>
+		<select name="sortby" id="sortby" onchange="updateTable();">
+		<option selected="selected" value="name">Name</option>
+		<option value="mass">Mass</option>
+		<option value="radius">Radius</option>
+		<option value="Discovery method">Discovery method</option>
+		<option value="semimajoraxis">Semi-major axis</option>
+		<option value="eccentricity">Eccentricity</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="lastupdate">Last update</option>
+		<option value="distance">Distance</option>
+		<option value="rightascension">Right ascension</option>
+		<option value="declination">Declination</option>
+		</select>
+	</td>
 </tr>
 </tbody>
 </table>
@@ -154,6 +175,9 @@ var updateTable = function(first){
 			planetsxml = $("planet",xmldata);
 			break;
 	}
+	
+	var sortbykey 	= $("#sortby option:selected").val();
+	//planetsxml.sort(function (planet){return getValueForPlanetAndKey(planet,sortbykey);});
 
 
 	var fields = $("input[name=field]:checked");
