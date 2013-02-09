@@ -121,7 +121,7 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<select name="coloraxis" id="coloraxis" onchange="updatePlot();colorrangeUpdate();">
 		<option value="none">Constant</option>
 		<option value="discoverymethod">Discoverymethod</option>
-		<option value="numberofplanets">Number of planets in system</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option selected="selected" value="radius">Radius [RJup]</option>
@@ -424,53 +424,36 @@ var sizeScale;
 var logscalesize;
 var logscalecolor;
 var i = 0;
-function getColorForDomain(d){
-	var val = getValueForPlanetAndKey(d,colorkey);
-	if (logscalecolor && val<=0.) return NaN;
-	return	val; 
-}
-function getColor(d){
-	var val = getValueForPlanetAndKey(d,colorkey);
-	if (logscalecolor && val<=0.) return NaN;
-	return	val; 
-	if (colorkey=="numberofplanets"){
-		var system = $(d).parents("system"); 
-		var f = $("planet",system).length;
-		return d3.hsl(120.-colorScale(f), 1, 0.5);
+
+function getColor(planet){
+	switch (colorkey){
+		case "discoverymethod":
+ 			var text = $(colorkey,planet).text();
+			if (text=="RV") return "red";
+			if (text=="transit") return "green";
+			if (text=="imaging") return "blue";
+			if (text=="timing") return "yellow";
+			if (text=="microlensing") return "purple";
+			return "gray";
+		default:
+			var val = getValueForPlanetAndKey(planet,colorkey);
+			if (isNaN(val)) return "gray";
+			if (logscalecolor && val<=0.) return "#eee";
+			return d3.hsl(120.-colorScale(val), 1, 0.5);
 	}
-	var elem = $(colorkey,d);
-	if (!elem.length) return "gray";
-	var text = elem.text();
-	if (colorkey=="discoverymethod"){
-		if (text=="RV") return "red";
-		if (text=="transit") return "green";
-		if (text=="imaging") return "blue";
-		if (text=="timing") return "yellow";
-		if (text=="microlensing") return "purple";
-		return "gray";
-	}
-	var f = parseFloat(text);
-	if (logscalecolor && f<=0.) return "#eee";
-	return d3.hsl(120.-colorScale(f), 1, 0.5);
+
 }
 
-function getSize(d){
-	if (sizekey=="none") return 1;
-	var elem = d.getElementsByTagName(sizekey);
-	if (!elem.length) return undefined;
-	var text = $(elem[0]).text();
-	var f = parseFloat(text);
-	if (logscalesize && f<=0.) return null;
-	return f;
-}
-function size(d){
-	if (sizekey=="none") return sizemax;
-	var elem = d.getElementsByTagName(sizekey);
-	if (!elem.length) return null;
-	var text = $(elem[0]).text();
-	var f = parseFloat(text);
-	if (logscalesize && f<=0.) return null;
-	return sizeScale(f);
+function getSize(planet){
+	switch (sizekey){
+		case "none":
+			return sizemax; // will set all points sizes to sizemax
+
+		default:
+			var val = getValueForPlanetAndKey(planet,colorkey);
+			if (isNaN(val)) return 0;
+			return sizeScale(val);
+	}
 }
 
 var updatePlot = function(first){ 
@@ -543,14 +526,14 @@ var updatePlot = function(first){
 	}
 	if(d3.select("#colorrangeauto").node().checked){
 		colorDomain = d3.extent(planetsFiltered, function(d) { 
-				return getColorForDomain(d); 
+				return getValueForPlanetAndKey(d,colorkey); 
 			});
 		d3.select("[name=colorrangel]").node().value = colorDomain[0];
 		d3.select("[name=colorranger]").node().value = colorDomain[1];
 	}
 	if(d3.select("#sizerangeauto").node().checked){
 		sizeDomain = d3.extent(planetsFiltered, function(d) { 
-				return getSize(d); 
+				return getValueForPlanetAndKey(d,sizekey); 
 			});
 		d3.select("[name=sizerangel]").node().value = sizeDomain[0];
 		d3.select("[name=sizeranger]").node().value = sizeDomain[1];
@@ -596,10 +579,10 @@ var updatePlot = function(first){
 		.data(planetsFiltered,function(d) {return $("name:first",d).text(); });
 
 	circle.enter().append("circle")
-		.attr("cx", function(d) { return xScale($(xkey,d).text()); })
-		.attr("cy", function(d) { return yScale($(ykey,d).text()); })
-		.attr("r", function(d) {return size(d); })
-		.style("fill", function(d) { return getColor(d); })
+		.attr("cx", 	function(d) { return xScale(getValueForPlanetAndKey(d,xkey)); })
+		.attr("cy", 	function(d) { return yScale(getValueForPlanetAndKey(d,ykey)); })
+		.attr("r",  	function(d) { return getSize(d); })
+		.style("fill", 	function(d) { return getColor(d); })
 		.style("stroke", "black")
 		.style("opacity",(first?1:0))
 		.on("click", function(d) {
@@ -626,13 +609,13 @@ var updatePlot = function(first){
 				d3.select("#pop-up-content").html("");
 			}
 			var values = "";
-			values += 		 "<span>" +	xlabel + ":</span>" + $(d.getElementsByTagName(xkey)[0]).text()
-					+  "<br /><span>" +	ylabel + ":</span>" + $(d.getElementsByTagName(ykey)[0]).text();
-			if (colorkey!="none"&&getColorForDomain(d)){
-				values +=  "<br /><span>" +	colorlabel + ":</span>" + $(d.getElementsByTagName(colorkey)[0]).text();
+			values += 		 "<span>" +	xlabel + ":</span>" + getValueForPlanetAndKey(d,xkey)
+					+  "<br /><span>" +	ylabel + ":</span>" + getValueForPlanetAndKey(d,ykey);
+			if (colorkey!="none"){
+				values +=  "<br /><span>" +	colorlabel + ":</span>" + getValueForPlanetAndKey(d,colorkey);
 			}
-			if (sizekey!="none"&&size(d)){
-				values +=  "<br /><span>" +	sizelabel + ":</span>" + $(d.getElementsByTagName(sizekey)[0]).text();
+			if (sizekey!="none"){
+				values +=  "<br /><span>" +	sizelabel + ":</span>" + getValueForPlanetAndKey(d,sizekey);
 			}
 
 			$("#pop-up-values").html(values);
@@ -640,10 +623,10 @@ var updatePlot = function(first){
 		})
 		.transition()
 		.duration( (first?0:500) )
-		.attr("cx", function(d) { return xScale($(xkey,d).text()); })
-		.attr("cy", function(d) { return yScale($(ykey,d).text()); })
-		.attr("r", function(d) {return size(d); })
-		.style("fill", function(d) { return getColor(d); })
+		.attr("cx", 	function(d) { return xScale(getValueForPlanetAndKey(d,xkey)); })
+		.attr("cy", 	function(d) { return yScale(getValueForPlanetAndKey(d,ykey)); })
+		.attr("r",  	function(d) { return getSize(d); })
+		.style("fill", 	function(d) { return getColor(d); })
 		.style("opacity",1)
 		;
 
