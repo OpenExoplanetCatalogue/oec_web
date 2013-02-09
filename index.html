@@ -22,24 +22,60 @@
 <script language="php"> } </script>
 <!-- ########################### -->
 <!-- ########################### -->
-<h2>Open Exoplanet Catalogue - HTML5 interface</h2>
+<h2>Open Exoplanet Catalogue</h2>
 <p>
-	This page is currently under development. 
-	The following sites are already available.
+	The Open Exoplanet Catalogue is a catalogue of all discovered extra-solar planets. 
+	It is a new kind of astronomical database, based on small text files and a distributed version control system. 
+	It is decentralized and completely open.
+	Contribution and corrections are welcome. 
+	The Open Exoplanet Catalogue is furthermore the only catalogue that can correctly represent the orbital structure of planets in arbitrary binary, triple and quadruple star systems as well as orphan planets.
+</p>
+
+<!-- ########################### -->
+<h2><img src="./img/xml.png" alt="star" />The XML file format and the version control system git</h2>
+<p>
+	The data in the Open Exoplanet Catalogue is stored in human readable XML files. 
+	There is one separate file for each planetary system.
+	The combination of small text files and a human readable file format makes the entire catalogue work smoothly with git, a popular version control system used to manage different versions of the catalogue.
+	If you are not familiar with git, you can simply ignore this. 
+	However, git allows you to keep your local databse in sync with the main repository on github. 
+	Furthermore, you can trace back all changes made to every parameter and find out who made a certain entry and on what date.
+	The git commit message usually includes the reference to the scientific paper where the data is taken from. 
+	Thus, you can therefore also  easily find the scientific reference for every value in the catalogue.
+</p>
+<p>
+	If you are more familiar with simple comma or tab-separated ASCII tables, you can find these in the <a href="https://github.com/hannorein/oec_tables/">oec_tables repository</a> on github. 
+	They contain mostly the same information as the XML files.
+	However, some information, especially in the case of a binary system cannot be easily represented in an ASCII table. 
+	You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+</p>
+<p>
+	If you want to learn how to parse XML fils with python to create plots from this catalogue, have a look at the <a href="https://github.com/hannorein/oec_plots/">oec_plots repository</a> on github. 
+</p>
+
+<!-- ########################### -->
+<h2><img src="./img/database.png" alt="star" />Data download</h2>
+<p>
+The main repository of the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a> is hosted on github.</p>
+<p>
+This website is just a front end. 
+You do not need to use it to access the database.
+You can even built your own front end.
+All information on this page is directly generated from the XML files in the catalogue. 
+If you are interested in how, look at the source code of each page or look at the <a href="https://github.com/hannorein/oec_web/">oec_web repository</a> on github. 
+</p>
+
+<!-- ########################### -->
+<h2><img src="./img/kig.png" alt="star" />Available tools on this website</h2>
+<p>
+This website is under development. And it probably will always be.
+The following list of pages are already working.
 </p>
 <ul>
-	<li><a href="systems.html">systems.html</a>: An interactive tabel of all exoplanets.
+	<li><a href="systems.html">systems.html</a>: An interactive table of all exoplanets.
 	<li><a href="correlations.html">correlations.html</a>: An interactive correlation plot.
 	<li><a href="histograms.html">histograms.html</a>: An interactive histogram plot.
 </ul>
-
-
-<!-- ########################### -->
-<h2><img src="./img/xml.png" alt="star" />Data download</h2>
-<p>
-The data presented in this plot is taken from the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page is directly generated from the XML files in the catalogue. If you are interested in how, look at the source code. You can download the entire catalogue on <a href="https://github.com/hannorein/open_exoplanet_catalogue/">github</a>. You can also find ASCII tables of the same catalogue <a href="https://github.com/hannorein/oec_tables/">in a separate repository</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
-</p>
-
 
 <!-- If run on a server, you can include your own footer  -->
 <script language="php"> include "./.inc/footer.php"; if (false){ </script> 

@@ -87,3 +87,7 @@ div #pop-up-values span{
 	display: 	inline-block;
 	width: 		10.5em;
 }
+
+.clearer {
+	clear: both;
+}
