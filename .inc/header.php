@@ -27,14 +27,14 @@ pageTracker._trackPageview();
 <div class="inner-container">
 <div class="header">
 <div class="title">
-<div class="name"><a href="./">The New Visual Exoplanet Catalogue</a></div>
-<div class="tag">a visualisation  toolkit for extrasolar planetary systems</div>
+<div class="name"><a href="./">Open Exoplanet Catalogue</a></div>
+<div class="tag">a new toolkit for extrasolar planets</div>
 </div> <!-- title -->
 </div> <!-- header -->
 <div class="navigation">
 <h2>Catalogue</h2>
 <ul>
-<li><a href="./systems.html">All exoplanetary systems</a></li>
+<li><a href="./systems.html">All extrasolar planets</a></li>
 </ul>
 
 <!--
