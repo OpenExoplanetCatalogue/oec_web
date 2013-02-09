@@ -60,6 +60,8 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="temperature">Temperature [K]</option>
 		<option value="inclination">Inclination [deg]</option>
 		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
 		</select>
 	</td>
 </tr>
@@ -94,6 +96,8 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="temperature">Temperature [K]</option>
 		<option value="inclination">Inclination [deg]</option>
 		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
 		</select>
 	</td>
 </tr>
@@ -121,7 +125,6 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<select name="coloraxis" id="coloraxis" onchange="updatePlot();colorrangeUpdate();">
 		<option value="none">Constant</option>
 		<option value="discoverymethod">Discoverymethod</option>
-		<option value="numberofplanetsinsystem">Number of planets in system</option>
 		<option value="semimajoraxis">Semi-major axis [AU]</option>
 		<option value="mass">Mass [MJup]</option>
 		<option selected="selected" value="radius">Radius [RJup]</option>
@@ -130,6 +133,8 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="temperature">Temperature [K]</option>
 		<option value="inclination">Inclination [deg]</option>
 		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
 		</select>
 	</td>
 </tr>
@@ -165,6 +170,8 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="temperature">Temperature [K]</option>
 		<option value="inclination">Inclination [deg]</option>
 		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
 		</select>
 	</td>
 </tr>
@@ -450,7 +457,7 @@ function getSize(planet){
 			return sizemax; // will set all points sizes to sizemax
 
 		default:
-			var val = getValueForPlanetAndKey(planet,colorkey);
+			var val = getValueForPlanetAndKey(planet,sizekey);
 			if (isNaN(val)) return 0;
 			return sizeScale(val);
 	}
@@ -501,12 +508,12 @@ var updatePlot = function(first){
 		if (!isInSelection){
 			return false;
 		}
-		var tagx = $(xkey,d);
-		if(!tagx.length) return false;
-		if(logscalex && $(tagx).text()<=0.) return false;
-		var tagy = $(ykey,d);
-		if(!tagy.length) return false;
-		if(logscaley && $(tagy).text()<=0.) return false;
+		var valx = getValueForPlanetAndKey(d,xkey);
+		if(isNaN(valx)) return false;
+		if(logscalex && valx<=0.) return false;
+		var valy = getValueForPlanetAndKey(d,ykey);
+		if(isNaN(valy)) return false;
+		if(logscaley && valy<=0.) return false;
 		return true;
 	});
 	if($("#xrangeauto").is(":checked")){
@@ -604,9 +611,9 @@ var updatePlot = function(first){
 			d3.select("#pop-up").style("display","inline");
 			d3.select("#pop-up-title").html(name);
 			if (description){
-				d3.select("#pop-up-content").html(description);
+				d3.select("#pop-up-description").html(description);
 			}else{
-				d3.select("#pop-up-content").html("");
+				d3.select("#pop-up-description").html("");
 			}
 			var values = "";
 			values += 		 "<span>" +	xlabel + ":</span>" + getValueForPlanetAndKey(d,xkey)
