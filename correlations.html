@@ -270,6 +270,28 @@ d3.xml(source, "application/xml", function(xml) {
 	updatePlot(true);	
 });
 
+// Function returning the value specified by key for a given planet 
+function getValueForPlanetAndKey(planet,key){
+	switch (key){
+		case "numberofplanetsinsystem":
+			var system = $(planet).parents("system");
+			return system.find("planet").length;
+		
+		case "numberofstarsinsystem":
+			var system = $(planet).parents("system");
+			return system.find("star").length;
+			
+		case "declination":
+		case "rightascension":
+		case "distance":
+			var system = $(planet).parents("system");
+			return parseFloat($(key,system).text());
+
+		default:
+ 			return parseFloat($(key,planet).text());
+	}
+}
+
 // Function to save the svg data (vector graphic) as a png file (bitmap). 
 // It draws the content to an HTML5 canvas and then redirects the bowser to a data url.
 function saveaspng(){
@@ -401,22 +423,16 @@ var sizekey;
 var sizeScale;
 var logscalesize;
 var logscalecolor;
-
+var i = 0;
 function getColorForDomain(d){
-	if (colorkey=="numberofplanets"){
-		var system = $(d).parents("system"); 
-		var f = $("planet",system).length;
-		if (logscalecolor && f<=0.) return null;
-		return f;
-	}
-	var elem = $(colorkey,d);
-	if (!elem.length) return null;
-	var text = elem.text();
-	var f = parseFloat(text);
-	if (logscalecolor && f<=0.) return null;
-	return	f; 
+	var val = getValueForPlanetAndKey(d,colorkey);
+	if (logscalecolor && val<=0.) return NaN;
+	return	val; 
 }
 function getColor(d){
+	var val = getValueForPlanetAndKey(d,colorkey);
+	if (logscalecolor && val<=0.) return NaN;
+	return	val; 
 	if (colorkey=="numberofplanets"){
 		var system = $(d).parents("system"); 
 		var f = $("planet",system).length;
@@ -512,7 +528,7 @@ var updatePlot = function(first){
 	});
 	if($("#xrangeauto").is(":checked")){
 		xDomain = d3.extent(planetsFiltered, function(d) { 
-				return	parseFloat($(d.getElementsByTagName(xkey)[0]).text()); 
+				return getValueForPlanetAndKey(d,xkey);
 			});
 		$("input[name=xrangel]").val(xDomain[0]);
 		$("input[name=xranger]").val(xDomain[1]);
@@ -520,7 +536,7 @@ var updatePlot = function(first){
 
 	if($("#yrangeauto").is(":checked")){
 		yDomain = d3.extent(planetsFiltered, function(d) { 
-				return	parseFloat($(d.getElementsByTagName(ykey)[0]).text()); 
+				return getValueForPlanetAndKey(d,ykey);
 			});
 		$("input[name=yrangel]").val(yDomain[0]);
 		$("input[name=yranger]").val(yDomain[1]);
