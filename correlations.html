@@ -62,6 +62,9 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="discoveryyear">Discoveryyear</option>
 		<option value="numberofplanetsinsystem">Number of planets in system</option>
 		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
 		</select>
 	</td>
 </tr>
@@ -98,6 +101,9 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="discoveryyear">Discoveryyear</option>
 		<option value="numberofplanetsinsystem">Number of planets in system</option>
 		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
 		</select>
 	</td>
 </tr>
@@ -135,6 +141,9 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="discoveryyear">Discoveryyear</option>
 		<option value="numberofplanetsinsystem">Number of planets in system</option>
 		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
 		</select>
 	</td>
 </tr>
@@ -172,6 +181,9 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="discoveryyear">Discoveryyear</option>
 		<option value="numberofplanetsinsystem">Number of planets in system</option>
 		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
 		</select>
 	</td>
 </tr>
@@ -277,6 +289,7 @@ d3.xml(source, "application/xml", function(xml) {
 	updatePlot(true);	
 });
 
+
 // Function returning the value specified by key for a given planet 
 function getValueForPlanetAndKey(planet,key){
 	switch (key){
@@ -290,6 +303,10 @@ function getValueForPlanetAndKey(planet,key){
 			
 		case "declination":
 		case "rightascension":
+			var system = $(planet).parents("system");
+			var vals = $(key,system).text().split(" ");
+			return parseFloat(vals[0]) + parseFloat(vals[1])/60. + parseFloat(vals[2])/3600.;
+
 		case "distance":
 			var system = $(planet).parents("system");
 			return parseFloat($(key,system).text());
