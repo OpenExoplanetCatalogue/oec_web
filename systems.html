@@ -94,6 +94,7 @@ label input {
 <tr>
 	<td><label><input name="field" type="checkbox" value="declination" onclick="updateTable()"/>Declination [+-dd mm ss]</label> </td>
 </tr>
+<!--
 <tr>
 	<th rowspan="1" scope="row">
 		<label>Sort by</label>
@@ -115,6 +116,7 @@ label input {
 		</select>
 	</td>
 </tr>
+-->
 </tbody>
 </table>
 <!-- ########################### -->
@@ -169,15 +171,19 @@ function getValueForPlanetAndKey(planet,key){
 
 var updateTable = function(first){ 
 	var stellarmultiplicity = "all";
-	var planetsxml;
+	var planets;
 	switch(stellarmultiplicity){
 		case "all":
-			planetsxml = $("planet",xmldata);
+			planets = $("planet",xmldata);
 			break;
 	}
 	
-	var sortbykey 	= $("#sortby option:selected").val();
-	//planetsxml.sort(function (planet){return getValueForPlanetAndKey(planet,sortbykey);});
+//	var sortbykey 	= $("#sortby option:selected").val();
+//	planets.sort(function (planet1,planet2){
+//			var val1 = parseFloat(getValueForPlanetAndKey(planet1,sortbykey));
+//			var val2 = parseFloat(getValueForPlanetAndKey(planet2,sortbykey));
+//			return (val1>val2);
+//	});
 
 
 	var fields = $("input[name=field]:checked");
@@ -194,7 +200,7 @@ var updateTable = function(first){
 	th.exit().remove();
 
 	// Body
-	var tr = d3.select("#systemtablebody").selectAll("tr").data(planetsxml);
+	var tr = d3.select("#systemtablebody").selectAll("tr").data(planets);
 
 	tr.exit().remove();
 	
