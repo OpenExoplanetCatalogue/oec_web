@@ -501,7 +501,7 @@ var updatePlot = function(first){
 
 	sizemax = parseFloat($("#sizemax").val());
 
-	var planet;
+	var planets;
 	switch(stellarmultiplicity){
 		case "all":
 			planets = $("planet",xmldata);
@@ -513,8 +513,10 @@ var updatePlot = function(first){
 			planets = $("binary > star > planet",xmldata);
 			break;
 	}
-
-	var planetsFiltered = jQuery.grep(planets,function(d) {
+	var planetsCache =  Array();
+	var planetsFilteredN = 0;
+	
+	var planetsFiltered = jQuery.grep(planets,function(d,i) {
 		var discoverymethod = $("discoverymethod",d).text();
 		var isInSelection = false;
 		discoveryfilter[0].forEach(function(d){
@@ -531,19 +533,21 @@ var updatePlot = function(first){
 		var valy = getValueForPlanetAndKey(d,ykey);
 		if(isNaN(valy)) return false;
 		if(logscaley && valy<=0.) return false;
+		planetsCache[planetsFilteredN] = [valx,valy];
+		planetsFilteredN = planetsFilteredN + 1;
 		return true;
 	});
 	if($("#xrangeauto").is(":checked")){
-		xDomain = d3.extent(planetsFiltered, function(d) { 
-				return getValueForPlanetAndKey(d,xkey);
+		xDomain = d3.extent(planetsFiltered, function(d,i) { 
+				return planetsCache[i][0];
 			});
 		$("input[name=xrangel]").val(xDomain[0]);
 		$("input[name=xranger]").val(xDomain[1]);
 	}
 
 	if($("#yrangeauto").is(":checked")){
-		yDomain = d3.extent(planetsFiltered, function(d) { 
-				return getValueForPlanetAndKey(d,ykey);
+		yDomain = d3.extent(planetsFiltered, function(d,i) { 
+				return planetsCache[i][1];
 			});
 		$("input[name=yrangel]").val(yDomain[0]);
 		$("input[name=yranger]").val(yDomain[1]);
@@ -603,8 +607,8 @@ var updatePlot = function(first){
 		.data(planetsFiltered,function(d) {return $("name:first",d).text(); });
 
 	circle.enter().append("circle")
-		.attr("cx", 	function(d) { return xScale(getValueForPlanetAndKey(d,xkey)); })
-		.attr("cy", 	function(d) { return yScale(getValueForPlanetAndKey(d,ykey)); })
+		.attr("cx", 	function(d,i) { return xScale(planetsCache[i][0]); })
+		.attr("cy", 	function(d,i) { return yScale(planetsCache[i][1]); })
 		.attr("r",  	function(d) { return getSize(d); })
 		.style("fill", 	function(d) { return getColor(d); })
 		.style("stroke", "black")
@@ -647,8 +651,8 @@ var updatePlot = function(first){
 		})
 		.transition()
 		.duration( (first?0:500) )
-		.attr("cx", 	function(d) { return xScale(getValueForPlanetAndKey(d,xkey)); })
-		.attr("cy", 	function(d) { return yScale(getValueForPlanetAndKey(d,ykey)); })
+		.attr("cx", 	function(d,i) { return xScale(planetsCache[i][0]); })
+		.attr("cy", 	function(d,i) { return yScale(planetsCache[i][1]); })
 		.attr("r",  	function(d) { return getSize(d); })
 		.style("fill", 	function(d) { return getColor(d); })
 		.style("opacity",1)
