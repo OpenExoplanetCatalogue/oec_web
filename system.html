@@ -1,0 +1,493 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
+<script language="php"> include "./.inc/header.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+<head profile="http://www.w3.org/2005/10/profile">
+<link rel="icon" type="image/ico" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
+<title>Open Exoplanet Catalogue</title>
+<link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
+<script type="text/javascript" src="./js/d3.v3.min.js"></script>
+<script type="text/javascript" src="./js/rgbcolor.js"></script> 
+<script type="text/javascript" src="./js/canvg.js"></script> 
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="./js/jquery.tablesorter.min.js"></script> 
+</script>
+</head>
+<body>
+<div class="outer-container">
+<div class="inner-container">
+<div class="content">
+<!-- ** end server side header ** -->
+<script language="php"> } </script>
+<!-- ########################### -->
+<!-- ########################### -->
+<?
+				
+$filenamebase 	= preg_replace("/[^a-z0-9. \d+\d-]+/i","",$_REQUEST['id']).".xml";
+$filename 	= "open_exoplanet_catalogue/systems/".$filenamebase;
+if (!file_exists($filename)){
+	/// Failsafe
+	$failsafeworked = 0;
+	$filenames = glob('open_exoplanet_catalogue/systems/*.xml', GLOB_BRACE);
+	foreach($filenames as $filename){
+		$system 	= simplexml_load_file($filename);
+		$planets 	= $system->xpath('.//planet');
+		foreach($planets as $planet){
+			$names = $planet->name;
+			foreach($names as $name){
+				if (strcasecmp($name,$_REQUEST['id'])==0){
+					$failsafeworked = 1;
+					break 3;
+				}
+			}
+		}
+	}
+	if ($failsafeworked==0){
+		echo "System not found: ".($_REQUEST['id']);
+		exit(0);
+	}
+}
+
+$requestname 	= basename($filename,".xml");
+$system 	= simplexml_load_file($filename);
+$names 		= $system->xpath('./name');
+$stars 		= $system->xpath('.//star');
+$planets	= $system->xpath('.//planet');
+$ra = explode(" ",$system->rightascension);
+$raf = $ra[0]; $raf += 1.0/60.0 * $ra[1]; $raf += 1.0/(60.0*60.0) * $ra[2]; 
+$dec = explode(" ",$system->declination);
+$decf = $dec[0]; $decf<=0.?$sign=1.:$sign=-1.; $decf += $sign/60.0 * $dec[1]; $decf += $sign/(60.0*60.0) * $dec[2]; 
+?>
+
+
+<!-- ########################### -->
+<!-- ########################### -->
+<div style="width:50em;">
+	<div style="float:right;">
+		<iframe src="http://www.facebook.com/plugins/like.php?href=<?
+		$url = "http://exoplanet.hanno-rein.de/system.php?id=".urlencode($system->name);
+		print urlencode($url);
+		?>&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:25em; height:25px; padding-top:0.9em;" allowTransparency="true">
+		</iframe>
+	</div>
+</div>
+<h1><?=$system->name?></h1>
+<p>
+<?if (count($planets)==1){?>
+	The planetary system <?=$system->name?> hosts at least one planet.
+<?}?>
+<?if (count($planets)>1){?>
+	The planetary system <?=$system->name?> hosts at least <?=count($planets)?> planets.
+<?}?>
+<?if (count($stars)>1){?>
+	Note that the system is a multiple star system. It hosts at least <?=count($stars)?> stellar components.
+<?}?>
+<?if (count($stars)==0){?>
+	The planet is a so called orphan planet and not associated with any star.
+<?}?>
+</p>
+<p>
+<?if (count($planets)==1&&count($stars)<2){?>
+	<?=$planets[0]->description?>
+<?}?>
+</p>
+
+<div class="spacer"></div>
+
+
+<table cellspacing="0" summary="Details of the planetary system">
+<tr>
+	<th scope="col" class="nobg">&nbsp;</th>
+	<th scope="col">System parameters</th>
+</tr>
+<tr>
+	<th scope="row">Name</th>
+	<td><?=$names[0]?></td>
+</tr>
+	<?
+		foreach(array_slice($names,1) as $name){
+			?>
+			<tr>
+				<th scope="row">Alternative name</th>
+				<td><?=$system->name?></td>
+			</tr>
+			<?
+		}
+	?>
+<tr>
+	<th scope="row">Right ascension</th>
+	<td><?=($ra[0]?$ra[0]."h ".$ra[1]."m ".$ra[2]."s":"")?></td>
+<tr>
+</tr>
+	<th scope="row">Declination</th>
+	<td><?=($dec[0]?$dec[0]."&deg; ".$dec[1]."' ".$dec[2]."\"":"")?></td>
+</tr>
+</tr>
+	<th scope="row">Distance [parsec]</th>
+	<td><?=$system->distance?></td>
+</tr>
+</tr>
+	<th scope="row">Distance [lightyears]</th>
+	<td><?=($system->distance?sprintf("%.1f",(float)($system->distance)*3.261):"")?></td>
+</tr>
+</tr>
+	<th scope="row">Number of stars in system</th>
+	<td><?=count($stars)?></td>
+</tr>
+</tr>
+	<th scope="row">Number of planets in system</th>
+	<td><?=count($planets)?></td>
+</tr>
+</table>
+
+
+<!-- ########################### -->
+<?if($planets[0]->image){?>
+<h2><img src="./img/photo.png" alt="Image" />Image</h2>
+<a href='./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'><div style="background-image: url('./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'); width:50em; height:15em; background-position:center;">&nbsp;</div></a>
+<p>
+<?=htmlentities($planets[0]->imagedescription)?> Click on the image to get a higher resolution image.
+</p>
+<?}?>
+
+
+<!-- ########################### -->
+<h2><img src="./img/binary.png" alt="Architecture" />Architecture of the system</h2>
+<p>
+This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
+<?if(count($stars)>1){?>
+Note that <?=$system->name?> is binary system. The list can be used to infer which planet is orbiting which star and whether it is a S- or P-type orbit. 
+<?}else{?>
+<?=$system->name?> is not binary system, so the architecture is rather simple. 
+<?}?>
+</p>
+<?
+function printSubSystem($o,$type=0){
+	if ($type==1){
+		print "<ul style=\"padding: 0; margin: 0;\">";
+	}else{
+		print "<ul style=\"padding-left: 1em; margin-left: 1em;\">";
+	}
+	$binaries = $o->binary;
+	foreach ($binaries as $binary){
+		print "<li><img src=\"./img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
+		if ($binary->semimajoraxis){
+			print ", semi-major axis: ".$binary->semimajoraxis." AU";
+		}
+		if ($binary->period){
+			if ((float)$bianry->period>1000){
+				print ", period: ".((float)($binary->period)*0.002737909)." years";
+			}else{
+				print ", period: ".$binary->period." days";
+			}
+		}
+		printSubSystem($binary,2);
+	}
+	$stars = $o->star;
+	foreach ($stars as $star){
+		print "<li><img src=\"./img/star.png\" width=\"16\" height=\"16\" />&nbsp;".$star->name.", stellar object";
+		printSubSystem($star);
+	}
+	$planets = $o->planet;
+	foreach ($planets as $planet){
+		print "<li><img src=\"./img/planet.png\" width=\"16\" height=\"16\" />&nbsp;".$planet->name;
+		if ($type==0){
+			print ", planet";
+		}
+		if ($type==1){
+			print ", orphan planet";
+		}
+		if ($type==2){
+			print ", circumbinary planet, P-type";
+		}
+		if ($planet->semimajoraxis){
+			print ", semi-major axis: ".$planet->semimajoraxis." AU";
+		}
+		printSubSystem($planet);
+	}
+	print "</ul>";
+}
+printSubSystem($system,1);
+?>
+
+
+
+<!-- ########################### -->
+<?if($system->videolink){?>
+<h2><img src="./img/movie.png" alt="Video" />Video</h2>
+<p>This video shows the planetary system <?=$system->name?>. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
+<iframe width="640" height="360" src="http://www.youtube.com/embed/<?=end(explode("/",$system->videolink))?>?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>
+<?}?>
+
+
+<!-- ########################### -->
+<h2><img src="./img/planet.png" alt="Planets" />Planets in the system</h2>
+<p>This table lists all planets in the system <?=$system->name?>. If a row is empty, no data is available</p>
+<?
+$maxcol = 2;
+$planetcolumnmaxwidth = 17;
+if (count($planets)<2){
+	$planetcolumnmaxwidth = 34;
+}
+for ($r=0;$r<count($planets);$r+=$maxcol){
+	$_planets = array_slice($planets,$r,$maxcol);
+?>
+<table cellspacing="0" summary="Details of the planetary system" style="padding-bottom: 2em;">
+<tr>
+	<th scope="col" class="nobg">&nbsp;</th>
+	<?foreach($_planets as $planet){?>
+		<th scope="col"><?=$planet->name?></th>
+	<?}?>
+</tr>
+<tr>
+	<th valign="top" scope="row">Alternative names</th>
+	<?foreach($_planets as $planet){
+		$names = $planet->name;
+		?>
+		<td valign="top">
+		<?for($i=1;$i<count($names);$i++){
+			print $names[$i];
+			if ($i<count($names)-1) print "<br />";
+		}?>
+		</td>
+	<?}?>
+</tr>
+<tr>
+	<th valign="top" scope="row">Description and Trivia</th>
+	<?foreach($_planets as $planet){?>
+		<td valign="top"><div style="max-width: <?=$planetcolumnmaxwidth?>em;"><?=$planet->description?></div></td>
+	<?}?>
+</tr>
+<tr>
+	<th valign="top" scope="row">Lists</th>
+	<?foreach($_planets as $planet){
+		$lists = $planet->list;
+		?>
+		<td valign="top">
+		<?for($i=0;$i<count($lists);$i++){
+			print $lists[$i];
+			if ($i<count($lists)-1) print "<br />";
+		}?>
+		</td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Mass [M<sub>Jup</sub>]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->mass?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Mass [M<sub>Earth</sub>]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=($planet->mass?(float)($planet->mass)*317.89:"")?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Orbital period [days]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->period?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Semi-major axis [AU]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->semimajoraxis?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Eccentricity</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->eccentricity?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Radius [R<sub>Jup</sub>]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->radius?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Radius [R<sub>Earth</sub>]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=($planet->radius?(float)($planet->radius)*10.9732:"")?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Temperature [K]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->temperature?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Discovery method</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->discoverymethod?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Discovery year</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->discoveryyear?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Last updated [yy/mm/dd]</th>
+	<?foreach($_planets as $planet){?>
+		<td><?=$planet->lastupdate?></td>
+	<?}?>
+</tr>
+</table>
+<?}?>
+
+<!-- ########################### -->
+<?if (count($stars)>0){?>
+<h2><img src="./img/help-about.png" alt="star" />Stars in the system</h2>
+<p>This table lists all stars in the system <?=$system->name?>. If a row is empty, no data is available</p>
+<table cellspacing="0" summary="Details of the stars in the system">
+<tr>
+	<th scope="col" class="nobg">&nbsp;</th>
+	<?foreach($stars as $star){?>
+		<th scope="col"><?=$star->name?></th>
+	<?}?>
+</tr>
+<tr>
+	<th valign="top" scope="row">Alternative names</th>
+	<?foreach($stars as $star){
+		$names = $star->name;
+		?>
+		<td valign="top">
+		<?for($i=1;$i<count($names);$i++){
+			print $names[$i];
+			if ($i<count($names)-1) print "<br />";
+		}?>
+		</td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Mass [M<sub>Sun</sub>]</th>
+	<?foreach($stars as $star){?>
+		<td><?=$star->mass?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Radius [R<sub>Sun</sub>]</th>
+	<?foreach($stars as $star){?>
+		<td><?=$star->radius?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Age [Gyr]</th>
+	<?foreach($stars as $star){?>
+		<td><?=$star->age?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Metallicity [Fe/H]</th>
+	<?foreach($stars as $star){?>
+		<td><?=$star->metallicity?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Spectral type</th>
+	<?foreach($stars as $star){?>
+		<td><?=$star->spectraltype?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Temperature</th>
+	<?foreach($stars as $star){?>
+		<td><?=$star->temperature?></td>
+	<?}?>
+</tr>
+<tr>
+	<th scope="row">Visual magnitude</th>
+	<?foreach($stars as $star){?>
+		<td><?=$star->magV?></td>
+	<?}?>
+</tr>
+</table>
+<?}?>
+
+
+<!-- ########################### -->
+<h2><img src="./img/kig.png" alt="Visualizations" />Visualizations</h2>
+<h3>Planet sizes</h3>
+<p>
+The following plot shows the approximate sizes of the planets in this system
+The Solar System planets are shown as a comparison.
+Note that unless the radius has been determined through a transit observation, this is only an approximation (see Lissauer et al. 2011b).
+</p>
+<object data="./size.php?id=<?=urlencode($requestname)?>" width="480" height="400" type="image/svg+xml" />
+<? // show_svg("./size.php?id=".urlencode($requestname),480,400,"png"); ?>
+<?
+// Only non circumbinary planets
+if (count($system->xpath(".//star/planet"))>0){
+?>
+<h3>Habitable zone</h3>
+<p>
+The following plot shows the approximate location of the planets in this system with respect to the habitable zone (green) and the size of the star (red).
+This is only an estimate, using the star's spectral type and mass. 
+Note that if no green band is shown in the plot, then the planet's orbit is far outside the habitable zone.
+The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">Selsis, Kasting et al</a> are used to draw the inner and outer boundaries. 
+</p>
+<object data="./habitablezone.php?id=<?=urlencode($requestname)?>" width="600" height="100" type="image/svg+xml" />
+<?  //show_svg("./habitablezone.php?id=".urlencode($requestname),600,100,"png"); ?>
+<?}?>
+
+<!-- ########################### -->
+<h2><img src="./img/xml.png" alt="xml" />Data download</h2>
+<p>
+<a href="./<?=$filename?>" alt="XML File">Click here to download</a> the XML file for this system. It is part of the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page has been directly generated from this XML file. As an alternative to the single XML file, you can also download the entire catalogue on github at <a href="https://github.com/hannorein/open_exoplanet_catalogue/">https://github.com/hannorein/open_exoplanet_catalogue/</a>. You can also find ASCII tables of the same catalogue at <a href="https://github.com/hannorein/oec_tables/">https://github.com/hannorein/oec_tables/</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+</p>
+
+
+<!-- ########################### -->
+<h2><img src="./img/lightbulb.png" alt="corrections" />Corrections</h2>
+<p>
+If you spot an error or if you can contribute additional data to this entry, please send an e-mail to <a href="mailto:exoplanet@hanno-rein.de">exoplanet@hanno-rein.de</a>.
+If possible, please include the corrected <a href="./<?=$filename?>" alt="XML File">XML file</a> of this entry and a reference to where the new data is coming from, ideally a scientific paper.
+If you are fluent with git and <a href="http://github.com">github</a>, you can also create a pull request or open an issue on the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a> repository.
+In that case, your contribution will be properly attributed. 
+Please include the reference in your commit message.
+
+
+
+
+<!-- ########################### -->
+<h2><img src="./img/info.png" alt="references" />Scientific references</h2>
+<ul style="padding-left:0;">
+<li><img src="./img/link.png" width=11 height=11 alt ="history" /> Find references for each parameter using the <a href="https://github.com/hannorein/open_exoplanet_catalogue/blame/master/systems/<?=$filenamebase?>">git blame output</a> for the file <?=$filenamebase?>.
+<li><img src="./img/history.png" width=11 height=11 alt="blame" /> View all <a href="https://github.com/hannorein/open_exoplanet_catalogue/commits/master/systems/<?=$filenamebase?>">commits</a> contributing to the file <?=$filenamebase?>.
+</ul>
+<p>
+References to the scientific publications can be found in the commit messages of the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>.
+To see these, head over the github or <a href="https://github.com/hannorein/open_exoplanet_catalogue/blame/master/systems/<?=$filenamebase?>">click here</a> to directly go to the git blame output of this system.
+In the left column of the output you can see the commit message corresponding to each parameter. 
+It also lists the date of the last commit and the person making the changes.
+Within the commit message, you will find a link to the scientific publication where the data is taken from.
+Note that this is a new feature and not all system parameters might have a reference associated with it yet.
+Please help making this catalogue better and contribute data or references!
+</p>
+
+
+
+
+
+<!-- If run on a server, you can include your own footer  -->
+<script language="php"> include "./.inc/footer.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+</div> <!-- content -->
+<div class="clearer">&nbsp;</div>
+<div class="footer">
+The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself are licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
+</div> <!-- footer -->
+</div> <!-- inner container -->
+</div> <!-- outer container -->
+</body>
+</html>
+<!-- ** end server side header ** -->
+<script language="php"> } </script> 
