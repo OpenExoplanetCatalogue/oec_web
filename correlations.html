@@ -614,7 +614,7 @@ var updatePlot = function(first){
 		.style("stroke", "black")
 		.style("opacity",(first?1:0))
 		.on("click", function(d) {
-			document.location.href = "/system.php?id=" + $(d.getElementsByTagName("name")[0]).text();
+			document.location.href = "/system.html?id=" + $(d.getElementsByTagName("name")[0]).text();
 		})
 		.on("mouseout", function(d){
 			d3.select("#pop-up").style("display","none");
