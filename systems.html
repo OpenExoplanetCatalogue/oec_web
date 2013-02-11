@@ -13,6 +13,8 @@
 <script type="text/javascript" src="./js/rgbcolor.js"></script> 
 <script type="text/javascript" src="./js/canvg.js"></script> 
 <script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="./js/jquery.tablesorter.min.js"></script> 
+</script>
 </head>
 <body>
 <div class="outer-container">
@@ -121,7 +123,7 @@ label input {
 </table>
 <!-- ########################### -->
 <div class="spacer">&nbsp;</div>
-<table cellspacing="0" summary="List of exoplanets">
+<table cellspacing="0" summary="List of exoplanets" id="systemtable" class="tablesorter">
 <thead>
 <tr id="systemtablehead">
 </tr>
@@ -217,6 +219,7 @@ var updateTable = function(first){
 			return getValueForPlanetAndKey(d3.select(this.parentNode).datum(),$(d).val()); 
 		});
 
+	$("#systemtable").tablesorter(); 
 };
     
 </script>
