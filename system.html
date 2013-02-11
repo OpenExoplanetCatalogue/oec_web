@@ -341,6 +341,7 @@ for ($r=0;$r<count($planets);$r+=$maxcol){
 	<?}?>
 </tr>
 </table>
+<div class="spacer" style="height:10px;"></div>
 <?}?>
 
 <!-- ########################### -->
@@ -421,7 +422,7 @@ The following plot shows the approximate sizes of the planets in this system
 The Solar System planets are shown as a comparison.
 Note that unless the radius has been determined through a transit observation, this is only an approximation (see Lissauer et al. 2011b).
 </p>
-<object data="./size.php?id=<?=urlencode($requestname)?>" width="480" height="400" type="image/svg+xml" />
+<object data="./size.php?id=<?=urlencode($requestname)?>" width="480" height="400" type="image/svg+xml" ></object>
 <? // show_svg("./size.php?id=".urlencode($requestname),480,400,"png"); ?>
 <?
 // Only non circumbinary planets
@@ -434,7 +435,7 @@ This is only an estimate, using the star's spectral type and mass.
 Note that if no green band is shown in the plot, then the planet's orbit is far outside the habitable zone.
 The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">Selsis, Kasting et al</a> are used to draw the inner and outer boundaries. 
 </p>
-<object data="./habitablezone.php?id=<?=urlencode($requestname)?>" width="600" height="100" type="image/svg+xml" />
+<object data="./habitablezone.php?id=<?=urlencode($requestname)?>" width="600" height="100" type="image/svg+xml"></object>
 <?  //show_svg("./habitablezone.php?id=".urlencode($requestname),600,100,"png"); ?>
 <?}?>
 
