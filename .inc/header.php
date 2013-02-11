@@ -47,7 +47,7 @@ pageTracker._trackPageview();
 <h2>Plots</h2>
 <ul>
 <li><a href="./correlations.html">Correlations plots</a></li>
-<li><a href="./histogram.html">Histograms</a></li>
+<!--<li><a href="./histogram.html">Histograms</a></li>-->
 <li><a href="https://github.com/hannorein/oec_plots">Python scripts<br />for offline use</a></li>
 </ul>
 
