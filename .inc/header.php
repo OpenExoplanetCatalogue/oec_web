@@ -21,6 +21,7 @@ pageTracker._trackPageview();
 <script type="text/javascript" src="./js/rgbcolor.js"></script> 
 <script type="text/javascript" src="./js/canvg.js"></script> 
 <script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="./js/jquery.tablesorter.min.js"></script> 
 </head>
 <body>
 <div class="outer-container">
