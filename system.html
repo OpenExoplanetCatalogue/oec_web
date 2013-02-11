@@ -49,6 +49,7 @@ if (!file_exists($filename)){
 		echo "System not found: ".($_REQUEST['id']);
 		exit(0);
 	}
+	$filenamebase = basename($filename);
 }
 
 $requestname 	= basename($filename,".xml");

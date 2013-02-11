@@ -39,21 +39,12 @@ td {
 }
 
 /* tablesorter class */
-table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-	background-color: #e6EEEE;
-}
-table.tablesorter thead tr .header {
+table.tablesorter thead tr .tsheader {
 	background-image: url(../img/bg.png);
 	background-repeat: no-repeat;
 	background-position: center right;
 	cursor: pointer;
 	padding-right: 20px;
-}
-table.tablesorter tbody td {
-	background-color: #FFF;
-}
-table.tablesorter tbody tr.odd td {
-	background-color:#F0F0F6;
 }
 table.tablesorter thead tr .headerSortUp {
 	background-image: url(../img/asc.png);
