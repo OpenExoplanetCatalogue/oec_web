@@ -96,29 +96,24 @@ label input {
 <tr>
 	<td><label><input name="field" type="checkbox" value="declination" onclick="updateTable()"/>Declination [+-dd mm ss]</label> </td>
 </tr>
-<!--
 <tr>
-	<th rowspan="1" scope="row">
-		<label>Sort by</label>
+	<th rowspan="3" scope="row">
+	Stellar multiplicity
 	</th>
 	<td>
-		<select name="sortby" id="sortby" onchange="updateTable();">
-		<option selected="selected" value="name">Name</option>
-		<option value="mass">Mass</option>
-		<option value="radius">Radius</option>
-		<option value="Discovery method">Discovery method</option>
-		<option value="semimajoraxis">Semi-major axis</option>
-		<option value="eccentricity">Eccentricity</option>
-		<option value="numberofplanetsinsystem">Number of planets in system</option>
-		<option value="numberofstarsinsystem">Number of stars in system</option>
-		<option value="lastupdate">Last update</option>
-		<option value="distance">Distance</option>
-		<option value="rightascension">Right ascension</option>
-		<option value="declination">Declination</option>
-		</select>
+		<label for="stellarmultiplicity_all"><input checked="checked" name="stellarmultiplicity" type="radio" value="all" id="stellarmultiplicity_all" onclick="updateTable()"/>All planets</label>
 	</td>
 </tr>
--->
+<tr>
+	<td>
+		<label for="stellarmultiplicity_ptype"><input name="stellarmultiplicity" type="radio" value="ptype" id="stellarmultiplicity_circumbinary" onclick="updateTable()"/>Only circumbinary planets, P-type</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="stellarmultiplicity_stype"><input name="stellarmultiplicity" type="radio" value="stype" id="stellarmultiplicity_stype" onclick="updateTable()"/>Only planets around stars with<br />a wide binary companion, S-type</label>
+	</td>
+</tr>
 </tbody>
 </table>
 <!-- ########################### -->
@@ -164,6 +159,9 @@ function getValueForPlanetAndKey(planet,key){
 			var system = $(planet).parents("system");
 			return $(key,system).text();
 
+		case "name:first":
+ 			var name = $(key,planet).text();
+			return "<a href='./system.html?id="+name+"'>"+name+"</a>";
 		default:
  			return $(key,planet).text();
 	}
@@ -172,21 +170,19 @@ function getValueForPlanetAndKey(planet,key){
 
 
 var updateTable = function(first){ 
-	var stellarmultiplicity = "all";
+	var stellarmultiplicity = $("input:radio[name=stellarmultiplicity]:checked").val();
 	var planets;
 	switch(stellarmultiplicity){
 		case "all":
 			planets = $("planet",xmldata);
 			break;
+		case "ptype":
+			planets = $("binary > planet",xmldata);
+			break;
+		case "stype":
+			planets = $("binary > star > planet",xmldata);
+			break;
 	}
-	
-//	var sortbykey 	= $("#sortby option:selected").val();
-//	planets.sort(function (planet1,planet2){
-//			var val1 = parseFloat(getValueForPlanetAndKey(planet1,sortbykey));
-//			var val2 = parseFloat(getValueForPlanetAndKey(planet2,sortbykey));
-//			return (val1>val2);
-//	});
-
 
 	var fields = $("input[name=field]:checked");
 	
@@ -215,11 +211,11 @@ var updateTable = function(first){
 	td.enter().append("td");
 	
 	td	
-		.text(function(d) { 
+		.html(function(d) { 
 			return getValueForPlanetAndKey(d3.select(this.parentNode).datum(),$(d).val()); 
 		});
 
-	$("#systemtable").tablesorter(); 
+	$(".tablesorter").tablesorter(); 
 };
     
 </script>
