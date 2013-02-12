@@ -52,34 +52,8 @@ d3.xml(source, "application/xml", function(xml) {
 });
     
 </script>
-<?
+<!--
 				
-$filenamebase 	= preg_replace("/[^a-z0-9. \d+\d-]+/i","",$_REQUEST['id']).".xml";
-$filename 	= "open_exoplanet_catalogue/systems/".$filenamebase;
-if (!file_exists($filename)){
-	/// Failsafe
-	$failsafeworked = 0;
-	$filenames = glob('open_exoplanet_catalogue/systems/*.xml', GLOB_BRACE);
-	foreach($filenames as $filename){
-		$system 	= simplexml_load_file($filename);
-		$planets 	= $system->xpath('.//planet');
-		foreach($planets as $planet){
-			$names = $planet->name;
-			foreach($names as $name){
-				if (strcasecmp($name,$_REQUEST['id'])==0){
-					$failsafeworked = 1;
-					break 3;
-				}
-			}
-		}
-	}
-	if ($failsafeworked==0){
-		echo "System not found: ".($_REQUEST['id']);
-		exit(0);
-	}
-	$filenamebase = basename($filename);
-}
-
 $requestname 	= basename($filename,".xml");
 $system 	= simplexml_load_file($filename);
 $names 		= $system->xpath('./name');
@@ -89,7 +63,7 @@ $ra = explode(" ",$system->rightascension);
 $raf = $ra[0]; $raf += 1.0/60.0 * $ra[1]; $raf += 1.0/(60.0*60.0) * $ra[2]; 
 $dec = explode(" ",$system->declination);
 $decf = $dec[0]; $decf<=0.?$sign=1.:$sign=-1.; $decf += $sign/60.0 * $dec[1]; $decf += $sign/(60.0*60.0) * $dec[2]; 
-?>
+-->
 
 
 <!-- ########################### -->
