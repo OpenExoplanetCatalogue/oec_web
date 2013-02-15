@@ -149,11 +149,27 @@ d3.xml("systems.xml", "application/xml", function(xml) {
 
     
 </script>
+
+<div class="spacer" style="clear:left"></div>
+
 <!-- ########################### -->
 <h2><img src="./img/xml.png" alt="star" />Data download</h2>
 <p>
 The data presented in this plot is taken from the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page is directly generated from the XML files in the catalogue. If you are interested in how, look at the source code. You can download the entire catalogue on <a href="https://github.com/hannorein/open_exoplanet_catalogue/">github</a>. You can also find ASCII tables of the same catalogue <a href="https://github.com/hannorein/oec_tables/">in a separate repository</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
 </p>
-<?
-include "./.inc/footer.php";
-?>
+
+
+<!-- If run on a server, you can include your own footer  -->
+<script language="php"> include "./.inc/footer.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+</div> <!-- content -->
+<div class="clearer">&nbsp;</div>
+<div class="footer">
+The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself are licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
+</div> <!-- footer -->
+</div> <!-- inner container -->
+</div> <!-- outer container -->
+</body>
+</html>
+<!-- ** end server side header ** -->
+<script language="php"> } </script> 
