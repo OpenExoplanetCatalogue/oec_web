@@ -60,34 +60,29 @@ var viz = d3.select("#viz")
 
 var bubble = d3.layout.pack()
 	.sort(null)
+	.value(function(planet){
+		var radius = parseFloat($("radius",planet).text());
+		if (isNaN(radius)){
+			var mass = parseFloat($("mass",planet).text());
+			radius = Math.pow(mass*317.8942,1./2.06)/10.973299;
+		}
+		if (isNaN(radius)){
+			radius = 0;
+		}
+		return radius;
+		})
+	.children(function(d){
+		var c = $("system",d);
+		if (c.length>0) return c;
+		c = $("planet",d);
+		return c;
+	})
 	.size([width, height])
 	.padding(1.5);
 
 var updatePlot = function(first){ 
-	var xmlsystems = $("system",xmldata);
-	var jsonsystems = [];
-	for (var j=0;j<xmlsystems.length;j++){
-		var system = xmlsystems[j];
-		var xmlplanets = $("planet",system);
-		var jsonplanets = [];
-		for (var i=0;i<xmlplanets.length;i++){
-			var planet = xmlplanets[i];
-			var radius = parseFloat($("radius",planet).text());
-			if (isNaN(radius)){
-				var mass = parseFloat($("mass",planet).text());
-				radius = Math.pow(mass*317.8942,1./2.06)/10.973299;
-			}
-			if (radius>0.){
-				jsonplanets.push({name: $("name:first",planet).text(), value: radius, planet: planet, description: $("description",planet).text()});
-			}
-		}
-		jsonsystems.push({children: jsonplanets, name: $("name:first",system).text()});
-	}
-
-
-
 	var node = viz.selectAll(".node")
-		.data(bubble.nodes({children: jsonsystems}))
+		.data(bubble.nodes(xmldata))
 		.enter().append("g")
 		.attr("class", "node")
 		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
@@ -95,12 +90,12 @@ var updatePlot = function(first){
 
 	node.append("circle")
 		.attr("r", function(d) { return d.r; })
-	     	.style("fill", function(d) { 
-			switch(d.depth){
+	     	.style("fill", function(planet) { 
+			switch(planet.depth){
 				case 1: // system
-					return "#f1f1f1";
+					return "#e1e1e1";
 				case 2: // planet
-					var text = $("discoverymethod",d.planet).text();
+					var text = $("discoverymethod",planet).text();
 					if (text=="RV") return "red";
 					if (text=="transit") return "green";
 					if (text=="imaging") return "blue";
@@ -116,18 +111,18 @@ var updatePlot = function(first){
 		.on("mousemove", function(){
 			d3.select("#pop-up").style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
 		})
-		.on("mouseover", function(d){
-			switch(d.depth){
+		.on("mouseover", function(planet){
+			switch(planet.depth){
 				case 1: // system
-					var name = d.name;
+					var name = $("name:first",planet).text();
 					d3.select("#pop-up").style("display","inline");
 					d3.select("#pop-up-title").html(name);
 					d3.select("#pop-up-description").html("");
 					$("#pop-up-values").html("");
 					return;
 				case 2: // planet
-					var name = d.name;
-					var description = d.description;
+					var name = $("name:first",planet).text();
+					var description = $("description",planet).text();
 					d3.select("#pop-up").style("display","inline");
 					d3.select("#pop-up-title").html(name);
 					if (description){
@@ -136,7 +131,7 @@ var updatePlot = function(first){
 						d3.select("#pop-up-description").html("");
 					}
 					var values = "";
-					values += 		 "<span>Radius [RJup]:</span>" + format(d.value);
+					values += 		 "<span>Radius [RJup]:</span>" + format(planet.value);
 					$("#pop-up-values").html(values);
 					return;
 				default:
@@ -144,9 +139,10 @@ var updatePlot = function(first){
 			}
 
 		})
-		.on("click", function(d) {
-			if (d.depth>0){
-				document.location.href = "/system.html?id=" + d.name;
+		.on("click", function(planet) {
+			if (planet.depth>0){
+				var name = $("name:first",planet).text();
+				document.location.href = "/system.html?id=" + name;
 			}
 		});
 
