@@ -21,7 +21,9 @@
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="kig" />Bubble chart</h2>
 <p>This bubble chart shows the relative sizes of all discovered planets.  
-It uses the d3 javascript library and is directly rendered in your browser.
+The color corresponds to the discovery method (red = radial velocity, green = transit, blue = direct imaging, yellow = timing, purple = microlensing, gray = other).
+When a planet radius is not available, the planet mass is used to calculate an approximate size.
+This plot uses the d3 javascript library. It is rendered directly in your browser.
 </p>
 
 
@@ -56,9 +58,8 @@ var viz = d3.select("#viz")
 
 var bubble = d3.layout.pack()
 	.sort(null)
-	.size([500, 500])
+	.size([width, height])
 	.padding(1.5);
-var color =  d3.scale.category20c();
 
 var updatePlot = function(first){ 
 	var xmlsystems = $("system",xmldata);
@@ -75,7 +76,7 @@ var updatePlot = function(first){
 				radius = Math.pow(mass*317.8942,1./2.06)/10.973299;
 			}
 			if (radius>0.){
-				jsonplanets.push({name: $("name:first",planet).text(), value: radius, description: $("description",planet).text()});
+				jsonplanets.push({name: $("name:first",planet).text(), value: radius, planet: planet, description: $("description",planet).text()});
 			}
 		}
 		jsonsystems.push({children: jsonplanets, name: $("name:first",system).text()});
@@ -97,7 +98,13 @@ var updatePlot = function(first){
 				case 1: // system
 					return "#fafafa";
 				case 2: // planet
-					return color(d.name);
+					var text = $("discoverymethod",d.planet).text();
+					if (text=="RV") return "red";
+					if (text=="transit") return "green";
+					if (text=="imaging") return "blue";
+					if (text=="timing") return "yellow";
+					if (text=="microlensing") return "purple";
+					return "gray";
 			}
 			return "transparent"; 
 		})
