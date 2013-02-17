@@ -124,6 +124,20 @@ label input {
 </tr>
 </thead>
 <tbody id="systemtablebody">
+<script language="php"> 
+// Include server side script (to allow crawlers to access sites without js)
+$filename 	= "systems.xml";
+$requestname 	= basename($filename,".xml");
+$system 	= simplexml_load_file($filename);
+$planets	= $system->xpath('.//planet');
+foreach($planets as $planet){
+	print "<tr>\n";
+	print "\t<td><a href=\"./system.html?id=".$planet->name."\">".$planet->name."</a></td>\n";
+	print "\t<td>".$planet->mass."</td>\n";
+	print "\t<td>".$planet->semimajoraxis."</td>\n";
+	print "</tr>\n";
+}
+</script> 
 </tbody>
 </table>
 <!-- ########################### -->
@@ -140,7 +154,7 @@ var source = "systems.xml";
 var xmldata = null;
 d3.xml(source, "application/xml", function(xml) {
 	xmldata = xml;
-	updateTable(true);	
+//	updateTable(true);	
 });
 
 function getValueForPlanetAndKey(planet,key){
