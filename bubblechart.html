@@ -21,8 +21,11 @@
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="kig" />Bubble chart</h2>
 <p>This bubble chart shows the relative sizes of all discovered planets.  
-The color corresponds to the discovery method (red = radial velocity, green = transit, blue = direct imaging, yellow = timing, purple = microlensing, gray = other).
-When a planet radius is not available, the planet mass is used to calculate an approximate size.
+The color corresponds to the approximate equilibrium temperature of the planet. 
+A blue color indicates that the planet is too cold for water to be liquid. Red is too hot. Green might just be right. 
+However, not that these temperatures might vary significantly from the actual surface temperature of the planet, depending on cloud coverage, climate models and many other effects.
+A gray color indicates that the temperature for this planet is not available. 
+When a planet radius is not measured, the planet mass is used to calculate an approximate size.
 Planetary systems with multiple planets are grouped together.
 You can click on each planet or system to view its details.
 This plot uses the d3 javascript library. It is rendered directly in your browser.
@@ -51,12 +54,17 @@ var width 	= 500;
 var height 	= 500;
 
 var xmldata	= null;
-var format = d3.format(",.4f");
+var format4 = d3.format(".4f");
+var format1 = d3.format(".1f");
 var viz = d3.select("#viz")
 	.append("svg")
 	.attr("width", width)
 	.attr("height", height)
 	;    
+var colorScale = d3.scale.linear()
+	.domain([173,473])
+	.clamp(true)
+	.range([240,0]);
 
 var bubble = d3.layout.pack()
 	.sort(null)
@@ -95,13 +103,13 @@ var updatePlot = function(first){
 				case 1: // system
 					return "#e1e1e1";
 				case 2: // planet
-					var text = $("discoverymethod",planet).text();
-					if (text=="RV") return "red";
-					if (text=="transit") return "green";
-					if (text=="imaging") return "blue";
-					if (text=="timing") return "yellow";
-					if (text=="microlensing") return "purple";
-					return "gray";
+					var val = parseFloat($("temperature",planet).text());
+					if (isNaN(val)){
+						return "gray";
+					}else{
+						console.log(colorScale(val));
+						return d3.hsl(colorScale(val), 1, 0.5);
+					}
 			}
 			return "transparent"; 
 		})
@@ -131,7 +139,10 @@ var updatePlot = function(first){
 						d3.select("#pop-up-description").html("");
 					}
 					var values = "";
-					values += 		 "<span>Radius [RJup]:</span>" + format(planet.value);
+					values += 		 "<span>Radius [RJup]:</span>" + format4(planet.value);
+					var temperature = parseFloat($("temperature",planet).text());
+					values += 		 "<span>Temperature [Kelvin]:</span>" + format1(temperature);
+					values += 		 "<span>Temperature [Celsius]:</span>" + format1(temperature-273.15);
 					$("#pop-up-values").html(values);
 					return;
 				default:
