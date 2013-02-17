@@ -229,7 +229,7 @@ var updateTable = function(first){
 			return getValueForPlanetAndKey(d3.select(this.parentNode).datum(),$(d).val()); 
 		});
 
-	$(".tablesorter").tablesorter(); 
+	$(".tablesorter").tablesorter({ cssHeader: 'tsheader'});
 };
     
 </script>
