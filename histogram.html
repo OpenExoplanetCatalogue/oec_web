@@ -1,8 +1,25 @@
-<script language="php">
-include "./.inc/header.php";
-</script>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
+<script language="php"> include "./.inc/header.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+<head profile="http://www.w3.org/2005/10/profile">
+<link rel="icon" type="image/ico" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
+<title>Open Exoplanet Catalogue</title>
 <link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
+<script type="text/javascript" src="./js/d3.v3.min.js"></script>
+<script type="text/javascript" src="./js/rgbcolor.js"></script> 
+<script type="text/javascript" src="./js/canvg.js"></script> 
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+</head>
+<body>
+<div class="outer-container">
+<div class="inner-container">
+<div class="content">
+<!-- ** end server side header ** -->
+<script language="php"> } </script>
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="kig" />Histograms</h2>
 <p>This page is currently under development. 
@@ -101,6 +118,14 @@ label input {
 		<label for="filter_other"><input checked name="discoveryfilter" type="checkbox" value="" id="filter_other" onClick="updatePlot()"/>Planets found by other methods</label>
 	</td>
 </tr>
+<tr>
+	<th rowspan="1" scope="row">
+	Export
+	</th>
+	<td>
+		<input type="button" onclick="saveaspng()" value="Save plot as png file" />
+	</td>
+</tr>
 </table>
 <p>The plot updates automatically when the above parameters are changed</p>
 <!-- ########################### -->
@@ -137,8 +162,20 @@ label input {
 
 </style>
 <script type="text/javascript">
+// Function to save the svg data (vector graphic) as a png file (bitmap). 
+// It draws the content to an HTML5 canvas and then redirects the bowser to a data url.
+function saveaspng(){
+	d3.select("body").append("canvas")
+		.attr("width",width)	
+		.attr("height",height)	
+		.attr("id","canvas")
+		.style("display","none")
+		;	
+	canvg('canvas', $("#viz").html());
+	window.location = document.getElementById("canvas").toDataURL("image/png");
+}
 var width 	= 600;
-var height 	= 500;
+var height 	= 400;
 var paddingt 	= 10;
 var paddingb 	= 45;
 var paddingl 	= 65;
@@ -356,11 +393,27 @@ d3.xml("systems.xml", "application/xml", function(xml) {
 
     
 </script>
+
+<div class="spacer" style="clear:left"></div>
+
 <!-- ########################### -->
 <h2><img src="./img/xml.png" alt="star" />Data download</h2>
 <p>
 The data presented in this plot is taken from the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page is directly generated from the XML files in the catalogue. If you are interested in how, look at the source code. You can download the entire catalogue on <a href="https://github.com/hannorein/open_exoplanet_catalogue/">github</a>. You can also find ASCII tables of the same catalogue <a href="https://github.com/hannorein/oec_tables/">in a separate repository</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
 </p>
-<?
-include "./.inc/footer.php";
-?>
+
+
+<!-- If run on a server, you can include your own footer  -->
+<script language="php"> include "./.inc/footer.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+</div> <!-- content -->
+<div class="clearer">&nbsp;</div>
+<div class="footer">
+The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself are licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
+</div> <!-- footer -->
+</div> <!-- inner container -->
+</div> <!-- outer container -->
+</body>
+</html>
+<!-- ** end server side header ** -->
+<script language="php"> } </script> 
