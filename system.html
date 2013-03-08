@@ -24,8 +24,7 @@
 <script language="php"> } </script>
 <!-- ########################### -->
 <!-- ########################### -->
-<?
-				
+<script language="php">
 $filenamebase 	= preg_replace("/[^a-z0-9. \d+\d-]+/i","",$_REQUEST['id']).".xml";
 $filename 	= "open_exoplanet_catalogue/systems/".$filenamebase;
 if (!file_exists($filename)){
@@ -61,7 +60,7 @@ $ra = explode(" ",$system->rightascension);
 $raf = $ra[0]; $raf += 1.0/60.0 * $ra[1]; $raf += 1.0/(60.0*60.0) * $ra[2]; 
 $dec = explode(" ",$system->declination);
 $decf = $dec[0]; $decf<=0.?$sign=1.:$sign=-1.; $decf += $sign/60.0 * $dec[1]; $decf += $sign/(60.0*60.0) * $dec[2]; 
-?>
+</script>
 
 
 <!-- ########################### -->
