@@ -132,11 +132,6 @@ label input {
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <div id="viz"></div>
 <style>
-.axis path,
-.axis line {
-    fill: none;
-    stroke: black;
-}
 #viz, .infobox {
     font-family: sans-serif;
 }
@@ -145,18 +140,7 @@ label input {
     font-family: sans-serif;
     font-size: 12px;
 }
-.bar {
-	  fill: steelblue;
-	  stroke: #000;
-}
-
-.bar text {
-	  fill: #fff;
-}
-
 .axis path, .axis line {
-	  fill: none;
-	  stroke: #000;
 	  shape-rendering: crispEdges;
 }
 
@@ -322,6 +306,8 @@ var updatePlot = function(){
 
 	bar.enter().append("rect")
 		.attr("class", "bar")
+		.style("fill", "steelblue")
+		.style("stroke", "black")
 		.attr("transform", function(d) {
 			 return "translate(" + (xScale(d.x)+1) + "," + yScale(d.y) + ")"; 
 		})
@@ -382,6 +368,13 @@ var updatePlot = function(){
 			
 	gxaxislabel.text(xlabel);
 	gyaxislabel.text(ylabel);
+	
+	gxaxis.selectAll("path,line")
+		.style("fill","none")
+		.style("stroke","black");
+	gyaxis.selectAll("path,line")
+		.style("fill","none")
+		.style("stroke","black");
 
 	first = false;
 };
