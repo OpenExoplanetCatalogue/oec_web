@@ -221,7 +221,9 @@ function xrangeUpdate(){
 		updatePlot();
 	}
 }
-
+function log10(val) {
+	return Math.log(val) / Math.LN10;
+}
 
 var updatePlot = function(){ 
 	var discoveryfilter = d3.selectAll("input[name=discoveryfilter]:checked");
@@ -264,24 +266,28 @@ var updatePlot = function(){
 				return	parseFloat(d3.select(d).select(xkey).text()); 
 			})
 			];
+		if (logscalex){
+			xDomain[0] = log10(xDomain[0]);
+			xDomain[1] = log10(xDomain[1]);
+		}
 		d3.select("[name=xrangel]").node().value = xDomain[0];
 		d3.select("[name=xranger]").node().value = xDomain[1];
 	}
 	
 
 	var xScale;
-	if (logscalex){
-		xScale = d3.scale.log();
-	}else{
-		xScale = d3.scale.linear();
-	}
+	xScale = d3.scale.linear();
 	xScale.domain(xDomain).range([paddingl, width-paddingl-paddingr]);
 	
 	var data = d3.layout.histogram()
 	    	.bins(xScale.ticks(xnumbins))
 		.range(xDomain)
 	    	.value(function(d){
-			return d3.select(d).select(xkey).text();
+			if (logscalex){
+				return log10(d3.select(d).select(xkey).text());
+			}else{
+				return d3.select(d).select(xkey).text();
+			}
 	    	})
 	        (planets);
 	
@@ -366,7 +372,11 @@ var updatePlot = function(){
 		gyaxis.transition().call(yAxis);
 	}
 			
-	gxaxislabel.text(xlabel);
+	if (logscalex){
+		gxaxislabel.text("log10( " +xlabel+ " )");
+	}else{
+		gxaxislabel.text(xlabel);
+	}
 	gyaxislabel.text(ylabel);
 	
 	gxaxis.selectAll("path,line")
