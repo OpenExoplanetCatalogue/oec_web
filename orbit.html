@@ -67,15 +67,42 @@ function saveaspng(){
 }
 
 var t = 0;
+var scale = 0;
 
 setInterval(function() {
 	t = t + 0.2;
 	updatePlot(false);
  }, 10);
 
+var drag = d3.behavior.drag()
+     .origin(Object)
+     .on("drag", dragmove);
+
+viz.x = 0;
+viz.y = 0;
+viz.call(drag);
+
+function dragmove(d) {
+	d3.select(this)
+		.attr("viewBox", ""+d3.event.x+" "+d3.event.y+" "+width+" "+height);
+		.attr("x", ent.x+" "+d3.event.y+" "+width+" "+height);
+}
+
 var updatePlot = function(first){ 
 	var planets = $("planet",xmldata);
-	var scale = 800;
+	if (first){
+		scale = 0;
+		for (var i=0;i<planets.length;i++){
+			var planet = planets[i];
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			var ae = a*(1.+e);
+			if (ae>scale){
+				scale = ae;
+			}
+		}
+		scale = (height/2.)/scale * 0.95;
+	}
 
 	var ellipse = viz.selectAll("ellipse")
 			.data(planets);
