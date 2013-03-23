@@ -121,15 +121,21 @@ var updatePlot = function(first){
 			var n = 6.283185307179/parseFloat($("period",planet).text());
 			var a = parseFloat($("semimajoraxis",planet).text());
 			var e = parseFloat($("eccentricity",planet).text());
-			var peri = parseFloat($("longitude",planet).text());
-			return width/2.+scale*e*a+scale*a*Math.cos(peri*0.01745329251994+n*t);
+			var longitude = parseFloat($("longitude",planet).text());
+			return width/2.+scale*e*a+scale*a*Math.cos(longitude*0.01745329251994+n*t);
 			})
 		.attr("cy",function(planet){
 			var n = 6.283185307179/parseFloat($("period",planet).text());
 			var a = parseFloat($("semimajoraxis",planet).text());
 			var e = parseFloat($("eccentricity",planet).text());
-			var peri = parseFloat($("longitude",planet).text());
-			return height/2.+scale*a*Math.sqrt(1.-e*e)*Math.sin(peri*0.01745329251994+n*t);
+			var longitude = parseFloat($("longitude",planet).text());
+			return height/2.+scale*a*Math.sqrt(1.-e*e)*Math.sin(longitude*0.01745329251994+n*t);
+			})
+		.attr("transform",function(planet){
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			var peri = parseFloat($("paeriastron",planet).text()); //degrees
+			return "rotate("+peri+","+width/2.+","+height/2.+")";
 			});
 
 	dots.exit().remove();
