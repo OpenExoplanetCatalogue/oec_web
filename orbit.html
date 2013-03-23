@@ -109,28 +109,35 @@ var updatePlot = function(first){
 
 	ellipse.exit().remove();
 
-	var dots = viz.selectAll("circle")
+	var dots = viz.selectAll("g")
 			.data(planets);
-	dots.enter().append("circle")
+	var newdots = dots.enter().append("g");
+	
+	newdots.append("circle")
 		.attr("r",function(planet){
 			var m = parseFloat($("mass",planet).text());
 			return 10.*Math.pow(m,1./3.);
 		});
+
+	newdots.append("text")
+		.attr("x","20")
+		.attr("y","-10")
+		.text(function(planet){
+			return $("name",planet).first().text();
+			});
 	
-	dots	.attr("cx",function(planet){
+	dots
+		.attr("transform",function(planet){
 			var n = 6.283185307179/parseFloat($("period",planet).text());
 			var a = parseFloat($("semimajoraxis",planet).text());
 			var e = parseFloat($("eccentricity",planet).text());
 			var longitude = parseFloat($("longitude",planet).text());
-			return width/2.+scale*e*a+scale*a*Math.cos(longitude*0.01745329251994+n*t);
-			})
-		.attr("cy",function(planet){
-			var n = 6.283185307179/parseFloat($("period",planet).text());
-			var a = parseFloat($("semimajoraxis",planet).text());
-			var e = parseFloat($("eccentricity",planet).text());
-			var longitude = parseFloat($("longitude",planet).text());
-			return height/2.+scale*a*Math.sqrt(1.-e*e)*Math.sin(longitude*0.01745329251994+n*t);
-			})
+			var x = width/2.+scale*e*a+scale*a*Math.cos(longitude*0.01745329251994+n*t);
+			var y = height/2.+scale*a*Math.sqrt(1.-e*e)*Math.sin(longitude*0.01745329251994+n*t);
+			return "translate("+x+","+y+")";
+			});
+		
+	dots.select("circle")
 		.attr("transform",function(planet){
 			var a = parseFloat($("semimajoraxis",planet).text());
 			var e = parseFloat($("eccentricity",planet).text());
