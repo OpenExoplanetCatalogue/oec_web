@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
+<script language="php"> include "./.inc/header.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+<head profile="http://www.w3.org/2005/10/profile">
+<link rel="icon" type="image/ico" href="favicon.ico" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
+<title>Open Exoplanet Catalogue</title>
+<link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
+<script type="text/javascript" src="./js/d3.v3.min.js"></script>
+<script type="text/javascript" src="./js/rgbcolor.js"></script> 
+<script type="text/javascript" src="./js/canvg.js"></script> 
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+</head>
+<body>
+<div class="outer-container">
+<div class="inner-container">
+<div class="content">
+<!-- ** end server side header ** -->
+<script language="php"> } </script>
+<!-- ########################### -->
+
+
+<!-- ########################### -->
+<div id="viz"></div>
+<style>
+#viz, .infobox {
+    font-family: sans-serif;
+}
+
+#viz text {
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+</style>
+<script type="text/javascript">
+var width 	= 800;
+var height 	= 600;
+
+var xmldata	= null;
+var format4 = d3.format(".4f");
+var format1 = d3.format(".1f");
+var viz = d3.select("#viz")
+	.append("svg")
+	.attr("width", width)
+	.attr("height", height)
+	;    
+viz.append("image")
+	.attr("width","22")
+	.attr("height","22")
+	.attr("xlink:href","./img/star.png")
+	.attr("x", width/2.-11)
+	.attr("y", height/2.-11);
+
+function saveaspng(){
+	d3.select("body").append("canvas")
+		.attr("width",width)	
+		.attr("height",height)	
+		.attr("id","canvas")
+		.style("display","none")
+		;	
+	canvg('canvas', $("#viz").html());
+	window.location = document.getElementById("canvas").toDataURL("image/png");
+}
+
+var t = 0;
+
+setInterval(function() {
+	t = t + 0.2;
+	updatePlot(false);
+ }, 10);
+
+var updatePlot = function(first){ 
+	var planets = $("planet",xmldata);
+	var scale = 800;
+
+	var ellipse = viz.selectAll("ellipse")
+			.data(planets);
+	ellipse.enter().append("ellipse")
+		.attr("rx",function(planet){
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			return scale*a;
+			})
+		.attr("ry",function(planet){
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			return scale*a*Math.sqrt(1.-e*e);
+			})
+		.attr("fill","none")
+		.attr("cx",function(planet){
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			return width/2.+scale*e*a;
+			})
+		.attr("cy",function(planet){
+			return height/2.;
+			})
+		.attr("transform",function(planet){
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			var peri = parseFloat($("paeriastron",planet).text()); //degrees
+			return "rotate("+peri+","+width/2.+","+height/2.+")";
+			})
+		.attr("stroke","gray");
+
+	ellipse.exit().remove();
+
+	var dots = viz.selectAll("circle")
+			.data(planets);
+	dots.enter().append("circle")
+		.attr("r",function(planet){
+			var m = parseFloat($("mass",planet).text());
+			return 10.*Math.pow(m,1./3.);
+		});
+	
+	dots	.attr("cx",function(planet){
+			var n = 6.283185307179/parseFloat($("period",planet).text());
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			var peri = parseFloat($("longitude",planet).text());
+			return width/2.+scale*e*a+scale*a*Math.cos(peri*0.01745329251994+n*t);
+			})
+		.attr("cy",function(planet){
+			var n = 6.283185307179/parseFloat($("period",planet).text());
+			var a = parseFloat($("semimajoraxis",planet).text());
+			var e = parseFloat($("eccentricity",planet).text());
+			var peri = parseFloat($("longitude",planet).text());
+			return height/2.+scale*a*Math.sqrt(1.-e*e)*Math.sin(peri*0.01745329251994+n*t);
+			});
+
+	dots.exit().remove();
+};
+
+d3.xml("gj876.xml", "application/xml", function(xml) {
+	xmldata = xml;
+	updatePlot(true);	
+});
+
+    
+</script>
+
+<div class="spacer" style="clear:left"></div>
+		<input type="button" onclick="saveaspng()" value="Save plot as png file" />
+
+<script language="php"> include "./.inc/footer.php"; if (false){ </script> 
+<!-- ** start server side header ** -->
+</div> <!-- content -->
+<div class="clearer">&nbsp;</div>
+</div> <!-- inner container -->
+</div> <!-- outer container -->
+</body>
+</html>
+<!-- ** end server side header ** -->
+<script language="php"> } </script> 
