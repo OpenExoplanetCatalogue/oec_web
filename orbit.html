@@ -37,6 +37,58 @@
 
 </style>
 <script type="text/javascript">
+var M_PI = 3.1415926535897;
+function get2DPositionofPlanet(planet,time){
+	//if (!self.root) return GLKVector2Make(0, 0); // orphan planets
+	
+
+	var longitude 		= parseFloat($("longitude",planet).text())/180.*M_PI;
+	if (isNaN(longitude)) longitude = 0.0;
+	var ascendingnode 	= parseFloat($("ascendingnode",planet).text())/180.*M_PI;
+	if (isNaN(ascendingnode)) ascendingnode = 0.0;
+	var semimajoraxis 	= parseFloat($("semimajoraxis",planet).text());
+	if (isNaN(semimajoraxis)) semimajoraxis = 0.0;
+	var periastron 		= parseFloat($("periastron",planet).text())/180.*M_PI;
+	if (isNaN(periastron)) periastron = 0.0;
+	var period 		= parseFloat($("period",planet).text());
+	if (isNaN(period)) period = 0.0;
+	var eccentricity 	= parseFloat($("eccentricity",planet).text());
+	if (isNaN(eccentricity)) eccentricity = 0.0;
+	
+	var M = longitude - periastron; 		// Mean anomaly
+	if (period){
+		M += 2.*M_PI*time/period;
+	}else{
+		M += 2.*M_PI*time/365.; 		// assume default period: 1 year
+	}
+	var E = M+eccentricity*Math.sin(M);		// Eccentric anomaly
+	var deltaE = 0;
+	var counter = 15;
+	do{
+		deltaE = (E - eccentricity*Math.sin(E)- M)/(1.-eccentricity*Math.cos(E));
+		E -= deltaE;
+		counter--;
+	}while (Math.abs(deltaE)>1e-4 && counter);
+	
+	var _a = 1;
+	if (semimajoraxis>0) _a = semimajoraxis;
+	
+	var xp =_a*(Math.cos(E)-eccentricity);
+	var yp =_a*Math.sqrt(1.-eccentricity*eccentricity) * Math.sin(E);
+	
+	var sinNodengle = Math.sin(ascendingnode);
+	var cosNodengle = Math.cos(ascendingnode);
+	 var sinArgPeri = Math.sin(periastron-ascendingnode);
+	var cosArgPeri = Math.cos(periastron-ascendingnode);
+	
+	var point = {
+		"x": xp*(cosArgPeri*cosNodengle-sinArgPeri*sinNodengle) + yp*(-sinArgPeri*cosNodengle-cosArgPeri*sinNodengle),
+		"y": xp*(cosArgPeri*sinNodengle+sinArgPeri*cosNodengle) + yp*(-sinArgPeri*sinNodengle+cosArgPeri*cosNodengle),
+	};
+	return point;
+}
+</script>
+<script type="text/javascript">
 var width 	= 800;
 var height 	= 600;
 
@@ -83,9 +135,9 @@ viz.y = 0;
 viz.call(drag);
 
 function dragmove(d) {
-	d3.select(this)
-		.attr("viewBox", ""+d3.event.x+" "+d3.event.y+" "+width+" "+height);
-		.attr("x", ent.x+" "+d3.event.y+" "+width+" "+height);
+//	d3.select(this)
+//		.attr("viewBox", ""+d3.event.x+" "+d3.event.y+" "+width+" "+height);
+//		.attr("x", ent.x+" "+d3.event.y+" "+width+" "+height);
 }
 
 var updatePlot = function(first){ 
@@ -155,13 +207,8 @@ var updatePlot = function(first){
 	
 	dots
 		.attr("transform",function(planet){
-			var n = 6.283185307179/parseFloat($("period",planet).text());
-			var a = parseFloat($("semimajoraxis",planet).text());
-			var e = parseFloat($("eccentricity",planet).text());
-			var longitude = parseFloat($("longitude",planet).text());
-			var x = width/2.+scale*e*a+scale*a*Math.cos(longitude*0.01745329251994+n*t);
-			var y = height/2.+scale*a*Math.sqrt(1.-e*e)*Math.sin(longitude*0.01745329251994+n*t);
-			return "translate("+x+","+y+")";
+			var point =get2DPositionofPlanet(planet,t);
+			return "translate("+(point.x*scale+width/2.)+","+(point.y*scale+height/2.)+")";
 			});
 		
 	dots.select("circle")
@@ -169,7 +216,8 @@ var updatePlot = function(first){
 			var a = parseFloat($("semimajoraxis",planet).text());
 			var e = parseFloat($("eccentricity",planet).text());
 			var peri = parseFloat($("paeriastron",planet).text()); //degrees
-			return "rotate("+peri+","+width/2.+","+height/2.+")";
+			var ascendingnode 	= parseFloat($("ascendingnode",planet).text())/180.*M_PI;
+			return "rotate("+(peri-ascendingnode)+","+width/2.+","+height/2.+")";
 			});
 
 	dots.exit().remove();
