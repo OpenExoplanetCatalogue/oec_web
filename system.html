@@ -419,6 +419,39 @@ for ($r=0;$r<count($planets);$r+=$maxcol){
 
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="Visualizations" />Visualizations</h2>
+<h3>Orbits</h3>
+<div id="viz"></div>
+<div id="sliderbox">
+	<div id="speed-slider" class="dragdealer">
+		<div class="red-bar handle">speed</div>
+	</div>
+	<div id="zoom-slider" class="dragdealer">
+		<div class="red-bar handle">zoom</div>
+	</div>
+</div>
+<style>
+#viz, .infobox {
+    font-family: sans-serif;
+}
+
+#viz text {
+    font-family: sans-serif;
+    font-size: 12px;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+	$.ajax({
+		type: "GET",
+		url: "./<?=$filename?>",
+		dataType: "xml",
+		success: setupOrbitPlot
+		});
+	});
+
+
+</script>
+
 <h3>Planet sizes</h3>
 <p>
 The following plot shows the approximate sizes of the planets in this system
