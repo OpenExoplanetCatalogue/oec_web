@@ -69,9 +69,9 @@ var colorScale = d3.scale.linear()
 var bubble = d3.layout.pack()
 	.sort(null)
 	.value(function(planet){
-		var radius = parseFloat($("radius",planet).text());
+		var radius = parseFloat($("radius",planet.xml).text());
 		if (isNaN(radius)){
-			var mass = parseFloat($("mass",planet).text());
+			var mass = parseFloat($("mass",planet.xml).text());
 			radius = Math.pow(mass*317.8942,1./2.06)/10.973299;
 		}
 		if (isNaN(radius)){
@@ -80,16 +80,16 @@ var bubble = d3.layout.pack()
 		return radius;
 		})
 	.children(function(d){
-	  	var c = $("system",d);
-	        if (c.length<=0) c = $("planet",d);
-		return c;
+	  	var c = $("system",d.xml);
+	    if (c.length<=0) c = $("planet",d.xml);
+      return Array.prototype.map.call(c, function(d) { return {xml: d}; });
 	})
 	.size([width, height])
 	.padding(1.5);
 
 var updatePlot = function(first){ 
 	var node = viz.selectAll(".node")
-		.data(bubble.nodes(xmldata))
+    .data(bubble.nodes({xml: xmldata}))
 		.enter().append("g")
 		.attr("class", "node")
 		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
@@ -101,7 +101,7 @@ var updatePlot = function(first){
 				case 1: // system
 					return "#e1e1e1";
 				case 2: // planet
-					var val = parseFloat($("temperature",planet).text());
+					var val = parseFloat($("temperature",planet.xml).text());
 					if (isNaN(val)){
 						return "gray";
 					}else{
@@ -119,15 +119,15 @@ var updatePlot = function(first){
 		.on("mouseover", function(planet){
 			switch(planet.depth){
 				case 1: // system
-					var name = $("name:first",planet).text();
+					var name = $("name:first",planet.xml).text();
 					d3.select("#pop-up").style("display","inline");
 					d3.select("#pop-up-title").html(name);
 					d3.select("#pop-up-description").html("");
 					$("#pop-up-values").html("");
 					return;
 				case 2: // planet
-					var name = $("name:first",planet).text();
-					var description = $("description",planet).text();
+					var name = $("name:first",planet.xml).text();
+					var description = $("description",planet.xml).text();
 					d3.select("#pop-up").style("display","inline");
 					d3.select("#pop-up-title").html(name);
 					if (description){
@@ -137,7 +137,7 @@ var updatePlot = function(first){
 					}
 					var values = "";
 					values += 		 "<span>Radius [RJup]:</span>" + format4(planet.value);
-					var temperature = parseFloat($("temperature",planet).text());
+					var temperature = parseFloat($("temperature",planet.xml).text());
 					values += 		 "<span>Temperature [Kelvin]:</span>" + format1(temperature);
 					values += 		 "<span>Temperature [Celsius]:</span>" + format1(temperature-273.15);
 					$("#pop-up-values").html(values);
@@ -149,7 +149,7 @@ var updatePlot = function(first){
 		})
 		.on("click", function(planet) {
 			if (planet.depth>0){
-				var name = $("name:first",planet).text();
+				var name = $("name:first",planet.xml).text();
 				document.location.href = "/system.html?id=" + name;
 			}
 		});
