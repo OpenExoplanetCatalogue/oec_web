@@ -110,7 +110,8 @@ function setupOrbitPlot(xml){
 	for (var i=0;i<planets.length;i++){
 		var planet = planets[i];
 		var a = parseFloat($("semimajoraxis",planet).text());
-		var e = parseFloat($("eccentricity",planet).text());
+		var eccentricity = parseFloat($("eccentricity",planet).text());
+		if (isNaN(eccentricity)) eccentricity = 0.0;
 		var period = parseFloat($("period",planet).text());
 		var starmass = parseFloat($($(planet.parentNode).children("mass")[0]).text());
 		if ((isNaN(period) || period<=0.) && a>0.){
@@ -130,7 +131,7 @@ function setupOrbitPlot(xml){
 			d3.select(planet).append("semimajoraxis").text(a);
 		}
 
-		var ae = a*(1.+e);
+		var ae = a*(1.+eccentricity);
 		if (ae>scale){
 			scale = ae;
 		}
