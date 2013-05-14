@@ -55,6 +55,7 @@ if (!file_exists($filename)){
 	$filenamebase = basename($filename);
 }
 
+$filenamemeta 	= "oec_meta/systems/".$filenamebase;
 $requestname 	= basename($filename,".xml");
 $system 	= simplexml_load_file($filename);
 $names 		= $system->xpath('./name');
@@ -476,6 +477,84 @@ The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">S
 <?  //show_svg("./habitablezone.php?id=".urlencode($requestname),600,100,"png"); ?>
 <?}?>
 
+
+
+<!-- ########################### -->
+<h2><img src="./img/info.png" alt="references" />Scientific references and contributors</h2>
+<ul style="padding-left:0;">
+</ul>
+
+
+<script language="php">
+if (file_exists($filenamemeta)){
+	$metasystem 	= simplexml_load_file($filenamemeta);
+	$contributors 	= $metasystem->xpath('.//contributor');
+	$links	 	= $metasystem->xpath('.//link');
+}
+</script>
+
+
+<h3>Links to scientific papers and other data sources</h3>
+<p>The following table lists all links which are relevant to this particular system.</p>
+<table cellspacing="0" summary="Links">
+<?foreach($links as $link){?>
+<tr>
+	<td>
+		<img src="./img/link.png" width=11 height=11 alt ="history" /> 
+		<a href="<?=$link?>"><?=$link?></a> 
+	</td>
+</tr>
+<?}?>
+</table>
+<p>
+Note that this is just a summary. 
+More references to the scientific publications and comments can be found in the commit messages.
+To see these, head over the github or <a href="https://github.com/hannorein/open_exoplanet_catalogue/blame/master/systems/<?=$filenamebase?>">click here</a> to directly go to the git blame output of this system.
+In the left column of the output you can see the commit message corresponding to each parameter. 
+It also lists the date of the last commit and the person making the changes.
+Within the commit message, you will find a link to the scientific publication where the data is taken from.
+Note that this is a new feature and not all system parameters might have a reference associated with it yet.
+Please help making this catalogue better and contribute data or references!
+</p>
+
+
+
+
+<h3>Open Exoplanet Catalogue contributors</h3>
+<p>This table lists all people who have contributed to the Open Exoplanet Catalogue. 
+Please consider contributing! <a href="http://openexoplanetcatalogue.com/contribute/">Click here</a> to find out how.
+</p>
+<table cellspacing="0" summary="Contributors">
+<tr>
+	<th scope="col">Number of commits</th>
+	<th scope="col">Contributor</th>
+	<th scope="col">E-mail</th>
+</tr>
+<?foreach($contributors as $contributor){?>
+<tr>
+	<td>
+		<img src="./img/history.png" width=11 height=11 alt="blame" /> 
+		<?=$contributor['commits']?> 
+	</td>
+	<td>
+		<?=$contributor?>
+	</td>
+	<td>
+		<?=str_replace("@","(at)",$contributor['email'])?>
+	</td>
+</tr>
+<?}?>
+</table>
+<p>
+	View all <a href="https://github.com/hannorein/open_exoplanet_catalogue/commits/master/systems/<?=$filenamebase?>">commits</a> contributing to the file <?=$filenamebase?>.
+</p>
+
+<p>
+</p>
+
+
+
+
 <!-- ########################### -->
 <h2><img src="./img/xml.png" alt="xml" />Data download</h2>
 <p>
@@ -491,25 +570,6 @@ If possible, please include the corrected <a href="./<?=$filename?>" alt="XML Fi
 If you are fluent with git and <a href="http://github.com">github</a>, you can also create a pull request or open an issue on the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a> repository.
 In that case, your contribution will be properly attributed. 
 Please include the reference in your commit message.
-
-
-
-
-<!-- ########################### -->
-<h2><img src="./img/info.png" alt="references" />Scientific references</h2>
-<ul style="padding-left:0;">
-<li><img src="./img/link.png" width=11 height=11 alt ="history" /> Find references for each parameter using the <a href="https://github.com/hannorein/open_exoplanet_catalogue/blame/master/systems/<?=$filenamebase?>">git blame output</a> for the file <?=$filenamebase?>.
-<li><img src="./img/history.png" width=11 height=11 alt="blame" /> View all <a href="https://github.com/hannorein/open_exoplanet_catalogue/commits/master/systems/<?=$filenamebase?>">commits</a> contributing to the file <?=$filenamebase?>.
-</ul>
-<p>
-References to the scientific publications can be found in the commit messages of the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>.
-To see these, head over the github or <a href="https://github.com/hannorein/open_exoplanet_catalogue/blame/master/systems/<?=$filenamebase?>">click here</a> to directly go to the git blame output of this system.
-In the left column of the output you can see the commit message corresponding to each parameter. 
-It also lists the date of the last commit and the person making the changes.
-Within the commit message, you will find a link to the scientific publication where the data is taken from.
-Note that this is a new feature and not all system parameters might have a reference associated with it yet.
-Please help making this catalogue better and contribute data or references!
-</p>
 
 
 
