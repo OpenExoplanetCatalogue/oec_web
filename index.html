@@ -31,6 +31,66 @@
 	The Open Exoplanet Catalogue is furthermore the only catalogue that can correctly represent the orbital structure of planets in arbitrary binary, triple and quadruple star systems as well as orphan planets.
 </p>
 
+
+<!-- ########################### -->
+<h2><img src="./img/info.png" alt="info" />Statistics</h2>
+<script type="text/javascript">
+var source = "oec_meta/statistics.xml";
+
+var xmldata = null;
+d3.xml(source, "application/xml", function(xml) {
+	xmldata = xml;
+	updateTable(true);	
+});
+
+var updateTable = function(first){ 
+	// Body
+	$("#confirmedplanets").html($("confirmedplanets",xmldata).text());
+	$("#planets").html($("planets",xmldata).text());
+	$("#binaries").html($("binaries",xmldata).text());
+	$("#systems").html($("systems",xmldata).text());
+	$("#commits").html($("commits",xmldata).text());
+	var isfirstcontributor = true;
+	var contributors = $("contributor",xmldata);
+	for (var i=0; i<contributors.length; i++){
+		if (i!=0){
+			$("#contributors").append(", ");
+		}else{
+			$("#contributors").html("");
+		}
+		$("#contributors").append($(contributors[i]).text());
+	}
+
+
+};
+</script>
+
+<table cellspacing="0" summary="Statistics">
+<tr>
+	<td>Number of confirmed exoplanets</td>
+	<td id="confirmedplanets">&nbsp;</td>
+<tr></tr>
+	<td>Total number of planets (including Solar System objects and unconfirmed exoplanets)</td>
+	<td id="planets">&nbsp;</td>
+<tr></tr>
+	<td>Number of planetary systems</td>
+	<td id="systems">&nbsp;</td>
+<tr></tr>
+	<td>Number of binary systems</td>
+	<td id="binaries">&nbsp;</td>
+</tr>
+<tr></tr>
+	<td>Number of commits</td>
+	<td id="commits">&nbsp;</td>
+</tr>
+<tr></tr>
+	<td>List of contributors</td>
+	<td id="contributors">&nbsp;</td>
+</tr>
+</table>
+</p>
+
+
 <!-- ########################### -->
 <h2><img src="./img/database.png" alt="star" />Data access</h2>
 <p>
