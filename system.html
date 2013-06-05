@@ -85,7 +85,7 @@ function setupPage(xml){
 	planets = $(xml).find("planet");
 	stars = $(xml).find("star");
 	system = $(xml).find("system");
-	$(".systemdistance").text(getFormatForTag($("distance",system)));
+	$(".systemdistance").html(getFormatForTag($("distance",system)));
 }
 
 </script>
