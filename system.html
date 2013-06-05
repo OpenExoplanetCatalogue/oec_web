@@ -85,8 +85,11 @@ function setupPage(xml){
 	planets = $(xml).find("planet");
 	stars = $(xml).find("star");
 	system = $(xml).find("system");
+	// Setting up tags in page.
 	$(".systemdistance").html(getFormatForTag($("distance",system)));
 	$(".systemdistancelightyears").html(getFormatForTag($("distance",system),3.261));
+	$(".systemnumberofstars").text(stars.length);
+	$(".systemnumberofplanets").text(planets.length);
 }
 
 </script>
@@ -164,11 +167,11 @@ function setupPage(xml){
 </tr>
 </tr>
 	<th scope="row">Number of stars in system</th>
-	<td><?=count($stars)?></td>
+	<td><span class="systemnumberofstars"></span></td>
 </tr>
 </tr>
 	<th scope="row">Number of planets in system</th>
-	<td><?=count($planets)?></td>
+	<td><span class="systemnumberofplanets"></span></td>
 </tr>
 </table>
 
