@@ -9,12 +9,14 @@ function MIN(val1,val2) {
 }
 
 
-function getFormatForTag(tag){
-	var error_plus 		= parseFloat(tag.attr("errorplus"));
-	var error_minus 	= parseFloat(tag.attr("errorminus"));
-	var upperlimit 		= parseFloat(tag.attr("upperlimit"));
-	var lowerlimit 		= parseFloat(tag.attr("lowerlimit"));
-	var value 		= parseFloat(tag.text());
+function getFormatForTag(tag,factor){
+	factor = typeof factor !== 'undefined' ? factor : 1.0;
+
+	var error_plus 		= parseFloat(tag.attr("errorplus"))*factor;
+	var error_minus 	= parseFloat(tag.attr("errorminus"))*factor;
+	var upperlimit 		= parseFloat(tag.attr("upperlimit"))*factor;
+	var lowerlimit 		= parseFloat(tag.attr("lowerlimit"))*factor;
+	var value 		= parseFloat(tag.text())*factor;
 	
 	var hideErrors = false;
 	var dataString;

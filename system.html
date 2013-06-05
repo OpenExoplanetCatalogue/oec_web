@@ -86,6 +86,7 @@ function setupPage(xml){
 	stars = $(xml).find("star");
 	system = $(xml).find("system");
 	$(".systemdistance").html(getFormatForTag($("distance",system)));
+	$(".systemdistancelightyears").html(getFormatForTag($("distance",system),3.261));
 }
 
 </script>
@@ -159,7 +160,7 @@ function setupPage(xml){
 </tr>
 </tr>
 	<th scope="row">Distance [lightyears]</th>
-	<td><?=($system->distance?sprintf("%.1f",(float)($system->distance)*3.261):"")?></td>
+	<td><span class="systemdistancelightyears"></span></td>
 </tr>
 </tr>
 	<th scope="row">Number of stars in system</th>
