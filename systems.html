@@ -171,9 +171,11 @@ function getValueForPlanetAndKey(planet,key){
 			
 		case "declination":
 		case "rightascension":
-		case "lastupdate":
 			var system = $(planet).parents("system");
 			return $(key,system).text();
+
+		case "lastupdate":
+			return $(key,planet).text();
 
 		case "distance":
 			var system = $(planet).parents("system");
