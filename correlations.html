@@ -67,6 +67,7 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="declination">Declination [deg]</option>
 		<option value="rightascension">Right ascension [h]</option>
 		<option value="distance">Distance from Earth [pc]</option>
+		<option value="age">Stellar age [Gyrs]</option>
 		</select>
 	</td>
 </tr>
@@ -106,6 +107,7 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="declination">Declination [deg]</option>
 		<option value="rightascension">Right ascension [h]</option>
 		<option value="distance">Distance from Earth [pc]</option>
+		<option value="age">Stellar age [Gyrs]</option>
 		</select>
 	</td>
 </tr>
@@ -146,6 +148,7 @@ Hover over a circle to see to which planet it corresponds. Click on it to view t
 		<option value="declination">Declination [deg]</option>
 		<option value="rightascension">Right ascension [h]</option>
 		<option value="distance">Distance from Earth [pc]</option>
+		<option value="age">Stellar age [Gyrs]</option>
 		</select>
 	</td>
 </tr>
@@ -314,6 +317,11 @@ function getValueForPlanetAndKey(planet,key,returnhtml){
 		case "distance":
 			var system = $(planet).parents("system");
 			return parseFloat($(key,system).text());
+		
+		case "age":
+			var star = $(planet).parents("star");
+			return parseFloat($(key,star).text());
+
 
 		default:
 			if (returnhtml){
