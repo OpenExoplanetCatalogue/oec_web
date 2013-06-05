@@ -91,6 +91,7 @@ function setupPage(xml){
 	$(".systemnumberofstars").text(stars.length);
 	$(".systemnumberofplanets").text(planets.length);
 	$(".systemrightascension").html(getFormatForRightAscension($("rightascension",system).text()));
+	$(".systemdeclination").html(getFormatForDeclination($("declination",system).text()));
 }
 
 </script>
@@ -156,7 +157,7 @@ function setupPage(xml){
 <tr>
 </tr>
 	<th scope="row">Declination</th>
-	<td><?=($dec[0]?$dec[0]."&deg; ".$dec[1]."' ".$dec[2]."\"":"")?></td>
+	<td><span class="systemdeclination"></span></td>
 </tr>
 </tr>
 	<th scope="row">Distance [parsec]</th>

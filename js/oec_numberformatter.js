@@ -13,7 +13,15 @@ function getFormatForRightAscension(text){
 		return notAvailableString;
 	}else{
 		ra = text.split(" ");
-		return ra[0] + "i<sup>h</sup> " + ra[1] + "<sup>m</sup> " + ra[2] + "<sup>s</sup>";
+		return ra[0] + "<sup>h</sup> " + ra[1] + "<sup>m</sup> " + ra[2] + "<sup>s</sup>";
+	}
+}
+function getFormatForDeclination(text){
+	if (text.length<8){
+		return notAvailableString;
+	}else{
+		dec = text.split(" ");
+		return dec[0] + "&deg; " + dec[1] + "' " + dec[2] + "\"";
 	}
 }
 
