@@ -90,6 +90,7 @@ function setupPage(xml){
 	$(".systemdistancelightyears").html(getFormatForTag($("distance",system),3.261));
 	$(".systemnumberofstars").text(stars.length);
 	$(".systemnumberofplanets").text(planets.length);
+	$(".systemrightascension").html(getFormatForRightAscension($("rightascension",system).text()));
 }
 
 </script>
@@ -151,7 +152,7 @@ function setupPage(xml){
 	?>
 <tr>
 	<th scope="row">Right ascension</th>
-	<td><?=($ra[0]?$ra[0]."h ".$ra[1]."m ".$ra[2]."s":"")?></td>
+	<td><span class="systemrightascension"></span></td>
 <tr>
 </tr>
 	<th scope="row">Declination</th>

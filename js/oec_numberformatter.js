@@ -7,7 +7,15 @@ function MAX(val1,val2) {
 function MIN(val1,val2) {
 	  return Math.min(val1,val2);
 }
-
+var notAvailableString = "<span class=\"NA\">N/A</span>";
+function getFormatForRightAscension(text){
+	if (text.length<8){
+		return notAvailableString;
+	}else{
+		ra = text.split(" ");
+		return ra[0] + "i<sup>h</sup> " + ra[1] + "<sup>m</sup> " + ra[2] + "<sup>s</sup>";
+	}
+}
 
 function getFormatForTag(tag,factor){
 	factor = typeof factor !== 'undefined' ? factor : 1.0;
@@ -40,7 +48,7 @@ function getFormatForTag(tag,factor){
 		exponent = Math.floor(log10(lowerlimit));
 		dexponent = Math.pow(10, exponent);
 	}else{
-		return "<span class=\"NA\">N/A</span>";
+		return notAvailableString;
 	}
 
 	if ((exponent>-4 && exponent<5) || (!isNaN(value) && value<=0.) ){
