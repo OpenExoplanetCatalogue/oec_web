@@ -71,7 +71,7 @@ div #pop-up {
 	padding: 	5px 10px 5px 10px;
 	-moz-border-radius: 8px 8px;
 	border-radius:	8px 8px;
-	width: 		16em;
+	width: 		18em;
 	font-size: 	12px;
 }
 div #pop-up-title {
@@ -83,7 +83,7 @@ div #pop-up-title {
 div #pop-up-description, div #pop-up-title {
 	margin-bottom:	4px;
 }
-div #pop-up-values span{
+span.popupvalue{
 	display: 	inline-block;
 	width: 		10.5em;
 }

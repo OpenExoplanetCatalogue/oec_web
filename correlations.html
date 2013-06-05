@@ -14,6 +14,7 @@
 <script type="text/javascript" src="./js/rgbcolor.js"></script> 
 <script type="text/javascript" src="./js/canvg.js"></script> 
 <script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="./js/oec_numberformatter.js"></script>
 </head>
 <body>
 <div class="outer-container">
@@ -292,7 +293,9 @@ d3.xml(source, "application/xml", function(xml) {
 
 
 // Function returning the value specified by key for a given planet 
-function getValueForPlanetAndKey(planet,key){
+function getValueForPlanetAndKey(planet,key,returnhtml){
+	returnhtml = (typeof returnhtml === "undefined") ? false : returnhtml;
+
 	switch (key){
 		case "numberofplanetsinsystem":
 			var system = $(planet).parents("system");
@@ -313,7 +316,12 @@ function getValueForPlanetAndKey(planet,key){
 			return parseFloat($(key,system).text());
 
 		default:
- 			return parseFloat($(key,planet).text());
+			if (returnhtml){
+ 				return getFormatForTag($(key,planet));
+			}else{
+ 				return parseFloat($(key,planet).text());
+			}
+
 	}
 }
 
@@ -638,13 +646,13 @@ var updatePlot = function(first){
 				d3.select("#pop-up-description").html("");
 			}
 			var values = "";
-			values += 		 "<span>" +	xlabel + ":</span>" + getValueForPlanetAndKey(d,xkey)
-					+  "<br /><span>" +	ylabel + ":</span>" + getValueForPlanetAndKey(d,ykey);
+			values += 		 "<span class=\"popupvalue\">" +	xlabel + ":</span>" + getValueForPlanetAndKey(d,xkey,true)
+					+  "<br /><span class=\"popupvalue\">" +	ylabel + ":</span>" + getValueForPlanetAndKey(d,ykey,true);
 			if (colorkey!="none"){
-				values +=  "<br /><span>" +	colorlabel + ":</span>" + getValueForPlanetAndKey(d,colorkey);
+				values +=  "<br /><span class=\"popupvalue\">" +	colorlabel + ":</span>" + getValueForPlanetAndKey(d,colorkey,true);
 			}
 			if (sizekey!="none"){
-				values +=  "<br /><span>" +	sizelabel + ":</span>" + getValueForPlanetAndKey(d,sizekey);
+				values +=  "<br /><span class=\"popupvalue\">" +	sizelabel + ":</span>" + getValueForPlanetAndKey(d,sizekey,true);
 			}
 
 			$("#pop-up-values").html(values);
