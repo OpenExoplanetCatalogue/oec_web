@@ -91,3 +91,24 @@ div #pop-up-values span{
 .clearer {
 	clear: both;
 }
+
+span.errorbars {
+	position:relative;
+	font-size: 0.6em;
+}
+
+span.errorplus { 
+	position:absolute;
+	z-index: 1;
+	top:-0.7em;
+}
+
+span.errorminus {
+	position:absolute;
+	z-index: 2;
+	top:0.3em;
+}
+
+span.NA {
+	color: lightgray;
+}

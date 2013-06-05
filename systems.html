@@ -171,9 +171,12 @@ function getValueForPlanetAndKey(planet,key){
 			
 		case "declination":
 		case "rightascension":
-		case "distance":
 			var system = $(planet).parents("system");
 			return $(key,system).text();
+
+		case "distance":
+			var system = $(planet).parents("system");
+			return getFormatForTag($(key,system));
 
 		case "name:first":
  			var name = $(key,planet).text();

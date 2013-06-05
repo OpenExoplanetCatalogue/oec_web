@@ -38,7 +38,7 @@ function getFormatForTag(tag){
 		exponent = Math.floor(log10(lowerlimit));
 		dexponent = Math.pow(10, exponent);
 	}else{
-		return "N/A";
+		return "<span class=\"NA\">N/A</span>";
 	}
 
 	if ((exponent>-4 && exponent<5) || (!isNaN(value) && value<=0.) ){
@@ -76,18 +76,18 @@ function getFormatForTag(tag){
 		dataString = value.toFixed(significantdigits);
 	}else{
 		if (!isNaN(lowerlimit)){
-			dataString = "> "+lowerlimit.toFixed(significantdigits);
+			dataString = "&gt; "+lowerlimit.toFixed(significantdigits);
 		}else if (!isNaN(upperlimit)){
-			dataString = "< "+upperlimit.toFixed(significantdigits);
+			dataString = "&lt; "+upperlimit.toFixed(significantdigits);
 		}
 	}
 
 	if (isExp){
 		exp2String = exponent.toFixed(0);
 		if (hasErrors){
-			exp1String = " )*10"
+			exp1String = " )&#183;10"
 		}else{
-			exp1String = " *10"
+			exp1String = " &#183;10"
 		}
 	}else{
 		exp1String = "";
@@ -96,18 +96,18 @@ function getFormatForTag(tag){
 
 	if (hasErrors){
 		if (!isNaN(error_minus)){
-			errorMinusString = "-"+error_minus.toFixed(significantdigits);
+			errorMinusString = "&#8722;"+error_minus.toFixed(significantdigits);
 		}else{
 			errorMinusString = "";
 		}
 		if (!isNaN(error_plus)){
-			errorPlusString = "+"+error_plus.toFixed(significantdigits);
+			errorPlusString = "&#43;"+error_plus.toFixed(significantdigits);
 		}else{
 			errorPlusString = "";
 		}
 		if (!isNaN(error_minus)&&!isNaN(error_minus)){
-			if (errorMinusString.substring(1)==errorPlusString.substring(1)){
-				errorString = "+/-"+ errorMinusString.substring(1);
+			if (errorMinusString.substring(7)==errorPlusString.substring(5)){
+				errorString = "&#177;"+ errorMinusString.substring(7);
 				errorMinusString = "";
 				errorPlusString = "";
 			}else{
@@ -128,5 +128,15 @@ function getFormatForTag(tag){
 	}else{
 		exp0String = "";
 	}
-	return exp0String+dataString+errorString+"<sup>"+errorPlusString+"</sup>"+"<sub>"+errorMinusString+"</sub>"+exp1String+"<sup>"+exp2String+"</sup>";
+	var returnString = "";
+	returnString += exp0String;
+	returnString += dataString;
+	returnString += errorString;
+	returnString += "<span class=\"errorbars\">";
+	returnString += "<span class=\"errorplus\">"+errorPlusString+"</span>";
+	returnString += "<span class=\"errorminus\">"+errorMinusString+"</span>";
+	returnString += "</span>";
+	returnString += exp1String+"<sup>"+exp2String+"</sup>";
+
+	return returnString;
 }
