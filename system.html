@@ -18,6 +18,7 @@
 <script type="text/javascript" src="./js/jquery.tablesorter.min.js"></script> 
 <script type="text/javascript" src="./js/dragdealer.js"></script>
 <script type="text/javascript" src="./js/oec_orbit.js"></script>
+<script type="text/javascript" src="./js/oec_numberformatter.js"></script>
 </script>
 </head>
 <body>
@@ -65,6 +66,28 @@ $ra = explode(" ",$system->rightascension);
 $raf = $ra[0]; $raf += 1.0/60.0 * $ra[1]; $raf += 1.0/(60.0*60.0) * $ra[2]; 
 $dec = explode(" ",$system->declination);
 $decf = $dec[0]; $decf<=0.?$sign=1.:$sign=-1.; $decf += $sign/60.0 * $dec[1]; $decf += $sign/(60.0*60.0) * $dec[2]; 
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$.ajax({
+		type: "GET",
+		url: "./<?=$filename?>",
+		dataType: "xml",
+		success: setupPage
+		});
+	});
+
+var planets;
+var stars; 
+var system;
+function setupPage(xml){
+	setupOrbitPlot(xml);
+	planets = $(xml).find("planet");
+	stars = $(xml).find("star");
+	system = $(xml).find("system");
+	$(".systemdistance").text(getFormatForTag($("distance",system)));
+}
+
 </script>
 
 
@@ -132,7 +155,7 @@ $decf = $dec[0]; $decf<=0.?$sign=1.:$sign=-1.; $decf += $sign/60.0 * $dec[1]; $d
 </tr>
 </tr>
 	<th scope="row">Distance [parsec]</th>
-	<td><?=$system->distance?></td>
+	<td><span class="systemdistance"></span></td>
 </tr>
 </tr>
 	<th scope="row">Distance [lightyears]</th>
@@ -441,18 +464,6 @@ for ($r=0;$r<count($planets);$r+=$maxcol){
     font-size: 12px;
 }
 </style>
-<script type="text/javascript">
-$(document).ready(function(){
-	$.ajax({
-		type: "GET",
-		url: "./<?=$filename?>",
-		dataType: "xml",
-		success: setupOrbitPlot
-		});
-	});
-
-
-</script>
 
 <h3>Planet sizes</h3>
 <p>
