@@ -132,11 +132,15 @@ function getFormatForTag(tag){
 	returnString += exp0String;
 	returnString += dataString;
 	returnString += errorString;
-	returnString += "<span class=\"errorbars\">";
-	returnString += "<span class=\"errorplus\">"+errorPlusString+"</span>";
-	returnString += "<span class=\"errorminus\">"+errorMinusString+"</span>";
-	returnString += "</span>";
-	returnString += exp1String+"<sup>"+exp2String+"</sup>";
+	if (errorPlusString.length || errorMinusString.length){
+		returnString += "<span class=\"errorbars\">";
+		returnString += "<span class=\"errorplus\">"+errorPlusString+"</span>";
+		returnString += "<span class=\"errorminus\">"+errorMinusString+"</span>";
+		returnString += "</span>";
+	}
+	if (exp2String.length || exp1String.length){
+		returnString += exp1String+"<sup>"+exp2String+"</sup>";
+	}
 
 	return returnString;
 }
