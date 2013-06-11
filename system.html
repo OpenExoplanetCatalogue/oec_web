@@ -83,6 +83,60 @@ $(document).ready(function(){
 		});
 	});
 
+var subSystemString = "";
+function printSubSystem(o,stype){
+	stype = typeof stype !== 'undefined' ? stype : 0;
+	if (stype==1){
+		subSystemString += "<ul style=\"padding: 0; margin: 0;\">";
+	}else{
+		subSystemString += "<ul style=\"padding-left: 1em; margin-left: 1em;\">";
+	}
+	var binaries = $("> binary",o);
+	for(var i=0;i<binaries.length;i++){
+		var binary = binaries.eq(i);
+		subSystemString += "<li><img src=\"./img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
+		var semia = $("> semimajoraxis",binary);
+		if (semia){
+			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
+		}
+		var period = $("> period",binary);
+		if (period){
+			if (parseFloat(period.text())>1000){
+				subSystemString += ", " +getFormatForTag(period,0.002737909)+" years";
+			}else{
+				subSystemString += ", " +getFormatForTag(period)+" days";
+			}
+		}
+		printSubSystem(binary,2);
+	}
+	var stars = $("> star",o);
+	for(var i=0;i<stars.length;i++){
+		var star = stars.eq(i);
+		subSystemString += "<li><img src=\"./img/star.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",star).first().text()+", stellar object";
+		printSubSystem(star);
+	}
+	var planets = $("> planet",o);
+	for(var i=0;i<planets.length;i++){
+		var planet = planets.eq(i);
+		subSystemString += "<li><img src=\"./img/planet.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",planet).first().text();
+		if (stype==0){
+			subSystemString += ", planet";
+		}
+		if (stype==1){
+			subSystemString += ", orphan planet";
+		}
+		if (stype==2){
+			subSystemString += ", circumbinary planet, P-type";
+		}
+		var semia = $("> semimajoraxis",planet);
+		if (semia){
+			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
+		}
+		printSubSystem(planet);
+	}
+	subSystemString += "</ul>";
+}
+
 var planets;
 var stars; 
 var system;
@@ -136,62 +190,16 @@ function setupPage(xml){
 			$(".systemimage").css("background-image","url('./open_exoplanet_catalogue/images/"+systemimage+".jpg')"); 
 			$(".systemimagedescription").text($("imagedescription",system).first().text());
 		}
+		var systemvideo = $("videolink",system).first().text().split("/").pop();
+		console.log(systemvideo);
+		if (systemvideo.length){
+			$(".systemvideosection").css("display","inline");
+			$(".systemvideo").attr("src","http://www.youtube.com/embed/"+systemvideo+"?rel=0&autoplay=1");
+		}
 	}
-------------------------
-------------------------
-------------------------
-
-<?
-function printSubSystem(o,type=0){
-	if ($type==1){
-		print "<ul style=\"padding: 0; margin: 0;\">";
-	}else{
-		print "<ul style=\"padding-left: 1em; margin-left: 1em;\">";
-	}
-	$binaries = $o->binary;
-	foreach ($binaries as $binary){
-		print "<li><img src=\"./img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
-		if ($binary->semimajoraxis){
-			print ", semi-major axis: ".$binary->semimajoraxis." AU";
-		}
-		if ($binary->period){
-			if ((float)$bianry->period>1000){
-				print ", period: ".((float)($binary->period)*0.002737909)." years";
-			}else{
-				print ", period: ".$binary->period." days";
-			}
-		}
-		printSubSystem($binary,2);
-	}
-	$stars = $o->star;
-	foreach ($stars as $star){
-		print "<li><img src=\"./img/star.png\" width=\"16\" height=\"16\" />&nbsp;".$star->name.", stellar object";
-		printSubSystem($star);
-	}
-	$planets = $o->planet;
-	foreach ($planets as $planet){
-		print "<li><img src=\"./img/planet.png\" width=\"16\" height=\"16\" />&nbsp;".$planet->name;
-		if ($type==0){
-			print ", planet";
-		}
-		if ($type==1){
-			print ", orphan planet";
-		}
-		if ($type==2){
-			print ", circumbinary planet, P-type";
-		}
-		if ($planet->semimajoraxis){
-			print ", semi-major axis: ".$planet->semimajoraxis." AU";
-		}
-		printSubSystem($planet);
-	}
-	print "</ul>";
-}
-printSubSystem($system,1);
-?>
-------------------------
-------------------------
-------------------------
+	
+	printSubSystem(system,1);
+	$(".systembinary").html(subSystemString);
 
 	var starstable = d3.select("#starstable");
 	var rows = ["Mass","Radius"];
@@ -290,11 +298,11 @@ This list shows all planetary and stellar components in the system. It gives a q
 
 
 <!-- ########################### -->
-<?if($system->videolink){?>
+<div class="systemvideosection" style="display: none;">
 <h2><img src="./img/movie.png" alt="Video" />Video</h2>
-<p>This video shows the planetary system <?=$system->name?>. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
-<iframe width="640" height="360" src="http://www.youtube.com/embed/<?=end(explode("/",$system->videolink))?>?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>
-<?}?>
+<p>This video shows the planetary system <span class="systemname"></span>. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
+<iframe width="640" height="360" class="systemvideo" frameborder="0" allowfullscreen></iframe>
+</div>
 
 
 <!-- ########################### -->
