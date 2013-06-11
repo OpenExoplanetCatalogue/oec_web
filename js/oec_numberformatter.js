@@ -25,6 +25,17 @@ function getFormatForDeclination(text){
 	}
 }
 
+function getFormatForTagText(tag){
+	if (tag){
+		var t = tag.text();
+		if (t.length<1){
+			return notAvailableString;
+		}
+		return t;
+	}
+	return notAvailableString;
+}
+
 function getFormatForTag(tag,factor){
 	factor = typeof factor !== 'undefined' ? factor : 1.0;
 

@@ -84,7 +84,7 @@ $(document).ready(function(){
 	});
 
 var subSystemString = "";
-function printSubSystem(o,stype){
+function setupArchitecture(o,stype){
 	stype = typeof stype !== 'undefined' ? stype : 0;
 	if (stype==1){
 		subSystemString += "<ul style=\"padding: 0; margin: 0;\">";
@@ -107,13 +107,13 @@ function printSubSystem(o,stype){
 				subSystemString += ", " +getFormatForTag(period)+" days";
 			}
 		}
-		printSubSystem(binary,2);
+		setupArchitecture(binary,2);
 	}
 	var stars = $("> star",o);
 	for(var i=0;i<stars.length;i++){
 		var star = stars.eq(i);
 		subSystemString += "<li><img src=\"./img/star.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",star).first().text()+", stellar object";
-		printSubSystem(star);
+		setupArchitecture(star);
 	}
 	var planets = $("> planet",o);
 	for(var i=0;i<planets.length;i++){
@@ -132,10 +132,11 @@ function printSubSystem(o,stype){
 		if (semia){
 			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
 		}
-		printSubSystem(planet);
+		setupArchitecture(planet);
 	}
 	subSystemString += "</ul>";
 }
+
 
 var planets;
 var stars; 
@@ -188,19 +189,49 @@ function setupPage(xml){
 		if (systemimage.length){
 			$(".systemimagesection").css("display","inline");
 			$(".systemimage").css("background-image","url('./open_exoplanet_catalogue/images/"+systemimage+".jpg')"); 
+			$(".systemimagelink").attr("href","./open_exoplanet_catalogue/images/"+systemimage+".jpg");
 			$(".systemimagedescription").text($("imagedescription",system).first().text());
 		}
 		var systemvideo = $("videolink",system).first().text().split("/").pop();
-		console.log(systemvideo);
 		if (systemvideo.length){
 			$(".systemvideosection").css("display","inline");
 			$(".systemvideo").attr("src","http://www.youtube.com/embed/"+systemvideo+"?rel=0&autoplay=1");
 		}
 	}
 	
-	printSubSystem(system,1);
+	setupArchitecture(system,1);
 	$(".systembinary").html(subSystemString);
 
+	for (var i=0;i<planets.length;i+=2){
+		$("#planettabletemplate").clone().css("display","table").appendTo(".planetsection");
+	}
+	var tables = $(".planetsection > .planettable");
+	for (var i=0;i<planets.length;i++){
+		var table = tables.eq(i/2);
+		var planet = planets.eq(i);
+		var planetnames = $("name",planet);
+		$(".planetname",table).append("<td>"+planetnames.first().text()+"</td>");
+		var alternativename = "<td>";
+		if (planetnames.length>1){
+			for(var j=1;j<planetnames.length;j++){
+				alternativename += planetnames.eq(j).text();
+				if (j!=planetnames.length-1){
+					alternativename += ", ";
+				}
+			}
+		}else{
+			alternativename += notAvailableString;
+		}
+		alternativename += "</td>";
+		$(".planetalternativename",table).append(alternativename);
+		$(".planetdescription",table).append("<td>"+getFormatForTagText($("description",planet))+"</td>");
+		$(".planetmass",table).append("<td>"+getFormatForTag($("mass",planet))+"</td>");
+
+	}
+	
+	
+	
+	
 	var starstable = d3.select("#starstable");
 	var rows = ["Mass","Radius"];
 		
@@ -279,7 +310,7 @@ function setupPage(xml){
 <!-- ########################### -->
 <div class="systemimagesection" style="display: none;">
 <h2><img src="./img/photo.png" alt="Image" />Image</h2>
-<a href='./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
+<a class="systemimagelink" href='#'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
 <p>
 <span class="systemimagedescription"></span><br /> Click on the image to get a higher resolution image.
 </p>
@@ -425,6 +456,60 @@ for ($r=0;$r<count($planets);$r+=$maxcol){
 </table>
 <div class="spacer" style="height:10px;"></div>
 <?}?>
+
+
+
+
+
+<div class="planetsection"></div>
+
+<table cellspacing="0" class="planettable" id="planettabletemplate" summary="Details of the planetary system" style="padding-bottom: 2em; display:none;">
+<tr class="planetname">
+	<th scope="col" class="nobg">&nbsp;</th>
+</tr>
+<tr class="planetalternativename">
+	<th valign="top" scope="row">Alternative names</th>
+</tr>
+<tr class="planetdescription">
+	<th valign="top" scope="row">Description and Trivia</th>
+</tr>
+<tr class="planetlists">
+	<th valign="top" scope="row">Lists</th>
+</tr>
+<tr class="planetmass">
+	<th scope="row">Mass [M<sub>Jup</sub>]</th>
+</tr>
+<tr>
+	<th scope="row">Mass [M<sub>Earth</sub>]</th>
+</tr>
+<tr>
+	<th scope="row">Orbital period [days]</th>
+</tr>
+<tr>
+	<th scope="row">Semi-major axis [AU]</th>
+</tr>
+<tr>
+	<th scope="row">Eccentricity</th>
+</tr>
+<tr>
+	<th scope="row">Radius [R<sub>Jup</sub>]</th>
+</tr>
+<tr>
+	<th scope="row">Radius [R<sub>Earth</sub>]</th>
+</tr>
+<tr>
+	<th scope="row">Temperature [K]</th>
+</tr>
+<tr>
+	<th scope="row">Discovery method</th>
+</tr>
+<tr>
+	<th scope="row">Discovery year</th>
+</tr>
+<tr>
+	<th scope="row">Last updated [yy/mm/dd]</th>
+</tr>
+</table>
 
 <!-- ########################### -->
 <?if (count($stars)>0){?>
