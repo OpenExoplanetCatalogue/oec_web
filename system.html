@@ -225,7 +225,31 @@ function setupPage(xml){
 		alternativename += "</td>";
 		$(".planetalternativename",table).append(alternativename);
 		$(".planetdescription",table).append("<td>"+getFormatForTagText($("description",planet))+"</td>");
+		var planetlists = $("list",planet);
+		var lists = "<td>";
+		if (planetlists.length>0){
+			for(var j=0;j<planetlists.length;j++){
+				lists += planetlists.eq(j).text();
+				if (j!=planetlists.length-1){
+					lists += ", ";
+				}
+			}
+		}else{
+			lists += notAvailableString;
+		}
+		lists += "</td>";
+		$(".planetlists",table).append(lists);
 		$(".planetmass",table).append("<td>"+getFormatForTag($("mass",planet))+"</td>");
+		$(".planetmassearth",table).append("<td>"+getFormatForTag($("mass",planet),317.8942)+"</td>");
+		$(".planetperiod",table).append("<td>"+getFormatForTag($("period",planet))+"</td>");
+		$(".planeteccentricity",table).append("<td>"+getFormatForTag($("eccentricity",planet))+"</td>");
+		$(".planetsemia",table).append("<td>"+getFormatForTag($("semimajoraxis",planet))+"</td>");
+		$(".planetradius",table).append("<td>"+getFormatForTag($("radius",planet))+"</td>");
+		$(".planetradiusearth",table).append("<td>"+getFormatForTag($("radius",planet),10.973299)+"</td>");
+		$(".planettemperature",table).append("<td>"+getFormatForTag($("temperature",planet))+"</td>");
+		$(".planetdiscoverymethod",table).append("<td>"+getFormatForTagText($("discoverymethod",planet))+"</td>");
+		$(".planetdiscoveryyear",table).append("<td>"+getFormatForTagText($("discoveryyear",planet))+"</td>");
+		$(".planetlastupdate",table).append("<td>"+getFormatForTagText($("lastupdate",planet))+"</td>");
 
 	}
 	
@@ -479,34 +503,34 @@ for ($r=0;$r<count($planets);$r+=$maxcol){
 <tr class="planetmass">
 	<th scope="row">Mass [M<sub>Jup</sub>]</th>
 </tr>
-<tr>
+<tr class="planetmassearth">
 	<th scope="row">Mass [M<sub>Earth</sub>]</th>
 </tr>
-<tr>
+<tr class="planetperiod">
 	<th scope="row">Orbital period [days]</th>
 </tr>
-<tr>
+<tr class="planetsemia">
 	<th scope="row">Semi-major axis [AU]</th>
 </tr>
-<tr>
+<tr class="planeteccentricity">
 	<th scope="row">Eccentricity</th>
 </tr>
-<tr>
+<tr class="planetradius">
 	<th scope="row">Radius [R<sub>Jup</sub>]</th>
 </tr>
-<tr>
+<tr class="planetradiusearth">
 	<th scope="row">Radius [R<sub>Earth</sub>]</th>
 </tr>
-<tr>
+<tr class="planettemperature">
 	<th scope="row">Temperature [K]</th>
 </tr>
-<tr>
+<tr class="planetdiscoverymethod">
 	<th scope="row">Discovery method</th>
 </tr>
-<tr>
+<tr class="planetdiscoveryyear">
 	<th scope="row">Discovery year</th>
 </tr>
-<tr>
+<tr class="planetlastupdate">
 	<th scope="row">Last updated [yy/mm/dd]</th>
 </tr>
 </table>
