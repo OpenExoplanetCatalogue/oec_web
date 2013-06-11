@@ -74,8 +74,7 @@ function qs(key) {
     return match && decodeURIComponent(match[1].replace(/\+/g, " "));
 }
 $(document).ready(function(){
-	var systemname = qs("system");
-	console.log("name "+systemname);
+	var systemname = qs("system");  // make this php-able
 	$.ajax({
 		type: "GET",
 		url: "./open_exoplanet_catalogue/systems/"+systemname+".xml",
@@ -88,13 +87,27 @@ var planets;
 var stars; 
 var system;
 function setupPage(xml){
-	console.log("Setup Page");
 	setupOrbitPlot(xml);
 	planets = $(xml).find("planet");
 	stars = $(xml).find("star");
 	system = $(xml).find("system");
 	// Setting up tags in page.
+	if (planets.length==1){
+		$(".systemcategory").append("The planetary system <span class=\"systemname\"></span> hosts at least one planet. ");
+	}
+	if (planets.length>1){
+		$(".systemcategory").append("The planetary system <span class=\"systemname\"></span> hosts at least <span class=\"systemnumberofplanets\"></span> planets. ");
+	}
+	if (stars.length>1){
+		$(".systemcategory").append("Note that the system is a multiple star system. It hosts at least <span class=\"systemnumberofstars\"></span> stellar components. ");
+	}
+	if (stars.length==0){
+		$(".systemcategory").append("The planet is a so called orphan planet and not associated with any star. ");
+	}
 	$(".systemname").text($("name",system).first().text());
+	if (stars.length<2 && planets.length==1){
+		$(".systemdescription").text($("description",planets[0]).text());
+	}
 	$(".systemdistance").html(getFormatForTag($("distance",system)));
 	$(".systemdistancelightyears").html(getFormatForTag($("distance",system),3.261));
 	$(".systemnumberofstars").text(stars.length);
@@ -129,23 +142,10 @@ function setupPage(xml){
 </div>
 <h1><span class="systemname"></span></h1>
 <p>
-<?if (count($planets)==1){?>
-	The planetary system <span class="systemname"></span> hosts at least one planet.
-<?}?>
-<?if (count($planets)>1){?>
-	The planetary system <span class="systemname"></span> hosts at least <span class="systemnumberofplanets"></span> planets.
-<?}?>
-<?if (count($stars)>1){?>
-	Note that the system is a multiple star system. It hosts at least <span class="systemnumberofstars" /> stellar components.
-<?}?>
-<?if (count($stars)==0){?>
-	The planet is a so called orphan planet and not associated with any star.
-<?}?>
+	<span class="systemcategory"></span>
 </p>
 <p>
-<?if (count($planets)==1&&count($stars)<2){?>
-	<?=$planets[0]->description?>
-<?}?>
+	<span class="systemdescription"></span>
 </p>
 
 <div class="spacer"></div>
