@@ -68,10 +68,17 @@ $dec = explode(" ",$system->declination);
 $decf = $dec[0]; $decf<=0.?$sign=1.:$sign=-1.; $decf += $sign/60.0 * $dec[1]; $decf += $sign/(60.0*60.0) * $dec[2]; 
 </script>
 <script type="text/javascript">
+function qs(key) {
+    key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
+    var match = location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
+    return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+}
 $(document).ready(function(){
+	var systemname = qs("system");
+	console.log("name "+systemname);
 	$.ajax({
 		type: "GET",
-		url: "./<?=$filename?>",
+		url: "./open_exoplanet_catalogue/systems/"+systemname+".xml",
 		dataType: "xml",
 		success: setupPage
 		});
@@ -81,17 +88,29 @@ var planets;
 var stars; 
 var system;
 function setupPage(xml){
+	console.log("Setup Page");
 	setupOrbitPlot(xml);
 	planets = $(xml).find("planet");
 	stars = $(xml).find("star");
 	system = $(xml).find("system");
 	// Setting up tags in page.
+	$(".systemname").text($("name",system).first().text());
 	$(".systemdistance").html(getFormatForTag($("distance",system)));
 	$(".systemdistancelightyears").html(getFormatForTag($("distance",system),3.261));
 	$(".systemnumberofstars").text(stars.length);
 	$(".systemnumberofplanets").text(planets.length);
 	$(".systemrightascension").html(getFormatForRightAscension($("rightascension",system).text()));
 	$(".systemdeclination").html(getFormatForDeclination($("declination",system).text()));
+
+
+	var starstable = d3.select("#starstable");
+	var rows = ["Mass","Radius"];
+		
+	d3.selectAll("tr")
+	.data(rows)
+	.enter()
+	.append("tr")
+	.text(function (column){return column;});
 }
 
 </script>
@@ -108,16 +127,16 @@ function setupPage(xml){
 		</iframe>
 	</div>
 </div>
-<h1><?=$system->name?></h1>
+<h1><span class="systemname"></span></h1>
 <p>
 <?if (count($planets)==1){?>
-	The planetary system <?=$system->name?> hosts at least one planet.
+	The planetary system <span class="systemname"></span> hosts at least one planet.
 <?}?>
 <?if (count($planets)>1){?>
-	The planetary system <?=$system->name?> hosts at least <?=count($planets)?> planets.
+	The planetary system <span class="systemname"></span> hosts at least <span class="systemnumberofplanets"></span> planets.
 <?}?>
 <?if (count($stars)>1){?>
-	Note that the system is a multiple star system. It hosts at least <?=count($stars)?> stellar components.
+	Note that the system is a multiple star system. It hosts at least <span class="systemnumberofstars" /> stellar components.
 <?}?>
 <?if (count($stars)==0){?>
 	The planet is a so called orphan planet and not associated with any star.
@@ -382,7 +401,7 @@ for ($r=0;$r<count($planets);$r+=$maxcol){
 <?if (count($stars)>0){?>
 <h2><img src="./img/help-about.png" alt="star" />Stars in the system</h2>
 <p>This table lists all stars in the system <?=$system->name?>. If a row is empty, no data is available</p>
-<table cellspacing="0" summary="Details of the stars in the system">
+<table cellspacing="0" id="starstable" summary="Details of the stars in the system">
 <tr>
 	<th scope="col" class="nobg">&nbsp;</th>
 	<?foreach($stars as $star){?>
