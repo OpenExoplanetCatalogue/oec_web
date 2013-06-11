@@ -166,7 +166,11 @@ function updatePlot(){
 	newdots.append("circle")
 		.attr("r",function(planet){
 			var m = parseFloat($("mass",planet).text());
-			return width/80.*Math.pow(m,1./3.);
+			if (m>0){
+				return width/80.*Math.pow(m,1./3.);
+			}else{
+				return 2;
+			}
 		});
 
 	newdots.append("text")
