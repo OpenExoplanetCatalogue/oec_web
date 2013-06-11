@@ -100,11 +100,26 @@ function setupPage(xml){
 	}
 	if (stars.length>1){
 		$(".systemcategory").append("Note that the system is a multiple star system. It hosts at least <span class=\"systemnumberofstars\"></span> stellar components. ");
+		$(".systembinarytext").html("Note that <span class=\"systemname\"></span> is binary system. The list can be used to infer which planet is orbiting which star and whether it is a S- or P-type orbit.");
+	}else{
+		$(".systembinarytext").html("<span class=\"systemname\"></span> is not binary system, so the architecture is rather simple. ");
 	}
 	if (stars.length==0){
 		$(".systemcategory").append("The planet is a so called orphan planet and not associated with any star. ");
 	}
-	$(".systemname").text($("name",system).first().text());
+	var systemnames = $("> name",system);
+	$(".systemname").text(systemnames.first().text());
+	if (systemnames.length>1){
+		for(var i=1;i<systemnames.length;i++){
+			$(".systemalternativenames").append(systemnames.eq(i).text());
+			if (i!=systemnames.length-1){
+				$(".systemalternativenames").append(", ");
+			}
+		}
+	}else{
+		$(".systemalternativenames").append(notAvailableString);
+	}
+
 	if (stars.length<2 && planets.length==1){
 		$(".systemdescription").text($("description",planets[0]).text());
 	}
@@ -122,110 +137,12 @@ function setupPage(xml){
 			$(".systemimagedescription").text($("imagedescription",system).first().text());
 		}
 	}
+------------------------
+------------------------
+------------------------
 
-	var starstable = d3.select("#starstable");
-	var rows = ["Mass","Radius"];
-		
-	d3.selectAll("tr")
-	.data(rows)
-	.enter()
-	.append("tr")
-	.text(function (column){return column;});
-}
-
-</script>
-
-
-<!-- ########################### -->
-<!-- ########################### -->
-<div style="width:50em;">
-	<div style="float:right;">
-		<iframe src="http://www.facebook.com/plugins/like.php?href=<?
-		$url = "http://exoplanet.hanno-rein.de/system.php?id=".urlencode($system->name);
-		print urlencode($url);
-		?>&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:25em; height:25px; padding-top:0.9em;" allowTransparency="true">
-		</iframe>
-	</div>
-</div>
-<h1><span class="systemname"></span></h1>
-<p>
-	<span class="systemcategory"></span>
-</p>
-<p>
-	<span class="systemdescription"></span>
-</p>
-
-<div class="spacer"></div>
-
-
-<table cellspacing="0" summary="Details of the planetary system">
-<tr>
-	<th scope="col" class="nobg">&nbsp;</th>
-	<th scope="col">System parameters</th>
-</tr>
-<tr>
-	<th scope="row">Name</th>
-	<td><?=$names[0]?></td>
-</tr>
-	<?
-		foreach(array_slice($names,1) as $name){
-			?>
-			<tr>
-				<th scope="row">Alternative name</th>
-				<td><?=$name?></td>
-			</tr>
-			<?
-		}
-	?>
-<tr>
-	<th scope="row">Right ascension</th>
-	<td><span class="systemrightascension"></span></td>
-<tr>
-</tr>
-	<th scope="row">Declination</th>
-	<td><span class="systemdeclination"></span></td>
-</tr>
-</tr>
-	<th scope="row">Distance [parsec]</th>
-	<td><span class="systemdistance"></span></td>
-</tr>
-</tr>
-	<th scope="row">Distance [lightyears]</th>
-	<td><span class="systemdistancelightyears"></span></td>
-</tr>
-</tr>
-	<th scope="row">Number of stars in system</th>
-	<td><span class="systemnumberofstars"></span></td>
-</tr>
-</tr>
-	<th scope="row">Number of planets in system</th>
-	<td><span class="systemnumberofplanets"></span></td>
-</tr>
-</table>
-
-
-<!-- ########################### -->
-<div class="systemimagesection" style="display: none;">
-<h2><img src="./img/photo.png" alt="Image" />Image</h2>
-<a href='./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
-<p>
-<span class="systemimagedescription"></span><br /> Click on the image to get a higher resolution image.
-</p>
-</div>
-
-
-<!-- ########################### -->
-<h2><img src="./img/binary.png" alt="Architecture" />Architecture of the system</h2>
-<p>
-This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
-<?if(count($stars)>1){?>
-Note that <?=$system->name?> is binary system. The list can be used to infer which planet is orbiting which star and whether it is a S- or P-type orbit. 
-<?}else{?>
-<?=$system->name?> is not binary system, so the architecture is rather simple. 
-<?}?>
-</p>
 <?
-function printSubSystem($o,$type=0){
+function printSubSystem(o,type=0){
 	if ($type==1){
 		print "<ul style=\"padding: 0; margin: 0;\">";
 	}else{
@@ -272,6 +189,103 @@ function printSubSystem($o,$type=0){
 }
 printSubSystem($system,1);
 ?>
+------------------------
+------------------------
+------------------------
+
+	var starstable = d3.select("#starstable");
+	var rows = ["Mass","Radius"];
+		
+	d3.selectAll("tr")
+	.data(rows)
+	.enter()
+	.append("tr")
+	.text(function (column){return column;});
+}
+
+</script>
+
+
+<!-- ########################### -->
+<!-- ########################### -->
+<div style="width:50em;">
+	<div style="float:right;">
+		<iframe src="http://www.facebook.com/plugins/like.php?href=<?
+		$url = "http://exoplanet.hanno-rein.de/system.php?id=".urlencode($system->name);
+		print urlencode($url);
+		?>&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:25em; height:25px; padding-top:0.9em;" allowTransparency="true">
+		</iframe>
+	</div>
+</div>
+<h1><span class="systemname"></span></h1>
+<p>
+	<span class="systemcategory"></span>
+</p>
+<p>
+	<span class="systemdescription"></span>
+</p>
+
+<div class="spacer"></div>
+
+
+<table cellspacing="0" summary="Details of the planetary system">
+<tr>
+	<th scope="col" class="nobg">&nbsp;</th>
+	<th scope="col">System parameters</th>
+</tr>
+<tr>
+	<th scope="row">Name</th>
+	<td><span class="systemname"></span></td>
+</tr>
+<tr>
+	<th scope="row">Alternative names</th>
+	<td><span class="systemalternativenames"></span></td>
+</tr>
+<tr>
+	<th scope="row">Right ascension</th>
+	<td><span class="systemrightascension"></span></td>
+<tr>
+</tr>
+	<th scope="row">Declination</th>
+	<td><span class="systemdeclination"></span></td>
+</tr>
+</tr>
+	<th scope="row">Distance [parsec]</th>
+	<td><span class="systemdistance"></span></td>
+</tr>
+</tr>
+	<th scope="row">Distance [lightyears]</th>
+	<td><span class="systemdistancelightyears"></span></td>
+</tr>
+</tr>
+	<th scope="row">Number of stars in system</th>
+	<td><span class="systemnumberofstars"></span></td>
+</tr>
+</tr>
+	<th scope="row">Number of planets in system</th>
+	<td><span class="systemnumberofplanets"></span></td>
+</tr>
+</table>
+
+
+<!-- ########################### -->
+<div class="systemimagesection" style="display: none;">
+<h2><img src="./img/photo.png" alt="Image" />Image</h2>
+<a href='./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
+<p>
+<span class="systemimagedescription"></span><br /> Click on the image to get a higher resolution image.
+</p>
+</div>
+
+
+<!-- ########################### -->
+<h2><img src="./img/binary.png" alt="Architecture" />Architecture of the system</h2>
+<p>
+This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
+<span class="systembinarytext"></span>
+</p>
+<div class="systembinary"> 
+</div>
 
 
 
