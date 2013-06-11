@@ -114,7 +114,14 @@ function setupPage(xml){
 	$(".systemnumberofplanets").text(planets.length);
 	$(".systemrightascension").html(getFormatForRightAscension($("rightascension",system).text()));
 	$(".systemdeclination").html(getFormatForDeclination($("declination",system).text()));
-
+	if (planets.length>1){
+		var systemimage = $("image",system).first().text();
+		if (systemimage.length){
+			$(".systemimagesection").css("display","inline");
+			$(".systemimage").css("background-image","url('./open_exoplanet_catalogue/images/"+systemimage+".jpg')"); 
+			$(".systemimagedescription").text($("imagedescription",system).first().text());
+		}
+	}
 
 	var starstable = d3.select("#starstable");
 	var rows = ["Mass","Radius"];
@@ -198,13 +205,13 @@ function setupPage(xml){
 
 
 <!-- ########################### -->
-<?if($planets[0]->image){?>
+<div class="systemimagesection" style="display: none;">
 <h2><img src="./img/photo.png" alt="Image" />Image</h2>
-<a href='./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'><div style="background-image: url('./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'); width:50em; height:15em; background-position:center;">&nbsp;</div></a>
+<a href='./open_exoplanet_catalogue/images/<?=$planets[0]->image?>.jpg'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
 <p>
-<?=htmlentities($planets[0]->imagedescription)?> Click on the image to get a higher resolution image.
+<span class="systemimagedescription"></span><br /> Click on the image to get a higher resolution image.
 </p>
-<?}?>
+</div>
 
 
 <!-- ########################### -->
