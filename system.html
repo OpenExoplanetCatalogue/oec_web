@@ -224,7 +224,7 @@ function setupPage(xml){
 		}
 		alternativename += "</td>";
 		$(".planetalternativename",table).append(alternativename);
-		$(".planetdescription",table).append("<td>"+getFormatForTagText($("description",planet))+"</td>");
+		$(".planetdescription",table).append("<td><div style=\"max-width: "+(planets.length==1?34:17)+"em;\">"+getFormatForTagText($("description",planet))+"</div></td>");
 		var planetlists = $("list",planet);
 		var lists = "<td>";
 		if (planetlists.length>0){
@@ -363,131 +363,9 @@ This list shows all planetary and stellar components in the system. It gives a q
 <!-- ########################### -->
 <h2><img src="./img/planet.png" alt="Planets" />Planets in the system</h2>
 <p>This table lists all planets in the system <?=$system->name?>. If a row is empty, no data is available</p>
-<?
-$maxcol = 2;
-$planetcolumnmaxwidth = 17;
-if (count($planets)<2){
-	$planetcolumnmaxwidth = 34;
-}
-for ($r=0;$r<count($planets);$r+=$maxcol){
-	$_planets = array_slice($planets,$r,$maxcol);
-?>
-<table cellspacing="0" summary="Details of the planetary system" style="padding-bottom: 2em;">
-<tr>
-	<th scope="col" class="nobg">&nbsp;</th>
-	<?foreach($_planets as $planet){?>
-		<th scope="col"><?=$planet->name?></th>
-	<?}?>
-</tr>
-<tr>
-	<th valign="top" scope="row">Alternative names</th>
-	<?foreach($_planets as $planet){
-		$names = $planet->name;
-		?>
-		<td valign="top">
-		<?for($i=1;$i<count($names);$i++){
-			print $names[$i];
-			if ($i<count($names)-1) print "<br />";
-		}?>
-		</td>
-	<?}?>
-</tr>
-<tr>
-	<th valign="top" scope="row">Description and Trivia</th>
-	<?foreach($_planets as $planet){?>
-		<td valign="top"><div style="max-width: <?=$planetcolumnmaxwidth?>em;"><?=$planet->description?></div></td>
-	<?}?>
-</tr>
-<tr>
-	<th valign="top" scope="row">Lists</th>
-	<?foreach($_planets as $planet){
-		$lists = $planet->list;
-		?>
-		<td valign="top">
-		<?for($i=0;$i<count($lists);$i++){
-			print $lists[$i];
-			if ($i<count($lists)-1) print "<br />";
-		}?>
-		</td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Mass [M<sub>Jup</sub>]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->mass?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Mass [M<sub>Earth</sub>]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=($planet->mass?(float)($planet->mass)*317.89:"")?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Orbital period [days]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->period?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Semi-major axis [AU]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->semimajoraxis?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Eccentricity</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->eccentricity?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Radius [R<sub>Jup</sub>]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->radius?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Radius [R<sub>Earth</sub>]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=($planet->radius?(float)($planet->radius)*10.9732:"")?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Temperature [K]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->temperature?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Discovery method</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->discoverymethod?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Discovery year</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->discoveryyear?></td>
-	<?}?>
-</tr>
-<tr>
-	<th scope="row">Last updated [yy/mm/dd]</th>
-	<?foreach($_planets as $planet){?>
-		<td><?=$planet->lastupdate?></td>
-	<?}?>
-</tr>
-</table>
-<div class="spacer" style="height:10px;"></div>
-<?}?>
-
-
-
-
-
 <div class="planetsection"></div>
 
-<table cellspacing="0" class="planettable" id="planettabletemplate" summary="Details of the planetary system" style="padding-bottom: 2em; display:none;">
+<table cellspacing="0" class="planettable" id="planettabletemplate" summary="Details of the planetary system" style="margin-bottom: 2em; display:none;">
 <tr class="planetname">
 	<th scope="col" class="nobg">&nbsp;</th>
 </tr>
