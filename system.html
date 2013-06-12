@@ -74,7 +74,7 @@ function qs(key) {
     return match && decodeURIComponent(match[1].replace(/\+/g, " "));
 }
 $(document).ready(function(){
-	var systemname = qs("system");  // make this php-able
+	var systemname = qs("id");  // make this php-able
 	$.ajax({
 		type: "GET",
 		url: "./open_exoplanet_catalogue/systems/"+systemname+".xml",
@@ -210,7 +210,7 @@ function setupPage(xml){
 		var table = tables.eq(i/2);
 		var planet = planets.eq(i);
 		var planetnames = $("name",planet);
-		$(".planetname",table).append("<td>"+planetnames.first().text()+"</td>");
+		$(".planetname",table).append("<th scope=\"col\">"+planetnames.first().text()+"</th>");
 		var alternativename = "<td>";
 		if (planetnames.length>1){
 			for(var j=1;j<planetnames.length;j++){
@@ -253,17 +253,36 @@ function setupPage(xml){
 
 	}
 	
-	
-	
-	
-	var starstable = d3.select("#starstable");
-	var rows = ["Mass","Radius"];
-		
-	d3.selectAll("tr")
-	.data(rows)
-	.enter()
-	.append("tr")
-	.text(function (column){return column;});
+	for (var i=0;i<stars.length;i+=2){
+		$("#startabletemplate").clone().css("display","table").appendTo(".starsection");
+	}
+	var tables = $(".starsection > .startable");
+	for (var i=0;i<stars.length;i++){
+		var table = tables.eq(i/2);
+		var star = stars.eq(i);
+		var starnames = $("> name",star);
+		$(".starname",table).append("<th scope=\"col\">"+starnames.first().text()+"</th>");
+		var alternativename = "<td>";
+		if (starnames.length>1){
+			for(var j=1;j<starnames.length;j++){
+				alternativename += starnames.eq(j).text();
+				if (j!=starnames.length-1){
+					alternativename += ", ";
+				}
+			}
+		}else{
+			alternativename += notAvailableString;
+		}
+		alternativename += "</td>";
+		$(".staralternativename",table).append(alternativename);
+		$(".starmass",table).append("<td>"+getFormatForTag($("> mass",star))+"</td>");
+		$(".starradius",table).append("<td>"+getFormatForTag($("> radius",star))+"</td>");
+		$(".starage",table).append("<td>"+getFormatForTag($("> age",star))+"</td>");
+		$(".starmetallicity",table).append("<td>"+getFormatForTag($("> metallicity",star))+"</td>");
+		$(".starspectraltype",table).append("<td>"+getFormatForTag($("> spectraltype",star))+"</td>");
+		$(".startemperature",table).append("<td>"+getFormatForTag($("> temperature",star))+"</td>");
+		$(".starmagv",table).append("<td>"+getFormatForTag($("> magV",star))+"</td>");
+	}
 }
 
 </script>
@@ -362,7 +381,7 @@ This list shows all planetary and stellar components in the system. It gives a q
 
 <!-- ########################### -->
 <h2><img src="./img/planet.png" alt="Planets" />Planets in the system</h2>
-<p>This table lists all planets in the system <?=$system->name?>. If a row is empty, no data is available</p>
+<p>This table lists all planets in the system <span class="systemname"></span>.</p>
 <div class="planetsection"></div>
 
 <table cellspacing="0" class="planettable" id="planettabletemplate" summary="Details of the planetary system" style="margin-bottom: 2em; display:none;">
@@ -414,73 +433,40 @@ This list shows all planetary and stellar components in the system. It gives a q
 </table>
 
 <!-- ########################### -->
-<?if (count($stars)>0){?>
 <h2><img src="./img/help-about.png" alt="star" />Stars in the system</h2>
-<p>This table lists all stars in the system <?=$system->name?>. If a row is empty, no data is available</p>
-<table cellspacing="0" id="starstable" summary="Details of the stars in the system">
-<tr>
+<p>This table lists all stars in the system <span class="systemname"></span>.</p>
+
+<div class="starsection"></div>
+
+<table cellspacing="0" class="startable" id="startabletemplate" summary="Details of the star system" style="margin-bottom: 2em; display:none;">
+<tr class="starname">
 	<th scope="col" class="nobg">&nbsp;</th>
-	<?foreach($stars as $star){?>
-		<th scope="col"><?=$star->name?></th>
-	<?}?>
 </tr>
-<tr>
+<tr class="staralternativename">
 	<th valign="top" scope="row">Alternative names</th>
-	<?foreach($stars as $star){
-		$names = $star->name;
-		?>
-		<td valign="top">
-		<?for($i=1;$i<count($names);$i++){
-			print $names[$i];
-			if ($i<count($names)-1) print "<br />";
-		}?>
-		</td>
-	<?}?>
 </tr>
-<tr>
+<tr class="starmass">
 	<th scope="row">Mass [M<sub>Sun</sub>]</th>
-	<?foreach($stars as $star){?>
-		<td><?=$star->mass?></td>
-	<?}?>
 </tr>
-<tr>
+<tr class="starradius">
 	<th scope="row">Radius [R<sub>Sun</sub>]</th>
-	<?foreach($stars as $star){?>
-		<td><?=$star->radius?></td>
-	<?}?>
 </tr>
-<tr>
+<tr class="starage">
 	<th scope="row">Age [Gyr]</th>
-	<?foreach($stars as $star){?>
-		<td><?=$star->age?></td>
-	<?}?>
 </tr>
-<tr>
+<tr class="starmetallicity">
 	<th scope="row">Metallicity [Fe/H]</th>
-	<?foreach($stars as $star){?>
-		<td><?=$star->metallicity?></td>
-	<?}?>
 </tr>
-<tr>
+<tr class="starspectraltype">
 	<th scope="row">Spectral type</th>
-	<?foreach($stars as $star){?>
-		<td><?=$star->spectraltype?></td>
-	<?}?>
 </tr>
-<tr>
-	<th scope="row">Temperature</th>
-	<?foreach($stars as $star){?>
-		<td><?=$star->temperature?></td>
-	<?}?>
+<tr class="startemperature">
+	<th scope="row">Temperature [K]</th>
 </tr>
-<tr>
+<tr class="starmagv">
 	<th scope="row">Visual magnitude</th>
-	<?foreach($stars as $star){?>
-		<td><?=$star->magV?></td>
-	<?}?>
 </tr>
 </table>
-<?}?>
 
 
 <!-- ########################### -->
