@@ -69,7 +69,7 @@ function qs(key) {
 $(document).ready(function(){
 	var systemname = qs("id");  // make this php-able
 <script language="php">
-	echo "systemname	= \"".$filenamebase."\";";
+	echo "systemname	= \"".$requestname."\";";
 </script>
 	$.ajax({
 		type: "GET",
