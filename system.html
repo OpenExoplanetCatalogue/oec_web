@@ -59,13 +59,6 @@ if (!file_exists($filename)){
 $filenamemeta 	= "oec_meta/systems/".$filenamebase;
 $requestname 	= basename($filename,".xml");
 $system 	= simplexml_load_file($filename);
-$names 		= $system->xpath('./name');
-$stars 		= $system->xpath('.//star');
-$planets	= $system->xpath('.//planet');
-$ra = explode(" ",$system->rightascension);
-$raf = $ra[0]; $raf += 1.0/60.0 * $ra[1]; $raf += 1.0/(60.0*60.0) * $ra[2]; 
-$dec = explode(" ",$system->declination);
-$decf = $dec[0]; $decf<=0.?$sign=1.:$sign=-1.; $decf += $sign/60.0 * $dec[1]; $decf += $sign/(60.0*60.0) * $dec[2]; 
 </script>
 <script type="text/javascript">
 function qs(key) {
@@ -75,6 +68,9 @@ function qs(key) {
 }
 $(document).ready(function(){
 	var systemname = qs("id");  // make this php-able
+<script language="php">
+	echo "systemname	= \"".$filenamebase."\";";
+</script>
 	$.ajax({
 		type: "GET",
 		url: "./open_exoplanet_catalogue/systems/"+systemname+".xml",
