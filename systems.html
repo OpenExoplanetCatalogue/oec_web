@@ -134,7 +134,7 @@ $system 	= simplexml_load_file($filename);
 $planets	= $system->xpath('.//planet');
 foreach($planets as $planet){
 	print "<tr>\n";
-	print "\t<td><a href=\"./system.html?id=".$planet->name."\">".$planet->name."</a></td>\n";
+	print "\t<td><a href=\"./system.html?id=". urlencode($planet->name) . "\">".$planet->name."</a></td>\n";
 	print "\t<td>".$planet->mass."</td>\n";
 	print "\t<td>".$planet->semimajoraxis."</td>\n";
 	print "</tr>\n";
@@ -183,7 +183,7 @@ function getValueForPlanetAndKey(planet,key){
 
 		case "name:first":
  			var name = $(key,planet).text();
-			return "<a href='./system.html?id="+name+"'>"+name+"</a>";
+			return "<a href='./system.html?id="+encodeURIComponent(name)+"'>"+name+"</a>";
 		default:
  			return getFormatForTag($(key,planet));
 	}
