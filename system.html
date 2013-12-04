@@ -174,12 +174,12 @@ function setupPage(xml){
 	if (stars.length<2 && planets.length==1){
 		$(".systemdescription").text($("description",planets[0]).text());
 	}
-	$(".systemdistance").html(getFormatForTag($("distance",system)));
-	$(".systemdistancelightyears").html(getFormatForTag($("distance",system),3.261));
+	$(".systemdistance").html(getFormatForTag($("> distance",system)));
+	$(".systemdistancelightyears").html(getFormatForTag($("> distance",system),3.261));
 	$(".systemnumberofstars").text(stars.length);
 	$(".systemnumberofplanets").text(planets.length);
-	$(".systemrightascension").html(getFormatForRightAscension($("rightascension",system).text()));
-	$(".systemdeclination").html(getFormatForDeclination($("declination",system).text()));
+	$(".systemrightascension").html(getFormatForRightAscension($("> rightascension",system).text()));
+	$(".systemdeclination").html(getFormatForDeclination($("> declination",system).text()));
 	if (planets.length>1){
 		var systemimage = $("image",system).first().text();
 		if (systemimage.length){
@@ -220,7 +220,7 @@ function setupPage(xml){
 		}
 		alternativename += "</td>";
 		$(".planetalternativename",table).append(alternativename);
-		$(".planetdescription",table).append("<td><div style=\"max-width: "+(planets.length==1?34:17)+"em;\">"+getFormatForTagText($("description",planet))+"</div></td>");
+		$(".planetdescription",table).append("<td><div style=\"max-width: "+(planets.length==1?34:17)+"em;\">"+getFormatForTagText($("> description",planet))+"</div></td>");
 		var planetlists = $("list",planet);
 		var lists = "<td>";
 		if (planetlists.length>0){
@@ -237,15 +237,15 @@ function setupPage(xml){
 		$(".planetlists",table).append(lists);
 		$(".planetmass",table).append("<td>"+getFormatForTag($("> mass",planet))+"</td>");
 		$(".planetmassearth",table).append("<td>"+getFormatForTag($("> mass",planet),317.8942)+"</td>");
-		$(".planetperiod",table).append("<td>"+getFormatForTag($("period",planet))+"</td>");
-		$(".planeteccentricity",table).append("<td>"+getFormatForTag($("eccentricity",planet))+"</td>");
-		$(".planetsemia",table).append("<td>"+getFormatForTag($("semimajoraxis",planet))+"</td>");
-		$(".planetradius",table).append("<td>"+getFormatForTag($("radius",planet))+"</td>");
-		$(".planetradiusearth",table).append("<td>"+getFormatForTag($("radius",planet),10.973299)+"</td>");
-		$(".planettemperature",table).append("<td>"+getFormatForTag($("temperature",planet))+"</td>");
-		$(".planetdiscoverymethod",table).append("<td>"+getFormatForTagText($("discoverymethod",planet))+"</td>");
-		$(".planetdiscoveryyear",table).append("<td>"+getFormatForTagText($("discoveryyear",planet))+"</td>");
-		$(".planetlastupdate",table).append("<td>"+getFormatForTagText($("lastupdate",planet))+"</td>");
+		$(".planetperiod",table).append("<td>"+getFormatForTag($("> period",planet))+"</td>");
+		$(".planeteccentricity",table).append("<td>"+getFormatForTag($("> eccentricity",planet))+"</td>");
+		$(".planetsemia",table).append("<td>"+getFormatForTag($("> semimajoraxis",planet))+"</td>");
+		$(".planetradius",table).append("<td>"+getFormatForTag($("> radius",planet))+"</td>");
+		$(".planetradiusearth",table).append("<td>"+getFormatForTag($("> radius",planet),10.973299)+"</td>");
+		$(".planettemperature",table).append("<td>"+getFormatForTag($("> temperature",planet))+"</td>");
+		$(".planetdiscoverymethod",table).append("<td>"+getFormatForTagText($("> discoverymethod",planet))+"</td>");
+		$(".planetdiscoveryyear",table).append("<td>"+getFormatForTagText($("> discoveryyear",planet))+"</td>");
+		$(".planetlastupdate",table).append("<td>"+getFormatForTagText($("> lastupdate",planet))+"</td>");
 
 	}
 	
