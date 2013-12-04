@@ -235,8 +235,8 @@ function setupPage(xml){
 		}
 		lists += "</td>";
 		$(".planetlists",table).append(lists);
-		$(".planetmass",table).append("<td>"+getFormatForTag($("mass",planet))+"</td>");
-		$(".planetmassearth",table).append("<td>"+getFormatForTag($("mass",planet),317.8942)+"</td>");
+		$(".planetmass",table).append("<td>"+getFormatForTag($("> mass",planet))+"</td>");
+		$(".planetmassearth",table).append("<td>"+getFormatForTag($("> mass",planet),317.8942)+"</td>");
 		$(".planetperiod",table).append("<td>"+getFormatForTag($("period",planet))+"</td>");
 		$(".planeteccentricity",table).append("<td>"+getFormatForTag($("eccentricity",planet))+"</td>");
 		$(".planetsemia",table).append("<td>"+getFormatForTag($("semimajoraxis",planet))+"</td>");
