@@ -325,9 +325,9 @@ function getValueForPlanetAndKey(planet,key,returnhtml){
 
 		default:
 			if (returnhtml){
- 				return getFormatForTag($(key,planet));
+ 				return getFormatForTag($("> "+key,planet));
 			}else{
- 				return parseFloat($(key,planet).text());
+ 				return parseFloat($("> "+key,planet).text());
 			}
 
 	}
