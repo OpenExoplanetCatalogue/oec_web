@@ -322,6 +322,14 @@ function getValueForPlanetAndKey(planet,key,returnhtml){
 			var star = $(planet).parents("star");
 			return parseFloat($(key,star).text());
 
+		case "discoverymethod":
+ 			var discoverymethod = $("> "+key,planet).text();
+			if (discoverymethod.length){
+				return discoverymethod;
+			}else{
+				return notAvailableString;
+			}
+			
 
 		default:
 			if (returnhtml){
