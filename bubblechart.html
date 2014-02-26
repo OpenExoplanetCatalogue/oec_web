@@ -137,10 +137,10 @@ var updatePlot = function(first){
 						d3.select("#pop-up-description").html("");
 					}
 					var values = "";
-					values += 		 "<span>Radius [RJup]:</span>" + format4(planet.value);
+					values += 		 "<span class=\"popupvalue\">Radius [RJup]:</span>" + format4(planet.value);
 					var temperature = parseFloat($("temperature",planet.xml).text());
-					values += 		 "<span>Temperature [Kelvin]:</span>" + format1(temperature);
-					values += 		 "<span>Temperature [Celsius]:</span>" + format1(temperature-273.15);
+					values += 		 "<span class=\"popupvalue\">Temperature [Kelvin]:</span>" + format1(temperature);
+					values += 		 "<span class=\"popupvalue\">Temperature [Celsius]:</span>" + format1(temperature-273.15);
 					$("#pop-up-values").html(values);
 					return;
 				default:
