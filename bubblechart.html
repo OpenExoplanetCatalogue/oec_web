@@ -67,8 +67,12 @@ var colorScale = d3.scale.linear()
 	.clamp(true)
 	.range([240,0]);
 
+function comparator(a, b) {
+	  return parseFloat($("temperature",a.xml).text()) - parseFloat($("temperature",b.xml).text()) ;
+}
+
 var bubble = d3.layout.pack()
-	.sort(null)
+	.sort(comparator)
 	.value(function(planet){
 		var radius = parseFloat($("radius",planet.xml).text());
 		if (isNaN(radius)){
