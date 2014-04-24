@@ -68,15 +68,15 @@ var colorScale = d3.scale.linear()
 	.range([240,0]);
 
 function comparator(a, b) {
-	  return parseFloat($("temperature",a.xml).text()) - parseFloat($("temperature",b.xml).text()) ;
+	  return parseFloat($("> radius",a.xml).text()) - parseFloat($("> radius",b.xml).text()) ;
 }
 
 var bubble = d3.layout.pack()
 	.sort(comparator)
 	.value(function(planet){
-		var radius = parseFloat($("radius",planet.xml).text());
+		var radius = parseFloat($("> radius",planet.xml).text());
 		if (isNaN(radius)){
-			var mass = parseFloat($("mass",planet.xml).text());
+			var mass = parseFloat($("> mass",planet.xml).text());
 			radius = Math.pow(mass*317.8942,1./2.06)/10.973299;
 		}
 		if (isNaN(radius)){
