@@ -44,8 +44,8 @@ This plot uses the <a href="http://d3js.org">d3</a> javascript library. It is re
 }
 </style>
 <script type="text/javascript">
-var width 	= 1772;
-var height 	= 1772;
+var width 	= 772;
+var height 	= 772;
 
 var xmldata	= null;
 var viz = d3.select("#viz")
@@ -53,13 +53,6 @@ var viz = d3.select("#viz")
 	.attr("width", width)
 	.attr("height", height)
 	;    
-
-var scale = 2.3;
-var bubble = d3.layout.pack()
-	.sort(null)
-	.size([width,height])
-	.padding(4.5*scale)
-	.radius(function(d){return scale*d})
 
 
 function shuffle(array) {
@@ -99,8 +92,8 @@ function systems(root){
 				var period = parseFloat($(this).find("period").text());
 				semimajoraxis = Math.pow(period*period*starm,1./3.);
 			}
-			if (semimajoraxis>0 && semimajoraxis < 61){
-				planets.push({value: semimajoraxis, fill: "none", color: "gray"});
+			if (semimajoraxis>0 && semimajoraxis < 41){
+				planets.push({radius: semimajoraxis, fill: "none", color: "gray"});
 				if (semimajoraxis>max_semimajoraxis){
 					max_semimajoraxis = semimajoraxis;
 				}
@@ -108,68 +101,130 @@ function systems(root){
 
 		}
 		);
-		if (planets.length>1){
-			systems.push({name: $(this).find("name:first").text(), value: max_semimajoraxis*1.1, fill: "none", color:"none", planets: planets});
+		if (planets.length>2){
+			systems.push({s:1., name: $(this).find("name:first").text(), radius: max_semimajoraxis*1., fill: "green", color:"none", planets: planets});
 		}
 	}
 	);
-	return {children: shuffle(systems), fill:"none"};
+	return shuffle(systems);
 }
 
 var updatePlot = function(first){ 
-	var node = viz.selectAll(".node")
-    		.data(bubble.nodes(systems(xmldata)))
+	var scale = 1.0;
+	var nodes = systems(xmldata);
+
+
+	var force = d3.layout.force()
+		.gravity(0.07)
+		.charge(-1)
+		.nodes(nodes)
+		.size([width,height])
+
+	force.start();
+
+	var node = viz.selectAll("g")
+    		.data(nodes)
 		.enter().append("g")
-		.attr("class", "node")
-	     	.style("fill", function(planet) { 
-			return "#ff0000";
-		})
-		.attr("transform", function(d) { 
-			return "translate(" + d.x + "," + d.y + ")"; }
-		);
+		.attr("radius",function(d){return d.radius;})
 	
-	node.append("circle")
-		.attr("r", function(d) { return d.r; })
-		.attr("title", function(d) { return d.name; })
-	     	.style("fill", function(d) { 
-			return d.fill;
-		})
-	     	.style("stroke-width", 1) 
-	     	.style("stroke", function(d) { 
-			return d.color;
-		})
+	force.on("tick", function(e) {
+		var 	q = d3.geom.quadtree(nodes),
+			i = 0,
+			n = nodes.length;
+
+		while (++i < n) q.visit(collide(nodes[i]));
+
+		viz.selectAll("g")
+			.attr("transform", function(d){
+				return "scale("+(d.s)+"),translate("+(d.x-width/4.)+","+(d.y-height/4.)+")";
+			})
+
+	});
+
+//	node.append("circle")
+//		.attr("r", function(d) { return d.radius*scale; })
+//		.attr("title", function(d) { return d.name; })
+//	     	.style("fill", function(d) { 
+//			return d.fill;
+//		})
+//	     	.style("stroke-width", 1) 
+//	     	.style("stroke", function(d) { 
+//			return d.color;
+//		})
+
+	function collide(node) {
+		var r = node.radius*scale + 16,
+		nx1 = node.x - r,
+		nx2 = node.x + r,
+		ny1 = node.y - r,
+		ny2 = node.y + r;
+		return function(quad, x1, y1, x2, y2) {
+			if (quad.point && (quad.point !== node)) {
+				var x = node.x - quad.point.x,
+				y = node.y - quad.point.y,
+				l = Math.sqrt(x * x + y * y),
+				r = node.radius*scale + quad.point.radius;
+				if (l < r) {
+					l = (l - r) / l * .5;
+					node.x -= x *= l;
+					node.y -= y *= l;
+					quad.point.x += x;
+					quad.point.y += y;
+				}
+			}
+			return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+		};
+	}
+
 
 	node.append("g")
 		.each(function(d) {
 			var system = this;
 			if (d.planets){
+
 				d3.select(system).append("circle")
-					.attr("r", d.value*scale*0.05)
+					.attr("r", d.radius*scale*0.05)
 					.style("fill", "#FF8C00")
 
 
 				d.planets.map( function(planet){
 			//		console.log(planet);
 					d3.select(system).append("circle")
-						.attr("r", planet.value*scale)
-		     				.style("stroke-width", planet.value*0.04*scale) 
+						.attr("r", planet.radius*scale)
+		     				.style("stroke-width", planet.radius*0.04*scale) 
 					     	.style("stroke", "lightgray")
 					     	.style("fill", "none")
 				
 					var randphi = Math.random() * 6.28318530718;
 
 					d3.select(system).append("circle")
-						.attr("r", planet.value*scale*0.1)
+						.attr("r", planet.radius*scale*0.1)
 					     	.style("fill", "black")
-						.attr("transform", "translate(" + planet.value*scale*Math.sin(randphi) + "," + planet.value*scale*Math.cos(randphi) + ")")
+						.attr("cx", planet.radius*scale*Math.sin(randphi))
+						.attr("cy", planet.radius*scale*Math.cos(randphi))
 					
 				})
 				d3.select(system).append("text")
 					.style("fill", "black")
-					.style("font-size", d.value*scale*0.3)
+					.style("font-size", d.radius*scale*0.3)
 					.style("text-anchor", "middle")
-					.attr("transform", "translate(" + 0 + "," + d.value*scale*1.15+ ")")
+					.attr("transform", "translate(" + 0 + "," + d.radius*scale*1.15+ ")")
 					.text(d.name)
+				
+				d3.select(system).append("circle")
+					.attr("r", d.radius*1.5)
+					.style("fill", "red")
+					.style("opacity", 0)
+					.on("mouseover", function(){
+						d3.select(this).transition().style("opacity", 0.5);
+					})
+					.on("mouseout", function(){
+						d3.select(this).transition().style("opacity", 0.);
+					})
+					.on("click", function(){
+					d3.select(system)[0][0].__data__.radius*=2;
+					})
+
 			}
 		})
 		;
