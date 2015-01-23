@@ -33,6 +33,8 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
 print "Parsing OEC done"
 
 def title(type):
+    if type=="name":
+        return "Primary planet name"
     if type=="numberofplanets":
         return "Number of planets"
     if type=="mass":
@@ -44,6 +46,8 @@ def render(xmlPair,type):
     system, planet = xmlPair
     if type=="numberofplanets":
         return "%d"%len(system.findall(".//planet"))
+    if type=="name":
+        return planet.find("./name").text
     try:
         return renderFloat(planet.find("./"+type))
     except:
@@ -60,16 +64,15 @@ def main_page():
 @app.route('/systems/')
 def systems():
     p = []
-    fields = ["mass","radius","numberofplanets"]
+    fields = ["name","mass","radius","numberofplanets"]
     for xmlPair in planets:
         system,planet = xmlPair
         d = {}
-        d["name"] = planet.find("./name").text
         d["fields"] = []
         for field in fields:
             d["fields"].append(render(xmlPair,field))
         p.append(d)
-    return render_template("systems.html",planets=p)
+    return render_template("systems.html",columns=map(title,fields),planets=p)
 
 
 @app.route('/planet/<planetname>')

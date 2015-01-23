@@ -4,18 +4,21 @@
 <table cellspacing="0" summary="List of exoplanets" id="systemtable" class="tablesorter">
 <thead>
 <tr id="systemtablehead">
+{% for column in columns %}
+<th>
+	{{ column|safe }}
+</th>
+{% endfor %}
 </tr>
 </thead>
 <tbody id="systemtablebody">
 {% for planet in planets %}
-<th>
-	{{ planet.name}}
-</th>
-{% for field in planet.fields %}
-<td>
-	{{ field|safe  }}
-</td>
-{% endfor %}
+	<tr>
+	{% for field in planet.fields %}
+	<td>
+		{{ field|safe  }}
+	</td>
+	{% endfor %}
 </tr>
 {% endfor %}
 </tbody>
