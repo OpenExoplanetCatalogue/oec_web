@@ -7,6 +7,7 @@ from flask import Flask, abort, render_template
 OEC_PATH = "open_exoplanet_catalogue/"
 
 print "Parsing OEC ..."
+systems = []
 planets = []
 stars = []
 binaries = []
@@ -15,10 +16,10 @@ binaries = []
 for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     # Open file
     f = open(filename, 'rt')
-
     # Try to parse file
     try:
         root = ET.parse(f).getroot()
+        systems += root
         for p in root.findall(".//planet"):
             planets.append((root,p))
         stars += root.findall(".//star")
@@ -30,6 +31,14 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
         f.close()
 
 print "Parsing OEC done"
+
+def title(type):
+    if type=="numberofplanets":
+        return "Number of planets"
+    if type=="mass":
+        return "Mass [M<sub>jup</sub>]"
+    if type=="radius":
+        return "Radius [R<sub>jup</sub>]"
 
 def render(xmlPair,type):
     system, planet = xmlPair
@@ -51,18 +60,14 @@ def main_page():
 @app.route('/systems/')
 def systems():
     p = []
+    fields = ["mass","radius","numberofplanets"]
     for xmlPair in planets:
+        system,planet = xmlPair
         d = {}
-        try:
-            name = xmlPair[1].find("./name").text
-        except:
-            name = "None"
-        d["name"] = name 
-        f = []
-        f.append(render(xmlPair,"mass"))
-        f.append(render(xmlPair,"radius"))
-        f.append(render(xmlPair,"numberofplanets"))
-        d["fields"] = f
+        d["name"] = planet.find("./name").text
+        d["fields"] = []
+        for field in fields:
+            d["fields"].append(render(xmlPair,field))
         p.append(d)
     return render_template("systems.html",planets=p)
 
