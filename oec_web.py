@@ -1,14 +1,12 @@
 import xml.etree.ElementTree as ET
 import glob
-import numberformat
+from numberformat import renderFloat
 from flask import Flask, abort, render_template
-from math import *
 
 
 OEC_PATH = "open_exoplanet_catalogue/"
 
 print "Parsing OEC ..."
-planet_names = {}
 planets = []
 stars = []
 binaries = []
@@ -21,7 +19,8 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     # Try to parse file
     try:
         root = ET.parse(f).getroot()
-        planets += root.findall(".//planet")
+        for p in root.findall(".//planet"):
+            planets.append((root,p))
         stars += root.findall(".//star")
         binaries += root.findall(".//binary")
     except ET.ParseError as error:
@@ -30,13 +29,18 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     finally:
         f.close()
 
-    for planet in planets:
-        names = planet.findall("./name")
-        for name in names:
-            planet_names[name.text] = filename
-
 print "Parsing OEC done"
 
+def render(xmlPair,type):
+    system, planet = xmlPair
+    if type=="numberofplanets":
+        return "%d"%len(system.findall(".//planet"))
+    try:
+        return renderFloat(planet.find("./"+type))
+    except:
+        pass
+
+    return ""
 
 app = Flask(__name__)
 @app.route('/')
@@ -47,16 +51,17 @@ def main_page():
 @app.route('/systems/')
 def systems():
     p = []
-    for planet in planets:
+    for xmlPair in planets:
         d = {}
         try:
-            name = planet.find("./name").text
+            name = xmlPair[1].find("./name").text
         except:
             name = "None"
         d["name"] = name 
         f = []
-        mass = renderFloat(planet.find("./mass"))
-        f.append(mass)
+        f.append(render(xmlPair,"mass"))
+        f.append(render(xmlPair,"radius"))
+        f.append(render(xmlPair,"numberofplanets"))
         d["fields"] = f
         p.append(d)
     return render_template("systems.html",planets=p)

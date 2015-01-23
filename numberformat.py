@@ -1,4 +1,7 @@
+# Formats a number tag in the OEC XML format.
+# <tag errorplus="0.1" errorminus="0.2">1.0</tag>
 
+from math import *
 def toFixed(f,digits):
     formatstring = "%%.%df"%digits
     return formatstring % f
