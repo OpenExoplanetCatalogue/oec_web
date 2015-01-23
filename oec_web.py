@@ -48,7 +48,7 @@ def renderFloat(tag, factor=1.):
         error_plus = float(tag.attrib["errorplus"])*factor
     else:
         error_plus = None
-    if "errorminux" in tag.attrib:
+    if "errorminus" in tag.attrib:
         error_minus = float(tag.attrib["errorminus"])*factor
     else:
         error_minus = None
@@ -158,8 +158,8 @@ def renderFloat(tag, factor=1.):
     		errorPlusString = ""
     	
     	if error_minus is not None and error_plus is not None:
-            if errorMinusString[7]==errorPlusString[5]:
-                errorString = "&#177;"+ errorMinusString[7]
+            if errorMinusString[7:]==errorPlusString[5:]:
+                errorString = "&#177;"+ errorMinusString[7:]
                 errorMinusString = ""
                 errorPlusString = ""
             else:
