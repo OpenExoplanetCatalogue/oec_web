@@ -7,6 +7,9 @@ OEC_PATH = "open_exoplanet_catalogue/"
 
 print "Parsing OEC ..."
 planet_names = {}
+planets = []
+stars = []
+binaries = []
 
 # Loop over all files and  create new data
 for filename in glob.glob(OEC_PATH + "systems/*.xml"):
@@ -16,9 +19,9 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     # Try to parse file
     try:
         root = ET.parse(f).getroot()
-        planets = root.findall(".//planet")
-        stars = root.findall(".//star")
-        binaries = root.findall(".//binary")
+        planets += root.findall(".//planet")
+        stars += root.findall(".//star")
+        binaries += root.findall(".//binary")
     except ET.ParseError as error:
         print '{}, {}'.format(filename, error)
         continue
@@ -42,7 +45,7 @@ def main_page():
 
 @app.route('/systems/')
 def systems():
-    return render_template("systems.html")
+    return render_template("systems.html",planets=planets)
 
 
 @app.route('/planet/<planetname>')
