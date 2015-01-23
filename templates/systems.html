@@ -8,10 +8,14 @@
 </thead>
 <tbody id="systemtablebody">
 {% for planet in planets %}
-<tr>
+<th>
+	{{ planet.name}}
+</th>
+{% for field in planet.fields %}
 <td>
-{{ planet.find("./name").text }}
+	{{ field|safe  }}
 </td>
+{% endfor %}
 </tr>
 {% endfor %}
 </tbody>
