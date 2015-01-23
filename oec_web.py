@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import glob
-from flask import Flask, abort
+from flask import Flask, abort, render_template
 
 
 OEC_PATH = "open_exoplanet_catalogue/"
@@ -36,8 +36,14 @@ print "Parsing OEC done"
 
 app = Flask(__name__)
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+@app.route('/index.html')
+def main_page():
+    return render_template("index.html")
+
+@app.route('/systems/')
+def systems():
+    return render_template("systems.html")
+
 
 @app.route('/planet/<planetname>')
 def hello_planet(planetname):
@@ -50,4 +56,4 @@ def hello_planet(planetname):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
