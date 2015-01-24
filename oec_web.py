@@ -5,7 +5,7 @@ from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template
 
 
-OEC_PATH = "open_exoplanet_catalogue/"
+OEC_PATH = "static/open_exoplanet_catalogue/"
 
 print "Parsing OEC ..."
 systems = []
