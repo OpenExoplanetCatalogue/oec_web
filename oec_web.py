@@ -14,7 +14,8 @@ numsystems = 0
 planets = []
 stars = []
 binaries = []
-xmlPairs = {}
+planetXmlPairs = {}
+systemXmlPairs = {}
 
 # Loop over all files and  create new data
 for filename in glob.glob(OEC_PATH + "systems/*.xml"):
@@ -31,7 +32,8 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
                     numconfirmedplanets += 1
             planets.append((root,p,filename))
             name = p.find("./name").text
-            xmlPairs[name] = (root,p,filename)
+            planetXmlPairs[name] = (root,p,filename)
+        systemXmlPairs[root.find("./name").text] = (root,None,filename)
         stars += root.findall(".//star")
         binaries += root.findall(".//binary")
     except ET.ParseError as error:
@@ -170,6 +172,19 @@ def render(xmlPair,type):
             return alternativenames
         # Default: just search for the property in the planet xml. 
         return renderFloat(star.find("./"+type))
+    # Long texts
+    if type=="systemcategory":
+        systemcategory = ""
+        systemname = renderText(system.find("./name"))
+        if len(system.findall(".//planet"))==1:
+            systemcategory += "The planetary system "+systemname+" hosts at least one planet. "
+        elif len(system.findall(".//planet"))>1:
+            systemcategory += "The planetary system "+systemname+" hosts at least %d planets. " % len(system.findall(".//planet"))
+        if len(system.findall(".//star"))>1:
+            systemcategory += "Note that the system is a multiple star system. It hosts at least %d stellar components. "% len(system.findall(".//star"))
+        elif len(system.findall(".//star"))==0:
+            systemcategory += "The planet is a so called orphan planet and not associated with any star. "
+        return systemcategory
 
     # Default: just search for the property in the planet xml. 
     return renderFloat(planet.find("./"+type))
@@ -186,7 +201,7 @@ def static_oec_meta(filename):
 
 @app.route('/')
 @app.route('/index.html')
-def main_page():
+def page_main():
     return render_template("index.html",
             numplanets=len(planets),
             numsystems=numsystems,
@@ -217,24 +232,9 @@ def page_systems():
 
 @app.route('/planet/<planetname>')
 @app.route('/planet/<planetname>/')
-def planet(planetname):
-    xmlPair = xmlPairs[planetname]
+def page_planet(planetname):
+    xmlPair = planetXmlPairs[planetname]
     system,planet,filename = xmlPair
-    systemname = render(xmlPair,"systemname")
-    systemcategory = ""
-    if len(system.findall(".//planet"))==1:
-        systemcategory += "The planetary system "+systemname+" hosts at least one planet. "
-    elif len(system.findall(".//planet"))>1:
-        systemcategory += "The planetary system "+systemname+" hosts at least %d planets. " % len(system.findall(".//planet"))
-    
-    if len(system.findall(".//star"))>1:
-        systemcategory += "Note that the system is a multiple star system. It hosts at least %d stellar components. "% len(system.findall(".//star"))
-    #	$(".systembinarytext").html("Note that <span class=\"systemname\"></span> is binary system. The list can be used to infer which planet is orbiting which star and whether it is a S- or P-type orbit.");
-    #}else{
-    #	$(".systembinarytext").html("<span class=\"systemname\"></span> is not binary system, so the architecture is rather simple. ");
-    #}
-    elif len(system.findall(".//star"))==0:
-        systemcategory += "The planet is a so called orphan planet and not associated with any star. "
 
     systemtable = []
     for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
@@ -260,17 +260,32 @@ def planet(planetname):
 
     return render_template("planet.html",
         planetname=planetname,
-        systemname=systemname,
+        systemname=render(xmlPair,"systemname"),
         systemtable=systemtable,
         planettable=planettable,
         startable=startable,
         filename=filename,
         references=references,
         contributors=contributors,
-        systemcategory=systemcategory,
+        systemcategory=render(xmlPair,"systemcategory"),
         )
     #abort(404)
 
+@app.route('/system/<systemname>')
+@app.route('/system/<systemname>/')
+def page_system(systemname):
+    xmlPair = systemXmlPairs[systemname]
+    system,planet,filename = xmlPair
+    
+    systemtable = []
+    for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
+        systemtable.append((title[row],render(xmlPair,row)))
+
+    return render_template("system.html",
+        systemname=render(xmlPair,"systemname"),
+        systemtable=systemtable,
+        systemcategory=render(xmlPair,"systemcategory"),
+        )
 
 if __name__ == '__main__':
     app.run(debug=True)

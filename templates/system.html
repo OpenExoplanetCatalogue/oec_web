@@ -1,0 +1,211 @@
+{% extends "detail.html" %}
+{% block title %}- {{planetname}}{% endblock title %}
+{% block content %}
+
+<script type="text/javascript">
+var subSystemString = "";
+function setupArchitecture(o,stype){
+	stype = typeof stype !== 'undefined' ? stype : 0;
+	if (stype==1){
+		subSystemString += "<ul style=\"padding: 0; margin: 0;\">";
+	}else{
+		subSystemString += "<ul style=\"padding-left: 1em; margin-left: 1em;\">";
+	}
+	var binaries = $("> binary",o);
+	for(var i=0;i<binaries.length;i++){
+		var binary = binaries.eq(i);
+		subSystemString += "<li><img src=\"/static/img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
+		var semia = $("> semimajoraxis",binary);
+		if (semia){
+			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
+		}
+		var period = $("> period",binary);
+		if (period){
+			if (parseFloat(period.text())>1000){
+				subSystemString += ", " +getFormatForTag(period,0.002737909)+" years";
+			}else{
+				subSystemString += ", " +getFormatForTag(period)+" days";
+			}
+		}
+		setupArchitecture(binary,2);
+	}
+	var stars = $("> star",o);
+	for(var i=0;i<stars.length;i++){
+		var star = stars.eq(i);
+		subSystemString += "<li><img src=\"/static/img/star.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",star).first().text()+", stellar object";
+		setupArchitecture(star);
+	}
+	var planets = $("> planet",o);
+	for(var i=0;i<planets.length;i++){
+		var planet = planets.eq(i);
+		subSystemString += "<li><img src=\"/static/img/planet.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",planet).first().text();
+		if (stype==0){
+			subSystemString += ", planet";
+		}
+		if (stype==1){
+			subSystemString += ", orphan planet";
+		}
+		if (stype==2){
+			subSystemString += ", circumbinary planet, P-type";
+		}
+		var semia = $("> semimajoraxis",planet);
+		if (semia){
+			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
+		}
+		setupArchitecture(planet);
+	}
+	subSystemString += "</ul>";
+}
+
+</script>
+
+
+<!-- ########################### -->
+<!-- ########################### -->
+<div style="width:50em;">
+	<div style="float:right;">
+		<iframe src="http://www.facebook.com/plugins/like.php?href=<?
+		$url = "http://exoplanet.hanno-rein.de/system.php?id=".urlencode($system->name);
+		print urlencode($url);
+		?>&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:25em; height:25px; padding-top:0.9em;" allowTransparency="true">
+		</iframe>
+	</div>
+</div>
+<h1>{{systemname|safe}}</h1>
+<p>
+	{{systemcategory|safe}}
+</p>
+<p>
+	<span class="systemdescription"></span>
+</p>
+
+<div class="spacer"></div>
+
+
+<table cellspacing="0" summary="Details of the planetary system">
+	<tr>
+		<th scope="col" class="nobg">&nbsp;</th>
+		<th scope="col">System parameters</th>
+	</tr>
+	{% for title,value in systemtable: %}
+	<tr>
+		<th scope="row">{{title|safe}}</th>
+		<td>{{value|safe}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+
+<!-- ########################### -->
+<div class="systemimagesection">
+<h2><img src="/static/img/photo.png" alt="Image" />Image</h2>
+<a class="systemimagelink" href='#'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
+<p>
+<span class="systemimagedescription"></span><br /> Click on the image to get a higher resolution image.
+</p>
+</div>
+
+
+<!-- ########################### -->
+<h2><img src="/static/img/binary.png" alt="Architecture" />Architecture of the system</h2>
+<p>
+This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
+<span class="systembinarytext"></span>
+</p>
+<div class="systembinary"> 
+</div>
+
+
+
+<!-- ########################### -->
+<div class="systemvideosection">
+<h2><img src="/static/img/movie.png" alt="Video" />Video</h2>
+<p>This video shows the planetary system {{systemname|safe}}. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
+<iframe width="640" height="360" class="systemvideo" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+<!-- ########################### -->
+<h2><img src="/static/img/planet.png" alt="Planets" />Planets in the system</h2>
+<p>This table lists all planets in the system {{systemname|safe}}.</p>
+<div class="planetsection"></div>
+
+<table cellspacing="0" summary="Details of the planetary system">
+	<tr>
+		<th scope="col" class="nobg">&nbsp;</th>
+		<th scope="col">Planet parameters</th>
+	</tr>
+	{% for title,value in planettable: %}
+	<tr>
+		<th scope="row">{{title|safe}}</th>
+		<td>{{value|safe}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<!-- ########################### -->
+<h2><img src="/static/img/help-about.png" alt="star" />Stars in the system</h2>
+<p>This table lists all stars in the system {{systemname|safe}}.</p>
+
+<div class="starsection"></div>
+
+<table cellspacing="0" summary="Details of the star system">
+	<tr>
+		<th scope="col" class="nobg">&nbsp;</th>
+		<th scope="col">Stellar parameters</th>
+	</tr>
+	{% for title,value in startable: %}
+	<tr>
+		<th scope="row">{{title|safe}}</th>
+		<td>{{value|safe}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+
+<!-- ########################### -->
+<h2><img src="/static/img/kig.png" alt="Visualizations" />Visualizations</h2>
+<h3>Orbits</h3>
+<div id="viz"></div>
+<div id="sliderbox">
+	<div id="speed-slider" class="dragdealer">
+		<div class="red-bar handle">speed</div>
+	</div>
+	<div id="zoom-slider" class="dragdealer">
+		<div class="red-bar handle">zoom</div>
+	</div>
+</div>
+<style>
+#viz, .infobox {
+    font-family: sans-serif;
+}
+
+#viz text {
+    font-family: sans-serif;
+    font-size: 12px;
+}
+</style>
+
+<h3>Planet sizes</h3>
+<p>
+The following plot shows the approximate sizes of the planets in this system
+The Solar System planets are shown as a comparison.
+Note that unless the radius has been determined through a transit observation, this is only an approximation (see Lissauer et al. 2011b).
+</p>
+<object data="./size.php?id=<?=urlencode($requestname)?>" width="480" height="400" type="image/svg+xml" ></object>
+<? // show_svg("./size.php?id=".urlencode($requestname),480,400,"png"); ?>
+
+
+<h3>Habitable zone</h3>
+<p>
+The following plot shows the approximate location of the planets in this system with respect to the habitable zone (green) and the size of the star (red).
+This is only an estimate, using the star's spectral type and mass. 
+Note that if no green band is shown in the plot, then the planet's orbit is far outside the habitable zone.
+The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">Selsis, Kasting et al</a> are used to draw the inner and outer boundaries. 
+</p>
+<object data="./habitablezone.php?id=<?=urlencode($requestname)?>" width="600" height="100" type="image/svg+xml"></object>
+<?  //show_svg("./habitablezone.php?id=".urlencode($requestname),600,100,"png"); ?>
+
+{{ super() }}
+
+{% endblock content %}
