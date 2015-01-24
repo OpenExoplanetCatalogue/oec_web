@@ -1,26 +1,27 @@
 {% extends "layout.html" %}
+{% block title %}- List of all extrasolar planets{% endblock title %}
 {% block content %}
 
 <table cellspacing="0" summary="List of exoplanets" id="systemtable" class="tablesorter">
 <thead>
-<tr id="systemtablehead">
-{% for column in columns %}
-<th>
-	{{ column|safe }}
-</th>
-{% endfor %}
-</tr>
+	<tr id="systemtablehead">
+		{% for column in columns %}
+		<th>
+			{{ column|safe }}
+		</th>
+		{% endfor %}
+	</tr>
 </thead>
 <tbody id="systemtablebody">
-{% for planet in planets %}
+	{% for planet in planets %}
 	<tr>
-	{% for field in planet.fields %}
-	<td>
-		{{ field|safe  }}
-	</td>
+		{% for field in planet.fields %}
+		<td>
+			{{ field|safe  }}
+		</td>
+		{% endfor %}
+	</tr>
 	{% endfor %}
-</tr>
-{% endfor %}
 </tbody>
 </table>
 

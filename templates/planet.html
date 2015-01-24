@@ -1,65 +1,7 @@
-<?include(".inc/prepend.php");?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
-<script language="php"> include "./.inc/header.php"; if (false){ </script> 
-<!-- ** start server side header ** -->
-<head profile="http://www.w3.org/2005/10/profile">
-<link rel="icon" type="image/ico" href="favicon.ico" />
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
-<title>Open Exoplanet Catalogue</title>
-<link rel="stylesheet" type="text/css" href="./css/style.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="./css/tables.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="./css/dragdealer.css" media="screen" />
-<script type="text/javascript" src="./js/d3.v3.min.js"></script>
-<script type="text/javascript" src="./js/rgbcolor.js"></script> 
-<script type="text/javascript" src="./js/canvg.js"></script> 
-<script type="text/javascript" src="./js/jquery.min.js"></script>
-<script type="text/javascript" src="./js/jquery.tablesorter.min.js"></script> 
-<script type="text/javascript" src="./js/dragdealer.js"></script>
-<script type="text/javascript" src="./js/oec_orbit.js"></script>
-<script type="text/javascript" src="./js/oec_numberformatter.js"></script>
-</script>
-</head>
-<body>
-<div class="outer-container">
-<div class="inner-container">
-<div class="content">
-<!-- ** end server side header ** -->
-<script language="php"> } </script>
-<!-- ########################### -->
-<!-- ########################### -->
-<script language="php">
-$filenamebase 	= preg_replace("/[^a-z0-9. \d+\d-]+/i","",$_REQUEST['id']).".xml";
-$filename 	= "open_exoplanet_catalogue/systems/".$filenamebase;
-if (!file_exists($filename)){
-	/// Failsafe
-	$failsafeworked = 0;
-	$filenames = glob('open_exoplanet_catalogue/systems/*.xml', GLOB_BRACE);
-	foreach($filenames as $filename){
-		$system 	= simplexml_load_file($filename);
-		$planets 	= $system->xpath('.//planet');
-		foreach($planets as $planet){
-			$names = $planet->name;
-			foreach($names as $name){
-				if (strcasecmp($name,$_REQUEST['id'])==0){
-					$failsafeworked = 1;
-					break 3;
-				}
-			}
-		}
-	}
-	if ($failsafeworked==0){
-		echo "System not found: ".($_REQUEST['id']);
-		exit(0);
-	}
-	$filenamebase = basename($filename);
-}
+{% extends "layout.html" %}
+{% block title %}- {{planetname}}{% endblock title %}
+{% block content %}
 
-$filenamemeta 	= "oec_meta/systems/".$filenamebase;
-$requestname 	= basename($filename,".xml");
-$system 	= simplexml_load_file($filename);
-</script>
 <script type="text/javascript">
 function qs(key) {
     key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
@@ -68,9 +10,6 @@ function qs(key) {
 }
 $(document).ready(function(){
 	var systemname = qs("id");  // make this php-able
-<script language="php">
-	echo "systemname	= \"".$requestname."\";";
-</script>
 	$.ajax({
 		type: "GET",
 		url: "./open_exoplanet_catalogue/systems/"+systemname+".xml",
@@ -90,7 +29,7 @@ function setupArchitecture(o,stype){
 	var binaries = $("> binary",o);
 	for(var i=0;i<binaries.length;i++){
 		var binary = binaries.eq(i);
-		subSystemString += "<li><img src=\"./img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
+		subSystemString += "<li><img src=\"/static/img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
 		var semia = $("> semimajoraxis",binary);
 		if (semia){
 			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
@@ -108,13 +47,13 @@ function setupArchitecture(o,stype){
 	var stars = $("> star",o);
 	for(var i=0;i<stars.length;i++){
 		var star = stars.eq(i);
-		subSystemString += "<li><img src=\"./img/star.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",star).first().text()+", stellar object";
+		subSystemString += "<li><img src=\"/static/img/star.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",star).first().text()+", stellar object";
 		setupArchitecture(star);
 	}
 	var planets = $("> planet",o);
 	for(var i=0;i<planets.length;i++){
 		var planet = planets.eq(i);
-		subSystemString += "<li><img src=\"./img/planet.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",planet).first().text();
+		subSystemString += "<li><img src=\"/static/img/planet.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",planet).first().text();
 		if (stype==0){
 			subSystemString += ", planet";
 		}
@@ -142,43 +81,13 @@ function setupPage(xml){
 	planets = $(xml).find("planet");
 	stars = $(xml).find("star");
 	system = $(xml).find("system");
-	// Setting up tags in page.
-	if (planets.length==1){
-		$(".systemcategory").append("The planetary system <span class=\"systemname\"></span> hosts at least one planet. ");
-	}
-	if (planets.length>1){
-		$(".systemcategory").append("The planetary system <span class=\"systemname\"></span> hosts at least <span class=\"systemnumberofplanets\"></span> planets. ");
-	}
-	if (stars.length>1){
-		$(".systemcategory").append("Note that the system is a multiple star system. It hosts at least <span class=\"systemnumberofstars\"></span> stellar components. ");
-		$(".systembinarytext").html("Note that <span class=\"systemname\"></span> is binary system. The list can be used to infer which planet is orbiting which star and whether it is a S- or P-type orbit.");
-	}else{
-		$(".systembinarytext").html("<span class=\"systemname\"></span> is not binary system, so the architecture is rather simple. ");
-	}
-	if (stars.length==0){
-		$(".systemcategory").append("The planet is a so called orphan planet and not associated with any star. ");
-	}
-	var systemnames = $("> name",system);
-	$(".systemname").text(systemnames.first().text());
-	if (systemnames.length>1){
-		for(var i=1;i<systemnames.length;i++){
-			$(".systemalternativenames").append(systemnames.eq(i).text());
-			if (i!=systemnames.length-1){
-				$(".systemalternativenames").append(", ");
-			}
-		}
-	}else{
-		$(".systemalternativenames").append(notAvailableString);
-	}
 
 	if (stars.length<2 && planets.length==1){
 		$(".systemdescription").text($("description",planets[0]).text());
 	}
-	$(".systemdistance").html(getFormatForTag($("> distance",system)));
 	$(".systemdistancelightyears").html(getFormatForTag($("> distance",system),3.261));
 	$(".systemnumberofstars").text(stars.length);
 	$(".systemnumberofplanets").text(planets.length);
-	$(".systemrightascension").html(getFormatForRightAscension($("> rightascension",system).text()));
 	$(".systemdeclination").html(getFormatForDeclination($("> declination",system).text()));
 	if (planets.length>1){
 		var systemimage = $("image",system).first().text();
@@ -295,9 +204,9 @@ function setupPage(xml){
 		</iframe>
 	</div>
 </div>
-<h1><span class="systemname"></span></h1>
+<h1>{{systemname|safe}}</h1>
 <p>
-	<span class="systemcategory"></span>
+	{{systemcategory|safe}}
 </p>
 <p>
 	<span class="systemdescription"></span>
@@ -307,48 +216,22 @@ function setupPage(xml){
 
 
 <table cellspacing="0" summary="Details of the planetary system">
-<tr>
-	<th scope="col" class="nobg">&nbsp;</th>
-	<th scope="col">System parameters</th>
-</tr>
-<tr>
-	<th scope="row">Name</th>
-	<td><span class="systemname"></span></td>
-</tr>
-<tr>
-	<th scope="row">Alternative names</th>
-	<td><span class="systemalternativenames"></span></td>
-</tr>
-<tr>
-	<th scope="row">Right ascension</th>
-	<td><span class="systemrightascension"></span></td>
-<tr>
-</tr>
-	<th scope="row">Declination</th>
-	<td><span class="systemdeclination"></span></td>
-</tr>
-</tr>
-	<th scope="row">Distance [parsec]</th>
-	<td><span class="systemdistance"></span></td>
-</tr>
-</tr>
-	<th scope="row">Distance [lightyears]</th>
-	<td><span class="systemdistancelightyears"></span></td>
-</tr>
-</tr>
-	<th scope="row">Number of stars in system</th>
-	<td><span class="systemnumberofstars"></span></td>
-</tr>
-</tr>
-	<th scope="row">Number of planets in system</th>
-	<td><span class="systemnumberofplanets"></span></td>
-</tr>
+	<tr>
+		<th scope="col" class="nobg">&nbsp;</th>
+		<th scope="col">System parameters</th>
+	</tr>
+	{% for title,value in systemtable: %}
+	<tr>
+		<th scope="row">{{title|safe}}</th>
+		<td>{{value|safe}}</td>
+	</tr>
+	{% endfor %}
 </table>
 
 
 <!-- ########################### -->
 <div class="systemimagesection" style="display: none;">
-<h2><img src="./img/photo.png" alt="Image" />Image</h2>
+<h2><img src="/static/img/photo.png" alt="Image" />Image</h2>
 <a class="systemimagelink" href='#'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
 <p>
 <span class="systemimagedescription"></span><br /> Click on the image to get a higher resolution image.
@@ -357,7 +240,7 @@ function setupPage(xml){
 
 
 <!-- ########################### -->
-<h2><img src="./img/binary.png" alt="Architecture" />Architecture of the system</h2>
+<h2><img src="/static/img/binary.png" alt="Architecture" />Architecture of the system</h2>
 <p>
 This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
 <span class="systembinarytext"></span>
@@ -369,15 +252,15 @@ This list shows all planetary and stellar components in the system. It gives a q
 
 <!-- ########################### -->
 <div class="systemvideosection" style="display: none;">
-<h2><img src="./img/movie.png" alt="Video" />Video</h2>
-<p>This video shows the planetary system <span class="systemname"></span>. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
+<h2><img src="/static/img/movie.png" alt="Video" />Video</h2>
+<p>This video shows the planetary system {{systemname|safe}}. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
 <iframe width="640" height="360" class="systemvideo" frameborder="0" allowfullscreen></iframe>
 </div>
 
 
 <!-- ########################### -->
-<h2><img src="./img/planet.png" alt="Planets" />Planets in the system</h2>
-<p>This table lists all planets in the system <span class="systemname"></span>.</p>
+<h2><img src="/static/img/planet.png" alt="Planets" />Planets in the system</h2>
+<p>This table lists all planets in the system {{systemname|safe}}.</p>
 <div class="planetsection"></div>
 
 <table cellspacing="0" class="planettable" id="planettabletemplate" summary="Details of the planetary system" style="margin-bottom: 2em; display:none;">
@@ -429,8 +312,8 @@ This list shows all planetary and stellar components in the system. It gives a q
 </table>
 
 <!-- ########################### -->
-<h2><img src="./img/help-about.png" alt="star" />Stars in the system</h2>
-<p>This table lists all stars in the system <span class="systemname"></span>.</p>
+<h2><img src="/static/img/help-about.png" alt="star" />Stars in the system</h2>
+<p>This table lists all stars in the system {{systemname|safe}}.</p>
 
 <div class="starsection"></div>
 
@@ -466,7 +349,7 @@ This list shows all planetary and stellar components in the system. It gives a q
 
 
 <!-- ########################### -->
-<h2><img src="./img/kig.png" alt="Visualizations" />Visualizations</h2>
+<h2><img src="/static/img/kig.png" alt="Visualizations" />Visualizations</h2>
 <h3>Orbits</h3>
 <div id="viz"></div>
 <div id="sliderbox">
@@ -514,7 +397,7 @@ The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">S
 
 
 <!-- ########################### -->
-<h2><img src="./img/info.png" alt="references" />Scientific references and contributors</h2>
+<h2><img src="/static/img/info.png" alt="references" />Scientific references and contributors</h2>
 <ul style="padding-left:0;">
 </ul>
 
@@ -534,7 +417,7 @@ if (file_exists($filenamemeta)){
 <?foreach($links as $link){?>
 <tr>
 	<td>
-		<img src="./img/link.png" width=11 height=11 alt ="history" /> 
+		<img src="/static/img/link.png" width=11 height=11 alt ="history" /> 
 		<a href="<?=$link?>"><?=$link?></a> 
 	</td>
 </tr>
@@ -567,7 +450,7 @@ Please consider contributing! <a href="http://openexoplanetcatalogue.com/contrib
 <?foreach($contributors as $contributor){?>
 <tr>
 	<td>
-		<img src="./img/history.png" width=11 height=11 alt="blame" /> 
+		<img src="/static/img/history.png" width=11 height=11 alt="blame" /> 
 		<?=$contributor['commits']?> 
 	</td>
 	<td>
@@ -590,14 +473,14 @@ Please consider contributing! <a href="http://openexoplanetcatalogue.com/contrib
 
 
 <!-- ########################### -->
-<h2><img src="./img/xml.png" alt="xml" />Data download</h2>
+<h2><img src="/static/img/xml.png" alt="xml" />Data download</h2>
 <p>
 <a href="./<?=$filename?>" alt="XML File">Click here to download</a> the XML file for this system. It is part of the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page has been directly generated from this XML file. As an alternative to the single XML file, you can also download the entire catalogue on github at <a href="https://github.com/hannorein/open_exoplanet_catalogue/">https://github.com/hannorein/open_exoplanet_catalogue/</a>. You can also find ASCII tables of the same catalogue at <a href="https://github.com/hannorein/oec_tables/">https://github.com/hannorein/oec_tables/</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
 </p>
 
 
 <!-- ########################### -->
-<h2><img src="./img/lightbulb.png" alt="corrections" />Corrections</h2>
+<h2><img src="/static/img/lightbulb.png" alt="corrections" />Corrections</h2>
 <p>
 If you spot an error or if you can contribute additional data to this entry, please send an e-mail to <a href="mailto:exoplanet@hanno-rein.de">exoplanet@hanno-rein.de</a>.
 If possible, please include the corrected <a href="./<?=$filename?>" alt="XML File">XML file</a> of this entry and a reference to where the new data is coming from, ideally a scientific paper.
@@ -609,17 +492,4 @@ Please include the reference in your commit message.
 
 
 
-<!-- If run on a server, you can include your own footer  -->
-<script language="php"> include "./.inc/footer.php"; if (false){ </script> 
-<!-- ** start server side header ** -->
-</div> <!-- content -->
-<div class="clearer">&nbsp;</div>
-<div class="footer">
-The data on this page is taken from the <a href="http://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. The Open Exoplanet Catalogue as well as this website itself are licensed under an <a href="https://github.com/hannorein/open_exoplanet_catalogue/blob/master/README.md">MIT license</a>.
-</div> <!-- footer -->
-</div> <!-- inner container -->
-</div> <!-- outer container -->
-</body>
-</html>
-<!-- ** end server side header ** -->
-<script language="php"> } </script> 
+{% endblock content %}
