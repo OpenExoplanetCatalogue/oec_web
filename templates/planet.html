@@ -97,23 +97,20 @@ function setupArchitecture(o,stype){
 
 
 <!-- ########################### -->
-<div class="systemimagesection">
+{% if image[0] %}
 <h2><img src="/static/img/photo.png" alt="Image" />Image</h2>
-<a class="systemimagelink" href='#'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
+<a class="systemimagelink" href='{{OEC_OUTREACH_LOCAL}}images/{{image[0]}}.jpg'><div class="systemimage" style="width:50em; height:15em; background-position:center; background-image:url('{{OEC_OUTREACH_LOCAL}}images/{{image[0]}}.jpg');">&nbsp;</div></a>
 <p>
-<span class="systemimagedescription"></span><br /> Click on the image to get a higher resolution image.
+{{image[1]}}
 </p>
-</div>
+{% endif %}
 
 
 <!-- ########################### -->
 <h2><img src="/static/img/binary.png" alt="Architecture" />Architecture of the system</h2>
 <p>
 This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
-<span class="systembinarytext"></span>
 </p>
-<div class="systembinary"> 
-</div>
 
 
 

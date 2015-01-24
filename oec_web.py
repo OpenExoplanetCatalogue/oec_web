@@ -59,6 +59,7 @@ title = {
     "rightascension":               "Right ascension",
     "declination":                  "Declination",
     "image":                        "Image",
+    "imagedescription":             "Image description",
     "starmass":                     "Mass [M<sub>Sun</sub>]",
     "starradius":                   "Radius [R<sub>Sun</sub>]",
     "starage":                      "Age [Gyr]",
@@ -101,7 +102,15 @@ def render(xmlPair,type):
     if type=="declination":
         return renderText(system.find("./declination"))
     if type=="image":
-        return renderText(planet.find("./image"))
+        try:
+            return planet.find("./image").text
+        except:
+            return None
+    if type=="imagedescription":
+        try:
+            return planet.find("./imagedescription").text
+        except:
+            return None
     if type=="description":
         return renderText(planet.find("./description"))
     if type=="name":
@@ -199,6 +208,11 @@ def static_oec(filename):
 def static_oec_meta(filename):
     return send_from_directory('oec_meta', filename)
 
+@app.route('/oec_outreach/<path:filename>')
+def static_oec_outreach(filename):
+    return send_from_directory('oec_outreach', filename)
+
+
 @app.route('/')
 @app.route('/index.html')
 def page_main():
@@ -262,6 +276,7 @@ def page_planet(planetname):
         planetname=planetname,
         systemname=render(xmlPair,"systemname"),
         systemtable=systemtable,
+        image=(render(xmlPair,"image"),render(xmlPair,"imagedescription")),
         planettable=planettable,
         startable=startable,
         filename=filename,
