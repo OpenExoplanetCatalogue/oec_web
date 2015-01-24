@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "detail.html" %}
 {% block title %}- {{planetname}}{% endblock title %}
 {% block content %}
 
@@ -97,7 +97,7 @@ function setupArchitecture(o,stype){
 
 
 <!-- ########################### -->
-<div class="systemimagesection" style="display: none;">
+<div class="systemimagesection">
 <h2><img src="/static/img/photo.png" alt="Image" />Image</h2>
 <a class="systemimagelink" href='#'><div class="systemimage" style="width:50em; height:15em; background-position:center;">&nbsp;</div></a>
 <p>
@@ -118,7 +118,7 @@ This list shows all planetary and stellar components in the system. It gives a q
 
 
 <!-- ########################### -->
-<div class="systemvideosection" style="display: none;">
+<div class="systemvideosection">
 <h2><img src="/static/img/movie.png" alt="Video" />Video</h2>
 <p>This video shows the planetary system {{systemname|safe}}. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
 <iframe width="640" height="360" class="systemvideo" frameborder="0" allowfullscreen></iframe>
@@ -194,10 +194,8 @@ Note that unless the radius has been determined through a transit observation, t
 </p>
 <object data="./size.php?id=<?=urlencode($requestname)?>" width="480" height="400" type="image/svg+xml" ></object>
 <? // show_svg("./size.php?id=".urlencode($requestname),480,400,"png"); ?>
-<?
-// Only non circumbinary planets
-if (count($system->xpath(".//star/planet"))>0){
-?>
+
+
 <h3>Habitable zone</h3>
 <p>
 The following plot shows the approximate location of the planets in this system with respect to the habitable zone (green) and the size of the star (red).
@@ -207,113 +205,7 @@ The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">S
 </p>
 <object data="./habitablezone.php?id=<?=urlencode($requestname)?>" width="600" height="100" type="image/svg+xml"></object>
 <?  //show_svg("./habitablezone.php?id=".urlencode($requestname),600,100,"png"); ?>
-<?}?>
 
-
-
-<!-- ########################### -->
-<h2><img src="/static/img/info.png" alt="references" />Scientific references and contributors</h2>
-<ul style="padding-left:0;">
-</ul>
-
-
-<script language="php">
-if (file_exists($filenamemeta)){
-	$metasystem 	= simplexml_load_file($filenamemeta);
-	$contributors 	= $metasystem->xpath('.//contributor');
-	$links	 	= $metasystem->xpath('.//link');
-}
-</script>
-
-
-<h3>Links to scientific papers and other data sources</h3>
-<table cellspacing="0" summary="Links">
-{% for link in references: %}
-	<tr>
-		<td>
-			<img src="/static/img/link.png" width=11 height=11 alt ="history" /> 
-			<a href="{{link|safe}}">{{link}}</a> 
-		</td>
-	</tr>
-{% else %}
-	<tr>
-		<td>
-			<span class="NA">No links found.</span>
-		</td>
-	</tr>
-{% endfor %}
-</table>
-<p>
-This table lists all links which are relevant to this particular system.
-Note that this is just a summary. 
-More references to the scientific publications and comments can be found in the commit messages.
-To see these, head over the github or <a href="{{OEC_GITHUB}}blame/master/{{filename|urlencode}}">click here</a> to directly go to the git blame output of this system.
-In the left column of the output you can see the commit message corresponding to each parameter. 
-It also lists the date of the last commit and the person making the changes.
-Within the commit message, you will find a link to the scientific publication where the data is taken from.
-Note that this is a new feature and not all system parameters might have a reference associated with it yet.
-Please help making this catalogue better and contribute data or references!
-</p>
-
-
-
-
-<h3>Open Exoplanet Catalogue contributors</h3>
-<table cellspacing="0" summary="Contributors">
-	<tr>
-		<th scope="col">Contributor</th>
-		<th scope="col">E-mail</th>
-		<th scope="col">Number of commits</th>
-	</tr>
-	{% for commits,email,name in contributors: %}
-	{% if loop.first %}
-	{% endif %}
-	<tr>
-		<td>{{name}}</td>
-		<td>{{email|safe|replace("@","(at)")}}</td>
-		<td>{{commits}}</td>
-	</tr>
-	{% else %}
-	<tr>
-		<td colspan="3">
-			<span class="NA">No contributors found.</span>
-		</td>
-	</tr>
-	{% endfor %}
-<?}?>
-</table>
-<p>
-	This table lists all people who have contributed to the Open Exoplanet Catalogue. 
-	Please consider contributing! <a href="http://openexoplanetcatalogue.com/contribute/">Click here</a> to find out how.
-	You can also view all <a href="{{OEC_GITHUB}}commits/master/{{filename|urlencode}}">commits</a> contributing to this file on github.
-</p>
-
-<p>
-</p>
-
-
-
-
-<!-- ########################### -->
-<h2><img src="/static/img/xml.png" alt="xml" />Data download</h2>
-<p>
-You can download the <a href="{{OEC_LOCAL}}{{filename|urlencode}}" alt="XML File">xml file</a> corresponding to this planetary system, which is part of the <a href="{{OEC_GITHUB}}">Open Exoplanet Catalogue</a>. 
-All information on this page has been directly generated from this XML file. 
-You can also download the entire catalogue over at <a href="{{OEC_GITHUB}}">github</a>. 
-If you prefer to download the dataset as an ASCII tables, you might find the <a href="{{OEC_TABLES_GITHUB}}">oec_tables</a> repository usefule.
-</p>
-
-
-<!-- ########################### -->
-<h2><img src="/static/img/lightbulb.png" alt="corrections" />Corrections</h2>
-<p>
-If you spot an error or if you can contribute additional data to this entry, please send an e-mail to <a href="mailto:exoplanet@hanno-rein.de">exoplanet@hanno-rein.de</a>.
-Please include the corrected <a href="{{OEC_LOCAL}}{{filename|urlencode}}" alt="XML File">xml file</a> and a reference to where the new data is coming from, ideally a scientific paper.
-If you are fluent with git and github, you can also create a pull request or open an issue on the <a href="{{OEC_GITHUB}}">Open Exoplanet Catalogue</a> repository.
-Please include the reference to the relevant scientific paper in your commit message.
-
-
-
-
+{{ super() }}
 
 {% endblock content %}
