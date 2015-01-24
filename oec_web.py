@@ -41,6 +41,10 @@ def title(type):
         return "Mass [M<sub>jup</sub>]"
     if type=="radius":
         return "Radius [R<sub>jup</sub>]"
+    if type=="massEarth":
+        return "Mass [M<sub>earth</sub>]"
+    if type=="radiusEarth":
+        return "Radius [R<sub>earth</sub>]"
 
 def render(xmlPair,type):
     system, planet = xmlPair
@@ -48,12 +52,11 @@ def render(xmlPair,type):
         return "%d"%len(system.findall(".//planet"))
     if type=="name":
         return planet.find("./name").text
-    try:
-        return renderFloat(planet.find("./"+type))
-    except:
-        pass
-
-    return ""
+    if type=="massEarth":
+        return renderFloat(planet.find("./mass"),317.8942)
+    if type=="radiusEarth":
+        return renderFloat(planet.find("./radius"),10.973299)
+    return renderFloat(planet.find("./"+type))
 
 app = Flask(__name__)
 @app.route('/')
@@ -64,7 +67,7 @@ def main_page():
 @app.route('/systems/')
 def systems():
     p = []
-    fields = ["name","mass","radius","numberofplanets"]
+    fields = ["name","mass","radius","massEarth","radiusEarth","numberofplanets"]
     for xmlPair in planets:
         system,planet = xmlPair
         d = {}

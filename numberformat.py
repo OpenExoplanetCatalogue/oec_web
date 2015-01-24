@@ -73,7 +73,7 @@ def renderFloat(tag, factor=1.):
     significantdigits = 2
     if value is not None:
         significantdigits = -floor(log10(fabs(value/2.)))
-        if error_plus is not None and error_minus is not None:
+        if error_plus is not None and error_minus is not None and error_plus!=0. and error_minus!=0.:
             error_significantdigits = max(-floor(log10(error_plus/2.)),-floor(log10(error_minus/2.)))
             significantdigits = max(error_significantdigits,significantdigits)
         else:
