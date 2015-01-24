@@ -2,3 +2,4 @@
 *.swp
 venv/
 *.pyc
+static/open_exoplanet_catalogue/

@@ -374,7 +374,7 @@ if (file_exists($filenamemeta)){
 <p>
 Note that this is just a summary. 
 More references to the scientific publications and comments can be found in the commit messages.
-To see these, head over the github or <a href="https://github.com/hannorein/open_exoplanet_catalogue/blame/master/systems/<?=$filenamebase?>">click here</a> to directly go to the git blame output of this system.
+To see these, head over the github or <a href="{{OEC_GITHUB}}blame/master/{{filename|urlencode}}">click here</a> to directly go to the git blame output of this system.
 In the left column of the output you can see the commit message corresponding to each parameter. 
 It also lists the date of the last commit and the person making the changes.
 Within the commit message, you will find a link to the scientific publication where the data is taken from.
@@ -411,7 +411,7 @@ Please consider contributing! <a href="http://openexoplanetcatalogue.com/contrib
 <?}?>
 </table>
 <p>
-	View all <a href="https://github.com/hannorein/open_exoplanet_catalogue/commits/master/systems/<?=$filenamebase?>">commits</a> contributing to the file <?=$filenamebase?>.
+	View all <a href="{{OEC_GITHUB}}commits/master/{{filename|urlencode}}">commits</a> contributing to the file <?=$filenamebase?>.
 </p>
 
 <p>
@@ -423,7 +423,7 @@ Please consider contributing! <a href="http://openexoplanetcatalogue.com/contrib
 <!-- ########################### -->
 <h2><img src="/static/img/xml.png" alt="xml" />Data download</h2>
 <p>
-<a href="./<?=$filename?>" alt="XML File">Click here to download</a> the XML file for this system. It is part of the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page has been directly generated from this XML file. As an alternative to the single XML file, you can also download the entire catalogue on github at <a href="https://github.com/hannorein/open_exoplanet_catalogue/">https://github.com/hannorein/open_exoplanet_catalogue/</a>. You can also find ASCII tables of the same catalogue at <a href="https://github.com/hannorein/oec_tables/">https://github.com/hannorein/oec_tables/</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+<a href="{{OEC_LOCAL}}{{filename|urlencode}}" alt="XML File">Click here to download</a> the XML file for this system. It is part of the <a href="{{OEC_GITHUB}}">Open Exoplanet Catalogue</a>. All information on this page has been directly generated from this XML file. As an alternative to the single XML file, you can also download the entire catalogue on github at <a href="{{OEC_GITHUB}}">{{OEC_GITHUB}}</a>. You can also find ASCII tables of the same catalogue at <a href="{{OEC_TABLES_GITHUB}}">{{OEC_TABLES_GITHUB}}</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
 </p>
 
 

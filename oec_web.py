@@ -18,14 +18,15 @@ xmlPairs = {}
 for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     # Open file
     f = open(filename, 'rt')
+    filename = filename[len(OEC_PATH):]
     # Try to parse file
     try:
         root = ET.parse(f).getroot()
         systems += root
         for p in root.findall(".//planet"):
-            planets.append((root,p))
+            planets.append((root,p,filename))
             name = p.find("./name").text
-            xmlPairs[name] = (root,p)
+            xmlPairs[name] = (root,p,filename)
         stars += root.findall(".//star")
         binaries += root.findall(".//binary")
     except ET.ParseError as error:
@@ -74,7 +75,7 @@ title = {
 }
 
 def render(xmlPair,type):
-    system, planet = xmlPair
+    system, planet, filename = xmlPair
     if type=="numberofplanets":
         return "%d"%len(system.findall(".//planet"))
     if type=="numberofstars":
@@ -179,7 +180,7 @@ def systems():
     p = []
     fields = ["name","mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
     for xmlPair in planets:
-        system,planet = xmlPair
+        system,planet,filename = xmlPair
         d = {}
         name = render(xmlPair,"name")
         d["fields"] = ["<a href=\"/planet/%s/\">%s</a>"%(urllib.quote(name),name)]
@@ -191,9 +192,9 @@ def systems():
 
 @app.route('/planet/<planetname>')
 @app.route('/planet/<planetname>/')
-def hello_planet(planetname):
+def planet(planetname):
     xmlPair = xmlPairs[planetname]
-    system,planet = xmlPair
+    system,planet,filename = xmlPair
     systemname = render(xmlPair,"systemname")
     systemcategory = ""
     if len(system.findall(".//planet"))==1:
@@ -228,6 +229,7 @@ def hello_planet(planetname):
         systemtable=systemtable,
         planettable=planettable,
         startable=startable,
+        filename=filename,
         systemcategory=systemcategory,
         )
     #abort(404)
