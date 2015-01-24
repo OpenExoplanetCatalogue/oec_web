@@ -3,21 +3,6 @@
 {% block content %}
 
 <script type="text/javascript">
-function qs(key) {
-    key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
-    var match = location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
-    return match && decodeURIComponent(match[1].replace(/\+/g, " "));
-}
-$(document).ready(function(){
-	var systemname = qs("id");  // make this php-able
-	$.ajax({
-		type: "GET",
-		url: "./open_exoplanet_catalogue/systems/"+systemname+".xml",
-		dataType: "xml",
-		success: setupPage
-		});
-	});
-
 var subSystemString = "";
 function setupArchitecture(o,stype){
 	stype = typeof stype !== 'undefined' ? stype : 0;
@@ -70,124 +55,6 @@ function setupArchitecture(o,stype){
 		setupArchitecture(planet);
 	}
 	subSystemString += "</ul>";
-}
-
-
-var planets;
-var stars; 
-var system;
-function setupPage(xml){
-	setupOrbitPlot(xml);
-	planets = $(xml).find("planet");
-	stars = $(xml).find("star");
-	system = $(xml).find("system");
-
-	if (stars.length<2 && planets.length==1){
-		$(".systemdescription").text($("description",planets[0]).text());
-	}
-	$(".systemdistancelightyears").html(getFormatForTag($("> distance",system),3.261));
-	$(".systemnumberofstars").text(stars.length);
-	$(".systemnumberofplanets").text(planets.length);
-	$(".systemdeclination").html(getFormatForDeclination($("> declination",system).text()));
-	if (planets.length>1){
-		var systemimage = $("image",system).first().text();
-		if (systemimage.length){
-			$(".systemimagesection").css("display","inline");
-			$(".systemimage").css("background-image","url('./open_exoplanet_catalogue/images/"+systemimage+".jpg')"); 
-			$(".systemimagelink").attr("href","./open_exoplanet_catalogue/images/"+systemimage+".jpg");
-			$(".systemimagedescription").text($("imagedescription",system).first().text());
-		}
-		var systemvideo = $("videolink",system).first().text().split("/").pop();
-		if (systemvideo.length){
-			$(".systemvideosection").css("display","inline");
-			$(".systemvideo").attr("src","http://www.youtube.com/embed/"+systemvideo+"?rel=0&autoplay=1");
-		}
-	}
-	
-	setupArchitecture(system,1);
-	$(".systembinary").html(subSystemString);
-
-	for (var i=0;i<planets.length;i+=2){
-		$("#planettabletemplate").clone().css("display","table").appendTo(".planetsection");
-	}
-	var tables = $(".planetsection > .planettable");
-	for (var i=0;i<planets.length;i++){
-		var table = tables.eq(i/2);
-		var planet = planets.eq(i);
-		var planetnames = $("name",planet);
-		$(".planetname",table).append("<th scope=\"col\">"+planetnames.first().text()+"</th>");
-		var alternativename = "<td>";
-		if (planetnames.length>1){
-			for(var j=1;j<planetnames.length;j++){
-				alternativename += planetnames.eq(j).text();
-				if (j!=planetnames.length-1){
-					alternativename += ", ";
-				}
-			}
-		}else{
-			alternativename += notAvailableString;
-		}
-		alternativename += "</td>";
-		$(".planetalternativename",table).append(alternativename);
-		$(".planetdescription",table).append("<td><div style=\"max-width: "+(planets.length==1?34:17)+"em;\">"+getFormatForTagText($("> description",planet))+"</div></td>");
-		var planetlists = $("list",planet);
-		var lists = "<td>";
-		if (planetlists.length>0){
-			for(var j=0;j<planetlists.length;j++){
-				lists += planetlists.eq(j).text();
-				if (j!=planetlists.length-1){
-					lists += ", ";
-				}
-			}
-		}else{
-			lists += notAvailableString;
-		}
-		lists += "</td>";
-		$(".planetlists",table).append(lists);
-		$(".planetmass",table).append("<td>"+getFormatForTag($("> mass",planet))+"</td>");
-		$(".planetmassearth",table).append("<td>"+getFormatForTag($("> mass",planet),317.8942)+"</td>");
-		$(".planetperiod",table).append("<td>"+getFormatForTag($("> period",planet))+"</td>");
-		$(".planeteccentricity",table).append("<td>"+getFormatForTag($("> eccentricity",planet))+"</td>");
-		$(".planetsemia",table).append("<td>"+getFormatForTag($("> semimajoraxis",planet))+"</td>");
-		$(".planetradius",table).append("<td>"+getFormatForTag($("> radius",planet))+"</td>");
-		$(".planetradiusearth",table).append("<td>"+getFormatForTag($("> radius",planet),10.973299)+"</td>");
-		$(".planettemperature",table).append("<td>"+getFormatForTag($("> temperature",planet))+"</td>");
-		$(".planetdiscoverymethod",table).append("<td>"+getFormatForTagText($("> discoverymethod",planet))+"</td>");
-		$(".planetdiscoveryyear",table).append("<td>"+getFormatForTagText($("> discoveryyear",planet))+"</td>");
-		$(".planetlastupdate",table).append("<td>"+getFormatForTagText($("> lastupdate",planet))+"</td>");
-
-	}
-	
-	for (var i=0;i<stars.length;i+=2){
-		$("#startabletemplate").clone().css("display","table").appendTo(".starsection");
-	}
-	var tables = $(".starsection > .startable");
-	for (var i=0;i<stars.length;i++){
-		var table = tables.eq(i/2);
-		var star = stars.eq(i);
-		var starnames = $("> name",star);
-		$(".starname",table).append("<th scope=\"col\">"+starnames.first().text()+"</th>");
-		var alternativename = "<td>";
-		if (starnames.length>1){
-			for(var j=1;j<starnames.length;j++){
-				alternativename += starnames.eq(j).text();
-				if (j!=starnames.length-1){
-					alternativename += ", ";
-				}
-			}
-		}else{
-			alternativename += notAvailableString;
-		}
-		alternativename += "</td>";
-		$(".staralternativename",table).append(alternativename);
-		$(".starmass",table).append("<td>"+getFormatForTag($("> mass",star))+"</td>");
-		$(".starradius",table).append("<td>"+getFormatForTag($("> radius",star))+"</td>");
-		$(".starage",table).append("<td>"+getFormatForTag($("> age",star))+"</td>");
-		$(".starmetallicity",table).append("<td>"+getFormatForTag($("> metallicity",star))+"</td>");
-		$(".starspectraltype",table).append("<td>"+getFormatForTag($("> spectraltype",star))+"</td>");
-		$(".startemperature",table).append("<td>"+getFormatForTag($("> temperature",star))+"</td>");
-		$(".starmagv",table).append("<td>"+getFormatForTag($("> magV",star))+"</td>");
-	}
 }
 
 </script>
@@ -392,22 +259,21 @@ Please help making this catalogue better and contribute data or references!
 
 
 <h3>Open Exoplanet Catalogue contributors</h3>
-{{gitlog}}
 <table cellspacing="0" summary="Contributors">
 	<tr>
-		<th scope="col">Number of commits</th>
 		<th scope="col">Contributor</th>
 		<th scope="col">E-mail</th>
+		<th scope="col">Number of commits</th>
 	</tr>
-	{% for commits,name,email in contributortable: %}
+	{% for commits,email,name in contributors: %}
 	{% if loop.first %}
 	{% endif %}
 	<tr>
-		<img src="/static/img/history.png" width=11 height=11 alt="blame" /> 
-		<th scope="row">{{title|safe}}</th>
+		<td>{{name}}</td>
 		<td>{{email|safe|replace("@","(at)")}}</td>
+		<td>{{commits}}</td>
 	</tr>
-{% else %}
+	{% else %}
 	<tr>
 		<td colspan="3">
 			<span class="NA">No contributors found.</span>
@@ -431,7 +297,10 @@ Please help making this catalogue better and contribute data or references!
 <!-- ########################### -->
 <h2><img src="/static/img/xml.png" alt="xml" />Data download</h2>
 <p>
-<a href="{{OEC_LOCAL}}{{filename|urlencode}}" alt="XML File">Click here to download</a> the XML file for this system. It is part of the <a href="{{OEC_GITHUB}}">Open Exoplanet Catalogue</a>. All information on this page has been directly generated from this XML file. As an alternative to the single XML file, you can also download the entire catalogue on github at <a href="{{OEC_GITHUB}}">{{OEC_GITHUB}}</a>. You can also find ASCII tables of the same catalogue at <a href="{{OEC_TABLES_GITHUB}}">{{OEC_TABLES_GITHUB}}</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+You can download the <a href="{{OEC_LOCAL}}{{filename|urlencode}}" alt="XML File">xml file</a> corresponding to this planetary system, which is part of the <a href="{{OEC_GITHUB}}">Open Exoplanet Catalogue</a>. 
+All information on this page has been directly generated from this XML file. 
+You can also download the entire catalogue over at <a href="{{OEC_GITHUB}}">github</a>. 
+If you prefer to download the dataset as an ASCII tables, you might find the <a href="{{OEC_TABLES_GITHUB}}">oec_tables</a> repository usefule.
 </p>
 
 
@@ -439,10 +308,9 @@ Please help making this catalogue better and contribute data or references!
 <h2><img src="/static/img/lightbulb.png" alt="corrections" />Corrections</h2>
 <p>
 If you spot an error or if you can contribute additional data to this entry, please send an e-mail to <a href="mailto:exoplanet@hanno-rein.de">exoplanet@hanno-rein.de</a>.
-If possible, please include the corrected <a href="./<?=$filename?>" alt="XML File">XML file</a> of this entry and a reference to where the new data is coming from, ideally a scientific paper.
-If you are fluent with git and <a href="http://github.com">github</a>, you can also create a pull request or open an issue on the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a> repository.
-In that case, your contribution will be properly attributed. 
-Please include the reference in your commit message.
+Please include the corrected <a href="{{OEC_LOCAL}}{{filename|urlencode}}" alt="XML File">xml file</a> and a reference to where the new data is coming from, ideally a scientific paper.
+If you are fluent with git and github, you can also create a pull request or open an issue on the <a href="{{OEC_GITHUB}}">Open Exoplanet Catalogue</a> repository.
+Please include the reference to the relevant scientific paper in your commit message.
 
 
 

@@ -197,13 +197,19 @@ def main_page():
 @app.route('/systems/')
 def page_systems():
     p = []
-    fields = ["name","mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
+    fields = ["systemname","name","mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
+    lastfilename = ""
     for xmlPair in planets:
         system,planet,filename = xmlPair
+        systemname = "&nbsp;"
+        if lastfilename!=filename:
+            lastfilename = filename
+            systemname = render(xmlPair,"systemname")
+            systemname = "<a href=\"/system/%s/\">%s</a>"%(urllib.quote(systemname),systemname)
         d = {}
-        name = render(xmlPair,"name")
-        d["fields"] = ["<a href=\"/planet/%s/\">%s</a>"%(urllib.quote(name),name)]
-        for field in fields[1:]:
+        planetname = render(xmlPair,"name")
+        d["fields"] = [systemname,"<a href=\"/planet/%s/\">%s</a>"%(urllib.quote(planetname),planetname)]
+        for field in fields[2:]:
             d["fields"].append(render(xmlPair,field))
         p.append(d)
     return render_template("systems.html",columns=[title[field] for field in fields],planets=p)
@@ -243,11 +249,13 @@ def planet(planetname):
         startable.append((title[row],render(xmlPair,row)))
 
     references = []
-    f = open(OEC_META_PATH+filename, 'rt')
-    root = ET.parse(f).getroot()
-    for l in root.findall(".//link"):
-        references.append(l.text) 
-    f.close()
+    contributors = []
+    with open(OEC_META_PATH+filename, 'rt') as f:
+        root = ET.parse(f).getroot()
+        for l in root.findall(".//link"):
+            references.append(l.text) 
+        for c in root.findall(".//contributor"):
+            contributors.append((c.attrib["commits"],c.attrib["email"],c.text)) 
 
 
     return render_template("planet.html",
@@ -258,6 +266,7 @@ def planet(planetname):
         startable=startable,
         filename=filename,
         references=references,
+        contributors=contributors,
         systemcategory=systemcategory,
         )
     #abort(404)
