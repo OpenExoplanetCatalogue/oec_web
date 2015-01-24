@@ -7,6 +7,12 @@ def toFixed(f,digits):
     return formatstring % f
 
 notAvailableString = "<span class=\"NA\">N/A</span>"
+
+def renderText(tag):
+    if tag is None:
+        return notAvailableString
+    return tag.text
+
 def renderFloat(tag, factor=1.):
     if tag is None:
         return notAvailableString
@@ -45,7 +51,7 @@ def renderFloat(tag, factor=1.):
     dexponent = ""
     if value is not None:
         if value!=0.:
-            exponent = floor(log10(value))
+            exponent = floor(log10(fabs(value)))
             dexponent = pow(10, exponent)
         else:
             exponent = -2

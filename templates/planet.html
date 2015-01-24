@@ -276,54 +276,23 @@ This list shows all planetary and stellar components in the system. It gives a q
 	{% endfor %}
 </table>
 
-<tr class="planettemperature">
-	<th scope="row">Temperature [K]</th>
-</tr>
-<tr class="planetdiscoverymethod">
-	<th scope="row">Discovery method</th>
-</tr>
-<tr class="planetdiscoveryyear">
-	<th scope="row">Discovery year</th>
-</tr>
-<tr class="planetlastupdate">
-	<th scope="row">Last updated [yy/mm/dd]</th>
-</tr>
-</table>
-
 <!-- ########################### -->
 <h2><img src="/static/img/help-about.png" alt="star" />Stars in the system</h2>
 <p>This table lists all stars in the system {{systemname|safe}}.</p>
 
 <div class="starsection"></div>
 
-<table cellspacing="0" class="startable" id="startabletemplate" summary="Details of the star system" style="margin-bottom: 2em; display:none;">
-<tr class="starname">
-	<th scope="col" class="nobg">&nbsp;</th>
-</tr>
-<tr class="staralternativename">
-	<th valign="top" scope="row">Alternative names</th>
-</tr>
-<tr class="starmass">
-	<th scope="row">Mass [M<sub>Sun</sub>]</th>
-</tr>
-<tr class="starradius">
-	<th scope="row">Radius [R<sub>Sun</sub>]</th>
-</tr>
-<tr class="starage">
-	<th scope="row">Age [Gyr]</th>
-</tr>
-<tr class="starmetallicity">
-	<th scope="row">Metallicity [Fe/H]</th>
-</tr>
-<tr class="starspectraltype">
-	<th scope="row">Spectral type</th>
-</tr>
-<tr class="startemperature">
-	<th scope="row">Temperature [K]</th>
-</tr>
-<tr class="starmagv">
-	<th scope="row">Visual magnitude</th>
-</tr>
+<table cellspacing="0" summary="Details of the star system">
+	<tr>
+		<th scope="col" class="nobg">&nbsp;</th>
+		<th scope="col">Stellar parameters</th>
+	</tr>
+	{% for title,value in startable: %}
+	<tr>
+		<th scope="row">{{title|safe}}</th>
+		<td>{{value|safe}}</td>
+	</tr>
+	{% endfor %}
 </table>
 
 

@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import glob
 import urllib
-from numberformat import renderFloat, notAvailableString
+from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template
 
 
@@ -40,6 +40,8 @@ print "Parsing OEC done"
 title = {
     "name":                         "Primary planet name",
     "alternativenames":             "Alternative planet names",
+    "starname":                     "Star name",
+    "staralternativenames":         "Alternative star names",
     "systemname":                   "Primary system name",
     "systemalternativenames":       "Alternative system names",
     "distance":                     "Distance [parsec]",
@@ -49,6 +51,13 @@ title = {
     "rightascension":               "Right ascension",
     "declination":                  "Declination",
     "image":                        "Image",
+    "starmass":                     "Mass [M<sub>Sun</sub>]",
+    "starradius":                   "Radius [R<sub>Sun</sub>]",
+    "starage":                      "Age [Gyr]",
+    "starmetallicity":              "Metallicity [Fe/H]",
+    "starspectraltype":             "Spectral type",
+    "startemperature":              "Temperature [K]",
+    "starvisualmagnitude":          "Visual magnitude",
     "period":                       "Orbital period [days]",
     "semimajoraxis":                "Semi-major axis [AU]",
     "eccentricity":                 "Eccentricity",
@@ -80,23 +89,23 @@ def render(xmlPair,type):
         return renderFloat(planet.find("./radius"),10.973299)
     # Text based object
     if type=="rightascension":
-        return system.find("./rightascension").text
+        return renderText(system.find("./rightascension"))
     if type=="declination":
-        return system.find("./declination").text
+        return renderText(system.find("./declination"))
     if type=="image":
-        return planet.find("./image").text
+        return renderText(planet.find("./image"))
     if type=="description":
-        return planet.find("./description").text
+        return renderText(planet.find("./description"))
     if type=="name":
-        return planet.find("./name").text
+        return renderText(planet.find("./name"))
     if type=="discoveryyear":
-        return planet.find("./discoveryyear").text
+        return renderText(planet.find("./discoveryyear"))
     if type=="discoverymethod":
-        return planet.find("./discoverymethod").text
+        return renderText(planet.find("./discoverymethod"))
     if type=="lastupdate":
-        return planet.find("./lastupdate").text
+        return renderText(planet.find("./lastupdate"))
     if type=="systemname":
-        return system.find("./name").text
+        return renderText(system.find("./name"))
     if type=="alternativenames":
         alternativenames = notAvailableString 
         names = planet.findall("./name")
@@ -127,6 +136,35 @@ def render(xmlPair,type):
                 lists += "; "
             lists += l.text
         return lists
+    # Host star fields
+    if type[0:4]=="star":
+        stars = system.findall("./star")
+        star = None
+        for s in stars:
+            if planet in s:
+                star = s
+                break
+        if star is None:
+            return notAvailableString
+        type = type[4:]
+        # Text based object
+        if type=="spectraltype":
+            return renderText(star.find("./spectraltype"))
+        if type=="name":
+            return renderText(star.find("./name"))
+        if type=="alternativenames":
+            alternativenames = notAvailableString 
+            names = star.findall("./name")
+            for i,name in enumerate(names[1:]):
+                if i==0:
+                    alternativenames = ""
+                else:
+                    alternativenames += ", "
+                alternativenames += name.text
+            return alternativenames
+        # Default: just search for the property in the planet xml. 
+        return renderFloat(star.find("./"+type))
+
     # Default: just search for the property in the planet xml. 
     return renderFloat(planet.find("./"+type))
 
@@ -179,12 +217,17 @@ def hello_planet(planetname):
     planettable = []
     for row in ["name","alternativenames","description","lists","mass","massEarth","radius","radiusEarth","period","semimajoraxis","eccentricity","temperature","discoverymethod","discoveryyear","lastupdate"]:
         planettable.append((title[row],render(xmlPair,row)))
+    
+    startable = []
+    for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starvisualmagnitude"]:
+        startable.append((title[row],render(xmlPair,row)))
 
     return render_template("planet.html",
         planetname=planetname,
         systemname=systemname,
         systemtable=systemtable,
         planettable=planettable,
+        startable=startable,
         systemcategory=systemcategory,
         )
     #abort(404)
