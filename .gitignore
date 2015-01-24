@@ -2,4 +2,5 @@
 *.swp
 venv/
 *.pyc
-static/open_exoplanet_catalogue/
+open_exoplanet_catalogue/
+oec_meta/

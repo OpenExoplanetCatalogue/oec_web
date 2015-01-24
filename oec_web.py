@@ -2,13 +2,15 @@ import xml.etree.ElementTree as ET
 import glob
 import urllib
 from numberformat import renderFloat, renderText, notAvailableString
-from flask import Flask, abort, render_template
+from flask import Flask, abort, render_template, send_from_directory
 
 
-OEC_PATH = "static/open_exoplanet_catalogue/"
+OEC_PATH = "open_exoplanet_catalogue/"
+OEC_META_PATH = "oec_meta/"
 
 print "Parsing OEC ..."
-systems = []
+numconfirmedplanets = 0
+numsystems = 0
 planets = []
 stars = []
 binaries = []
@@ -22,8 +24,11 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     # Try to parse file
     try:
         root = ET.parse(f).getroot()
-        systems += root
+        numsystems +=1
         for p in root.findall(".//planet"):
+            for l in p.findall("./list"):
+                if l.text == "Confirmed planets":
+                    numconfirmedplanets += 1
             planets.append((root,p,filename))
             name = p.find("./name").text
             xmlPairs[name] = (root,p,filename)
@@ -170,13 +175,27 @@ def render(xmlPair,type):
     return renderFloat(planet.find("./"+type))
 
 app = Flask(__name__)
+
+@app.route('/open_exoplanet_catalogue/<path:filename>')
+def static_oec(filename):
+    return send_from_directory('open_exoplanet_catalogue', filename)
+
+@app.route('/oec_meta/<path:filename>')
+def static_oec_meta(filename):
+    return send_from_directory('oec_meta', filename)
+
 @app.route('/')
 @app.route('/index.html')
 def main_page():
-    return render_template("index.html")
+    return render_template("index.html",
+            numplanets=len(planets),
+            numsystems=numsystems,
+            numconfirmedplanets=numconfirmedplanets,
+            numbinaries=len(binaries),
+        )
 
 @app.route('/systems/')
-def systems():
+def page_systems():
     p = []
     fields = ["name","mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
     for xmlPair in planets:
@@ -223,6 +242,14 @@ def planet(planetname):
     for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starvisualmagnitude"]:
         startable.append((title[row],render(xmlPair,row)))
 
+    references = []
+    f = open(OEC_META_PATH+filename, 'rt')
+    root = ET.parse(f).getroot()
+    for l in root.findall(".//link"):
+        references.append(l.text) 
+    f.close()
+
+
     return render_template("planet.html",
         planetname=planetname,
         systemname=systemname,
@@ -230,6 +257,7 @@ def planet(planetname):
         planettable=planettable,
         startable=startable,
         filename=filename,
+        references=references,
         systemcategory=systemcategory,
         )
     #abort(404)

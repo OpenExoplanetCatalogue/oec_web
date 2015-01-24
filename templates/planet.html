@@ -360,18 +360,24 @@ if (file_exists($filenamemeta)){
 
 
 <h3>Links to scientific papers and other data sources</h3>
-<p>The following table lists all links which are relevant to this particular system.</p>
 <table cellspacing="0" summary="Links">
-<?foreach($links as $link){?>
-<tr>
-	<td>
-		<img src="/static/img/link.png" width=11 height=11 alt ="history" /> 
-		<a href="<?=$link?>"><?=$link?></a> 
-	</td>
-</tr>
-<?}?>
+{% for link in references: %}
+	<tr>
+		<td>
+			<img src="/static/img/link.png" width=11 height=11 alt ="history" /> 
+			<a href="{{link|safe}}">{{link}}</a> 
+		</td>
+	</tr>
+{% else %}
+	<tr>
+		<td>
+			<span class="NA">No links found.</span>
+		</td>
+	</tr>
+{% endfor %}
 </table>
 <p>
+This table lists all links which are relevant to this particular system.
 Note that this is just a summary. 
 More references to the scientific publications and comments can be found in the commit messages.
 To see these, head over the github or <a href="{{OEC_GITHUB}}blame/master/{{filename|urlencode}}">click here</a> to directly go to the git blame output of this system.
@@ -386,32 +392,34 @@ Please help making this catalogue better and contribute data or references!
 
 
 <h3>Open Exoplanet Catalogue contributors</h3>
-<p>This table lists all people who have contributed to the Open Exoplanet Catalogue. 
-Please consider contributing! <a href="http://openexoplanetcatalogue.com/contribute/">Click here</a> to find out how.
-</p>
+{{gitlog}}
 <table cellspacing="0" summary="Contributors">
-<tr>
-	<th scope="col">Number of commits</th>
-	<th scope="col">Contributor</th>
-	<th scope="col">E-mail</th>
-</tr>
-<?foreach($contributors as $contributor){?>
-<tr>
-	<td>
+	<tr>
+		<th scope="col">Number of commits</th>
+		<th scope="col">Contributor</th>
+		<th scope="col">E-mail</th>
+	</tr>
+	{% for commits,name,email in contributortable: %}
+	{% if loop.first %}
+	{% endif %}
+	<tr>
 		<img src="/static/img/history.png" width=11 height=11 alt="blame" /> 
-		<?=$contributor['commits']?> 
-	</td>
-	<td>
-		<?=$contributor?>
-	</td>
-	<td>
-		<?=str_replace("@","(at)",$contributor['email'])?>
-	</td>
-</tr>
+		<th scope="row">{{title|safe}}</th>
+		<td>{{email|safe|replace("@","(at)")}}</td>
+	</tr>
+{% else %}
+	<tr>
+		<td colspan="3">
+			<span class="NA">No contributors found.</span>
+		</td>
+	</tr>
+	{% endfor %}
 <?}?>
 </table>
 <p>
-	View all <a href="{{OEC_GITHUB}}commits/master/{{filename|urlencode}}">commits</a> contributing to the file <?=$filenamebase?>.
+	This table lists all people who have contributed to the Open Exoplanet Catalogue. 
+	Please consider contributing! <a href="http://openexoplanetcatalogue.com/contribute/">Click here</a> to find out how.
+	You can also view all <a href="{{OEC_GITHUB}}commits/master/{{filename|urlencode}}">commits</a> contributing to this file on github.
 </p>
 
 <p>
