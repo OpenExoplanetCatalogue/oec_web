@@ -112,3 +112,86 @@ span.errorminus {
 span.NA {
 	color: lightgray;
 }
+
+.header {
+	background: url('/static/img/header_n.jpg') no-repeat;
+	height: 250px;
+	margin-bottom: 0px;
+	text-align: right;
+}
+
+.header .title {
+	color: #000;
+	padding-top: 60px;
+	padding-right: 40px;
+	text-align: right;
+}
+.header .title .name a {
+	color: #000;
+	font-size: 5em;
+	font-weight: bold;
+	text-decoration: none;
+	text-align: right;
+}
+.header .title .name a:hover {border-color: #F60;}
+
+.header .title .tag {
+	text-align: right;
+	font-size: 1.2em;
+	letter-spacing: 0.2em;
+	padding-top: 10px;
+}
+.navigation {
+	padding-top: 50px;
+	padding-right: 30px;
+	background: #fff url('/static/img/header2.jpg') no-repeat;
+	float: left; 
+	width: 220px;
+}
+.navigation h2 {
+	font: bold 1.6em sans-serif;
+	line-height: 30px;
+	margin: 0;
+	padding-left: 11px;
+}
+.navigation ul {
+	padding-bottom: 10px;
+	border-top: 1px solid #000;
+}
+.navigation li {border-bottom: 1px solid #b1b1b1;}
+.navigation li a {
+	font-size: 1.1em;
+	color: #7c7c7c;
+	display: block;
+	padding: 8px 0 8px 5%;
+	text-decoration: none;
+	width: 95%;
+}
+.navigation li a:hover {
+	background: #c7c7c7;
+	color: #282828;	
+}
+.content {
+	margin-left: 250px;
+	margin-top: 0px;
+}
+
+#forkongithub a{
+	background:#f00;color:#fff;text-decoration:none;font-family:arial,sans-serif;text-align:center;font-weight:bold;padding:5px 40px;font-size:1rem;line-height:2rem;position:relative;transition:0.5s;
+}
+#forkongithub a:hover{
+	background:#fa0;color:#fff;}
+#forkongithub a::before,#forkongithub a::after{
+	content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;
+}
+#forkongithub a::after{
+	bottom:1px;top:auto;
+}
+@media screen and (min-width:800px){
+	#forkongithub{
+		position:absolute;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;z-index:9999;
+	}
+	#forkongithub a{
+		width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);box-shadow:4px 4px 10px rgba(0,0,0,0.8);
+	}
+}

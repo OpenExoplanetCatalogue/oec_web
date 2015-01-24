@@ -32,30 +32,30 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
 
 print "Parsing OEC done"
 
-def title(type):
-    if type=="name":
-        return "Primary planet name"
-    if type=="numberofplanets":
-        return "Number of planets"
-    if type=="mass":
-        return "Mass [M<sub>jup</sub>]"
-    if type=="radius":
-        return "Radius [R<sub>jup</sub>]"
-    if type=="massEarth":
-        return "Mass [M<sub>earth</sub>]"
-    if type=="radiusEarth":
-        return "Radius [R<sub>earth</sub>]"
+""" Array of title of propoerties """
+title = {
+    "name":             "Primary planet name",
+    "numberofplanets":  "Number of planets in system",
+    "numberofstars":    "Number of stars in system",
+    "mass":             "Mass [M<sub>jup</sub>]",
+    "radius":           "Radius [R<sub>jup</sub>]",
+    "massEarth":        "Mass [M<sub>earth</sub>]",
+    "radiusEarth":      "Radius [R<sub>earth</sub>]"
+}
 
 def render(xmlPair,type):
     system, planet = xmlPair
     if type=="numberofplanets":
         return "%d"%len(system.findall(".//planet"))
+    if type=="numberofstars":
+        return "%d"%len(system.findall(".//star"))
     if type=="name":
         return planet.find("./name").text
     if type=="massEarth":
         return renderFloat(planet.find("./mass"),317.8942)
     if type=="radiusEarth":
         return renderFloat(planet.find("./radius"),10.973299)
+    # Default: just search for the property in the planet xml. 
     return renderFloat(planet.find("./"+type))
 
 app = Flask(__name__)
@@ -67,7 +67,7 @@ def main_page():
 @app.route('/systems/')
 def systems():
     p = []
-    fields = ["name","mass","radius","massEarth","radiusEarth","numberofplanets"]
+    fields = ["name","mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
     for xmlPair in planets:
         system,planet = xmlPair
         d = {}
@@ -75,7 +75,7 @@ def systems():
         for field in fields:
             d["fields"].append(render(xmlPair,field))
         p.append(d)
-    return render_template("systems.html",columns=map(title,fields),planets=p)
+    return render_template("systems.html",columns=[title[field] for field in fields],planets=p)
 
 
 @app.route('/planet/<planetname>')
