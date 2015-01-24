@@ -67,7 +67,7 @@ title = {
     "period":                       "Orbital period [days]",
     "semimajoraxis":                "Semi-major axis [AU]",
     "eccentricity":                 "Eccentricity",
-    "temperature":                  "Equilibtrium temperature [K]",
+    "temperature":                  "Equilibrium temperature [K]",
     "lists":                        "Lists",
     "description":                  "Description",
     "discoveryyear":                "Discovery year",
