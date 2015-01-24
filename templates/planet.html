@@ -263,40 +263,19 @@ This list shows all planetary and stellar components in the system. It gives a q
 <p>This table lists all planets in the system {{systemname|safe}}.</p>
 <div class="planetsection"></div>
 
-<table cellspacing="0" class="planettable" id="planettabletemplate" summary="Details of the planetary system" style="margin-bottom: 2em; display:none;">
-<tr class="planetname">
-	<th scope="col" class="nobg">&nbsp;</th>
-</tr>
-<tr class="planetalternativename">
-	<th valign="top" scope="row">Alternative names</th>
-</tr>
-<tr class="planetdescription">
-	<th valign="top" scope="row">Description and Trivia</th>
-</tr>
-<tr class="planetlists">
-	<th valign="top" scope="row">Lists</th>
-</tr>
-<tr class="planetmass">
-	<th scope="row">Mass [M<sub>Jup</sub>]</th>
-</tr>
-<tr class="planetmassearth">
-	<th scope="row">Mass [M<sub>Earth</sub>]</th>
-</tr>
-<tr class="planetperiod">
-	<th scope="row">Orbital period [days]</th>
-</tr>
-<tr class="planetsemia">
-	<th scope="row">Semi-major axis [AU]</th>
-</tr>
-<tr class="planeteccentricity">
-	<th scope="row">Eccentricity</th>
-</tr>
-<tr class="planetradius">
-	<th scope="row">Radius [R<sub>Jup</sub>]</th>
-</tr>
-<tr class="planetradiusearth">
-	<th scope="row">Radius [R<sub>Earth</sub>]</th>
-</tr>
+<table cellspacing="0" summary="Details of the planetary system">
+	<tr>
+		<th scope="col" class="nobg">&nbsp;</th>
+		<th scope="col">Planet parameters</th>
+	</tr>
+	{% for title,value in planettable: %}
+	<tr>
+		<th scope="row">{{title|safe}}</th>
+		<td>{{value|safe}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
 <tr class="planettemperature">
 	<th scope="row">Temperature [K]</th>
 </tr>

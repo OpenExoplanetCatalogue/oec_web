@@ -4,7 +4,7 @@ html {
 
 body {
 	color: 		#282828;
-	font: 		normal 78.5% sans-serif;
+	font-family:	sans-serif, Arial;
 	margin: 	0;
 	padding: 	0;
 }
@@ -18,9 +18,6 @@ a {color: #4ba5da;}
 a:hover {color: #282828;}
 li {list-style: none;}
 
-h1 {font: normal 2.3em sans-serif;}
-h2 {font: normal 1.4em sans-serif;}
-h3 {font: italic 1.2em sans-serif;}
 
 h1,h2,h3 {
 	padding-top: 	6px;
@@ -121,14 +118,13 @@ span.NA {
 }
 
 .header .title {
-	color: #000;
 	padding-top: 60px;
 	padding-right: 100px;
 	text-align: right;
 }
 .header .title .name a {
+	font-size: 4em;
 	color: #000;
-	font-size: 5em;
 	font-weight: bold;
 	text-decoration: none;
 	text-align: right;
@@ -147,7 +143,7 @@ span.NA {
 	width: 220px;
 }
 .navigation h2 {
-	font: bold 1.6em sans-serif;
+	font-size:	1.3em;
 	line-height: 30px;
 	margin: 0;
 	padding-left: 11px;
@@ -158,7 +154,7 @@ span.NA {
 }
 .navigation li {border-bottom: 1px solid #b1b1b1;}
 .navigation li a {
-	font-size: 1.1em;
+	font-size: 1.0em;
 	color: #7c7c7c;
 	display: block;
 	padding: 8px 0 8px 5%;

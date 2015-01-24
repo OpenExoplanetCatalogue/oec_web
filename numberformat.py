@@ -44,8 +44,13 @@ def renderFloat(tag, factor=1.):
     exponent = ""
     dexponent = ""
     if value is not None:
-        exponent = floor(log10(value))
-        dexponent = pow(10, exponent)
+        if value!=0.:
+            exponent = floor(log10(value))
+            dexponent = pow(10, exponent)
+        else:
+            exponent = -2
+            dexponent = pow(10, exponent)
+
     elif upperlimit is not None:
         exponent = floor(log10(upperlimit))
         dexponent = pow(10, exponent)
@@ -72,7 +77,10 @@ def renderFloat(tag, factor=1.):
     
     significantdigits = 2
     if value is not None:
-        significantdigits = -floor(log10(fabs(value/2.)))
+        if value!=0.:
+            significantdigits = -floor(log10(fabs(value/2.)))
+        else:
+            significantdigits = 0
         if error_plus is not None and error_minus is not None and error_plus!=0. and error_minus!=0.:
             error_significantdigits = max(-floor(log10(error_plus/2.)),-floor(log10(error_minus/2.)))
             significantdigits = max(error_significantdigits,significantdigits)

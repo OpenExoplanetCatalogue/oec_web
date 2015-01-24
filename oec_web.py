@@ -39,13 +39,25 @@ print "Parsing OEC done"
 """ Array of title of propoerties """
 title = {
     "name":                         "Primary planet name",
+    "alternativenames":             "Alternative planet names",
     "systemname":                   "Primary system name",
     "systemalternativenames":       "Alternative system names",
     "distance":                     "Distance [parsec]",
+    "distancelightyears":           "Distance [lightyears]",
     "numberofplanets":              "Number of planets in system",
     "numberofstars":                "Number of stars in system",
     "rightascension":               "Right ascension",
     "declination":                  "Declination",
+    "image":                        "Image",
+    "period":                       "Orbital period [days]",
+    "semimajoraxis":                "Semi-major axis [AU]",
+    "eccentricity":                 "Eccentricity",
+    "temperature":                  "Equilibtrium temperature [K]",
+    "lists":                        "Lists",
+    "description":                  "Description",
+    "discoveryyear":                "Discovery year",
+    "discoverymethod":              "Discovery method",
+    "lastupdate":                   "Last updated [yy/mm/dd]",
     "mass":                         "Mass [M<sub>jup</sub>]",
     "radius":                       "Radius [R<sub>jup</sub>]",
     "massEarth":                    "Mass [M<sub>earth</sub>]",
@@ -58,10 +70,43 @@ def render(xmlPair,type):
         return "%d"%len(system.findall(".//planet"))
     if type=="numberofstars":
         return "%d"%len(system.findall(".//star"))
+    if type=="distance":
+        return renderFloat(system.find("./distance"))
+    if type=="distancelightyears":
+        return renderFloat(system.find("./distance"),3.2615638)
+    if type=="massEarth":
+        return renderFloat(planet.find("./mass"),317.8942)
+    if type=="radiusEarth":
+        return renderFloat(planet.find("./radius"),10.973299)
+    # Text based object
+    if type=="rightascension":
+        return system.find("./rightascension").text
+    if type=="declination":
+        return system.find("./declination").text
+    if type=="image":
+        return planet.find("./image").text
+    if type=="description":
+        return planet.find("./description").text
     if type=="name":
         return planet.find("./name").text
+    if type=="discoveryyear":
+        return planet.find("./discoveryyear").text
+    if type=="discoverymethod":
+        return planet.find("./discoverymethod").text
+    if type=="lastupdate":
+        return planet.find("./lastupdate").text
     if type=="systemname":
         return system.find("./name").text
+    if type=="alternativenames":
+        alternativenames = notAvailableString 
+        names = planet.findall("./name")
+        for i,name in enumerate(names[1:]):
+            if i==0:
+                alternativenames = ""
+            else:
+                alternativenames += ", "
+            alternativenames += name.text
+        return alternativenames
     if type=="systemalternativenames":
         systemalternativenames = notAvailableString 
         systemnames = system.findall("./name")
@@ -72,16 +117,16 @@ def render(xmlPair,type):
                 systemalternativenames += ", "
             systemalternativenames += name.text
         return systemalternativenames
-    if type=="rightascension":
-        return system.find("./rightascension").text
-    if type=="declination":
-        return system.find("./declination").text
-    if type=="distance":
-        return renderFloat(system.find("./distance"))
-    if type=="massEarth":
-        return renderFloat(planet.find("./mass"),317.8942)
-    if type=="radiusEarth":
-        return renderFloat(planet.find("./radius"),10.973299)
+    if type=="lists":
+        lists = notAvailableString 
+        ls = planet.findall("./list")
+        for i,l in enumerate(ls):
+            if i==0:
+                lists = ""
+            else:
+                lists += "; "
+            lists += l.text
+        return lists
     # Default: just search for the property in the planet xml. 
     return renderFloat(planet.find("./"+type))
 
@@ -126,13 +171,20 @@ def hello_planet(planetname):
     #}
     elif len(system.findall(".//star"))==0:
         systemcategory += "The planet is a so called orphan planet and not associated with any star. "
+
     systemtable = []
-    for row in ["systemname","systemalternativenames","rightascension","declination","distance","numberofstars","numberofplanets"]:
+    for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
         systemtable.append((title[row],render(xmlPair,row)))
+    
+    planettable = []
+    for row in ["name","alternativenames","description","lists","mass","massEarth","radius","radiusEarth","period","semimajoraxis","eccentricity","temperature","discoverymethod","discoveryyear","lastupdate"]:
+        planettable.append((title[row],render(xmlPair,row)))
+
     return render_template("planet.html",
         planetname=planetname,
         systemname=systemname,
         systemtable=systemtable,
+        planettable=planettable,
         systemcategory=systemcategory,
         )
     #abort(404)
