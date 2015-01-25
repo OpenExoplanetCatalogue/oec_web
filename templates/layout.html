@@ -3,28 +3,30 @@
 {% set OEC_GITHUB = "https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/" %}
 {% set OEC_TABLES_GITHUB = "https://github.com/OpenExoplanetCatalogue/oec_tables/" %}
 <head profile="http://www.w3.org/2005/10/profile">
-<link rel="icon" type="image/ico" href="favicon.ico" />
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
-<meta name="apple-itunes-app" content="app-id=327702034"/>
-<title>Open Exoplanet Catalogue {% block title %}{% endblock %}</title>
-<link rel="stylesheet" type="text/css" href="/static/css/style.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="/static/css/tables.css" media="screen" />
-<!-- Google Analytics start -->
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("UA-6857673-3");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-<!-- Google Analytics end -->
-<script type="text/javascript" src="/static/js/d3.v3.min.js"></script>
-<script type="text/javascript" src="/static/js/rgbcolor.js"></script> 
-<script type="text/javascript" src="/static/js/canvg.js"></script> 
-<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-<script type="text/javascript" src="/static/js/jquery.tablesorter.min.js"></script> 
+	<link rel="icon" type="image/ico" href="favicon.ico" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/><meta name="description" content="description"/>
+	<meta name="apple-itunes-app" content="app-id=327702034"/>
+	<title>Open Exoplanet Catalogue {% block title %}{% endblock %}</title>
+	<link rel="stylesheet" type="text/css" href="/static/css/style.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="/static/css/tables.css" media="screen" />
+	<!-- Google Analytics start -->
+	<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+	try {
+	var pageTracker = _gat._getTracker("UA-6857673-3");
+	pageTracker._trackPageview();
+	} catch(err) {}</script>
+	<!-- Google Analytics end -->
+	<script type="text/javascript" src="/static/js/d3.v3.min.js"></script>
+	<script type="text/javascript" src="/static/js/rgbcolor.js"></script> 
+	<script type="text/javascript" src="/static/js/canvg.js"></script> 
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.tablesorter.min.js"></script> 
+	{% block header %}
+	{% endblock %}
 </head>
 <body>
 <div class="outer-container">

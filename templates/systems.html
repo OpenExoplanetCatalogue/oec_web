@@ -1,9 +1,19 @@
 {% extends "layout.html" %}
 {% block title %}- List of all extrasolar planets{% endblock title %}
+{% block header %}
+<script>
+$(document).ready(function(){
+	$("#fieldsbutton").click(function(){
+		$("#fields").toggle();
+	});
+});
+</script>
+{% endblock header %}
 {% block content %}
 
+<button id="fieldsbutton">Show/hide available fields</button>
 <form action="./" method="GET">
-<table cellspacing="0" summary="Settings">
+<table id="fields" style="display:none;" cellspacing="0" summary="Settings">
 <thead>
 	<tr>
 		<th scope="col">Available fields<br/></th>
