@@ -5,7 +5,7 @@ height= 200
 
 def getRadius(planet):
     radiustag = planet.find("./radius")
-    if radiustag is not None:
+    if radiustag:
         return float(radiustag.text)
     else:
         masstag = planet.find("./mass")
@@ -17,7 +17,7 @@ def getRadius(planet):
                     return pow(m,1./3.)*0.0911302
                 else:
                     return pow(m,1./2.06)*0.0911302
-    return 1.
+    return 0.
 
 pl_i=0
 pl_id=0
@@ -25,47 +25,48 @@ texty = 0.
 space = 0.
 earth = 1.
 def plotplanet(radius,name,ss=True):
-        global earth,pl_i,texty,pl_id, space
-        svg = ""
-        size= 12
-        textx=pl_i+2
-        texty+=size+3
-        if ss:
-            y= height*3.0/2.0
-        else:
-            y= height*0.5
+    global earth,pl_i,texty,pl_id, space
+    svg = ""
+    size= 12
+    textx=pl_i+2
+    texty+=size+3
+    if ss:
+        y= height*3.0/2.0
+    else:
+        y= height*0.5
 
-        if ss:
-            style = "fill:url(#g2); stroke:none"
+    if ss:
+        style = "fill:url(#g2); stroke:none"
+    else:
+        if True:
+            style = "fill:url(#g3); stroke:none"
         else:
-            if cp:
-                style = "fill:url(#g3); stroke:none"
-            else:
-                style = "fill:url(#g1); stroke:none"
-        svg += '<circle 	cx="%f" cy="%f" r="%f" style="%s" />' %(
-                    pl_i+earth*radius+1,
-                    y, 
-                    earth*radius,
-                    style)
-        svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" fill="none" stroke="lightgrey" />'%(
-                    textx,
-                    texty-size/2,
-                    textx,
-                    y)
-        svg += '<text x="%f" y="%f" font-family="sans-serif" font-weight="normal"  font-size="%f" stroke="none" >%s</text>' %(
-                    textx,
-                    texty,
-                    size,
-                    name)
-        pl_i += 2*earth*radius+2+space
-        pl_id +=1
-        return svg
+            style = "fill:url(#g1); stroke:none"
+    svg += '<circle cx="%f" cy="%f" r="%f" style="%s" />' %(
+                pl_i+earth*radius+1,
+                y, 
+                earth*radius,
+                style)
+    svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" fill="none" stroke="lightgrey" />'%(
+                textx,
+                texty-size/2,
+                textx,
+                y)
+    svg += '<text x="%f" y="%f" font-family="sans-serif" font-weight="normal"  font-size="%f" stroke="none" >%s</text>' %(
+                textx,
+                texty,
+                size,
+                name)
+    pl_i += 2*earth*radius+2+space
+    pl_id +=1
+    return svg
 
 def size(xmlPair):
+    global earth,pl_i,texty,pl_id, space
     system, planet, filename = xmlPair 
-    planets = system.findall("./planet")
-    maxr = 0
-    for p in planet:
+    planets = system.findall(".//planet")
+    maxr = 0.
+    for p in planets:
         r = getRadius(p)
         if r>maxr:
             maxr = r
@@ -73,7 +74,6 @@ def size(xmlPair):
     pl_i=0
     textx=0
     space=10
-
 
 
     earth 	= 1.0/ maxr*height*0.4
@@ -86,17 +86,17 @@ def size(xmlPair):
         <radialGradient id = "g1" cx = "50%" cy = "50%" r = "50%">
             <stop style="stop-color:rgb(20,20,20);" offset = "0%"/>
             <stop style="stop-color:rgb(100,100,100);" offset = "95%"/>
-            <stop style="stop-color:rgb(250,250,250)" offset = "100%"/>
+            <stop style="stop-color:rgb(250,250,250);" offset = "100%"/>
             </radialGradient>
         <radialGradient id = "g2" cx = "50%" cy = "50%" r = "50%">
             <stop style="stop-color:rgb(120,120,120);" offset = "0%"/>
             <stop style="stop-color:rgb(180,180,180);" offset = "95%"/>
-            <stop style="stop-color:rgb(252,252,252)" offset = "100%"/>
+            <stop style="stop-color:rgb(252,252,252);" offset = "100%"/>
             </radialGradient>
         <radialGradient id = "g3" cx = "50%" cy = "50%" r = "50%">
             <stop style="stop-color:rgb(120,80,80);" offset = "0%"/>
             <stop style="stop-color:rgb(180,100,100);" offset = "95%"/>
-            <stop style="stop-color:rgb(252,202,202)" offset = "100%"/>
+            <stop style="stop-color:rgb(252,202,202);" offset = "100%"/>
             </radialGradient>
         </defs>
         <g style="stroke:black;">
@@ -111,4 +111,13 @@ def size(xmlPair):
     svg += plotplanet(   25269.0/71490.0, "Neptune" ,True)
     svg += plotplanet(   25559.0/71490.0, "Uranus" ,True)
     svg += plotplanet(   60268.0/71490.0, "Saturn"  ,True)
+    svg += plotplanet(   71490.0/71490.0, "Jupiter" ,True)
+    texty=0.0
+    pl_i=0
+    for p in planets:
+        radius = getRadius(p)
+        if radius>0.:
+            svg += plotplanet(radius, p.find("./name").text, False)
+    
+    svg += " </g>"
     return svg
