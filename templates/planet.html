@@ -62,15 +62,6 @@ function setupArchitecture(o,stype){
 
 <!-- ########################### -->
 <!-- ########################### -->
-<div style="width:50em;">
-	<div style="float:right;">
-		<iframe src="http://www.facebook.com/plugins/like.php?href=<?
-		$url = "http://exoplanet.hanno-rein.de/system.php?id=".urlencode($system->name);
-		print urlencode($url);
-		?>&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:25em; height:25px; padding-top:0.9em;" allowTransparency="true">
-		</iframe>
-	</div>
-</div>
 <h1>{{systemname|safe}}</h1>
 <p>
 	{{systemcategory|safe}}
@@ -78,8 +69,6 @@ function setupArchitecture(o,stype){
 <p>
 	<span class="systemdescription"></span>
 </p>
-
-<div class="spacer"></div>
 
 
 <table cellspacing="0" summary="Details of the planetary system">
@@ -111,15 +100,6 @@ function setupArchitecture(o,stype){
 <p>
 This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
 </p>
-
-
-
-<!-- ########################### -->
-<div class="systemvideosection">
-<h2><img src="/static/img/movie.png" alt="Video" />Video</h2>
-<p>This video shows the planetary system {{systemname|safe}}. It was created with the <a href="http://exoplanetapp.com">Exoplanet App</a>.</p>
-<iframe width="640" height="360" class="systemvideo" frameborder="0" allowfullscreen></iframe>
-</div>
 
 
 <!-- ########################### -->
@@ -189,8 +169,10 @@ The following plot shows the approximate sizes of the planets in this system
 The Solar System planets are shown as a comparison.
 Note that unless the radius has been determined through a transit observation, this is only an approximation (see Lissauer et al. 2011b).
 </p>
-<object data="./size.php?id=<?=urlencode($requestname)?>" width="480" height="400" type="image/svg+xml" ></object>
-<? // show_svg("./size.php?id=".urlencode($requestname),480,400,"png"); ?>
+<svg width="480" height="400">
+{{ vizsize }}
+</svg>
+{{ vizsize }}
 
 
 <h3>Habitable zone</h3>

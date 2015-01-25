@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import glob
 import urllib
+import visualizations 
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory
 
@@ -271,15 +272,19 @@ def page_planet(planetname):
         for c in root.findall(".//contributor"):
             contributors.append((c.attrib["commits"],c.attrib["email"],c.text)) 
 
+    vizsize = visualizations.size(xmlPair)
 
     return render_template("planet.html",
+        system=system,
+        planet=planet,
+        filename=filename,
         planetname=planetname,
+        vizsize=vizsize,
         systemname=render(xmlPair,"systemname"),
         systemtable=systemtable,
         image=(render(xmlPair,"image"),render(xmlPair,"imagedescription")),
         planettable=planettable,
         startable=startable,
-        filename=filename,
         references=references,
         contributors=contributors,
         systemcategory=render(xmlPair,"systemcategory"),
