@@ -273,6 +273,7 @@ def page_planet(planetname):
             contributors.append((c.attrib["commits"],c.attrib["email"],c.text)) 
 
     vizsize = visualizations.size(xmlPair)
+    vizhabitable = visualizations.habitable(xmlPair)
 
     return render_template("planet.html",
         system=system,
@@ -280,6 +281,7 @@ def page_planet(planetname):
         filename=filename,
         planetname=planetname,
         vizsize=vizsize,
+        vizhabitable=vizhabitable,
         systemname=render(xmlPair,"systemname"),
         systemtable=systemtable,
         image=(render(xmlPair,"image"),render(xmlPair,"imagedescription")),

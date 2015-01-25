@@ -173,3 +173,19 @@ def renderFloat(tag, factor=1.):
     
     
     return returnString;
+
+def getFloat(obj,tag,default=None):
+    v = obj.find(tag)
+    if v is not None:
+        v2 = v.text
+        try:
+           v3 = float(v2)
+        except:
+            return default
+    return default
+
+def getText(obj,tag,default=None):
+    v = obj.find(tag)
+    if v is not None:
+        return v.text
+    return default 

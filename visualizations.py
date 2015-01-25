@@ -1,4 +1,5 @@
 from math import *
+from numberformat import getFloat, getText
 
 width = 480
 height= 200
@@ -113,4 +114,139 @@ def size(xmlPair):
             svg += plotplanet(radius, p.find("./name").text, False)
     
     svg += " </g>"
+    return svg
+
+
+def habitable(xmlPair):
+    system, planet, filename = xmlPair 
+
+    stars = system.findall(".//star")
+    star = None
+    for s in stars:
+        if planet in s:
+            star = s
+            break
+    if star is None:
+        return None # cannot draw diagram for binary systems yet
+
+    planets = system.findall(".//planet")
+
+    maxa = 0
+    for planet in planets:
+        semimajoraxis = getFloat(planet,"./semimajoraxis")
+        if semimajoraxis is None:
+            hostmass = getFloat(star,"./mass",1.)
+            period = getFloat(planet,"./period",265.25)
+            semimajoraxis = pow(pow(period/6.283/365.25,2)*39.49/hostmass,1.0/3.0) 
+        if semimajoraxis>maxa:
+            maxa = semimajoraxis
+
+
+
+    spectraltype = getText(star,"./spectraltype","O")[0]
+    stellarr = getFloat(star,"./stellarr")
+    if stellarr is None or stellarr<0.01:
+        stellarr = 1.
+        if spectraltype=='O': stellarr=10.
+        if spectraltype=='B': stellarr=3.0
+        if spectraltype=='A': stellarr=1.5
+        if spectraltype=='F': stellarr=1.3
+        if spectraltype=='G': stellarr=1.0
+        if spectraltype=='K': stellarr=0.8
+        if spectraltype=='M': stellarr=0.5
+        
+    temperature = getFloat(star,"./temperature")
+    if temperature is None:
+        temperature=5500
+        if spectraltype=='O': temperature=40000
+        if spectraltype=='B': temperature=20000
+        if spectraltype=='A': temperature=8500
+        if spectraltype=='F': temperature=6500
+        if spectraltype=='G': temperature=5500
+        if spectraltype=='K': temperature=4000
+        if spectraltype=='M': temperature=3000
+    
+    temperature -= 5700
+        
+        
+    linsun2  = 0.68	
+    linsun1  = 0.95
+    loutsun1 = 1.67
+    loutsun2 = 1.95
+
+
+    _stellarMass = getFloat(star,"./mass",1.)
+    if _stellarMass>2.:
+        luminosity = pow(_stellarMass,3.5)
+    else:
+        luminosity = pow(_stellarMass,4.)
+
+    HZinner2 = (linsun2 -2.7619e-9*temperature-3.8095e-9*temperature*temperature) *sqrt(luminosity)
+    HZouter2 = (loutsun2-1.3786e-4*temperature-1.4286e-9*temperature*temperature) *sqrt(luminosity)
+    HZinner  = (linsun1 -2.7619e-9*temperature-3.8095e-9*temperature*temperature) *sqrt(luminosity)
+    HZouter  = (loutsun1-1.3786e-4*temperature-1.4286e-9*temperature*temperature) *sqrt(luminosity)
+
+    idnum=0
+
+
+    width = 600
+    height= 100
+    au 	= 2.0/ maxa*(width-100)*0.49
+    last_text_y=12
+
+    svg = """
+        <defs>
+            <radialGradient id="habitablegradient" > 
+                <stop id="stops0" offset=".0" stop-color="lightgreen" stop-opacity="0"/>
+                <stop id="stops1" offset="<?=($HZinner2)/($HZouter2)?>" stop-color="lightgreen" stop-opacity="0"/>
+                <stop id="stops2" offset="<?=($HZinner)/($HZouter2)?>" stop-color="lightgreen" stop-opacity="1"/>
+                <stop id="stops3" offset="<?=($HZouter)/($HZouter2)?>" stop-color="lightgreen" stop-opacity="1"/>
+                <stop id="stops4" offset="1" stop-color="lightgreen" stop-opacity="0"/>
+            </radialGradient> 
+        </defs>
+        """
+    if HZinner2<maxa*2:
+        svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" fill="url(#habitablegradient)" />' %(
+                0.,
+                height/2,
+                au*HZouter2,
+                au*HZouter2)
+        svg += '<text 	x="%f"" y="%f" font-family="sans-serif" font-weight="normal"  font-size="12" stroke="none" style="fill:green">Habitable zone</text>' %(
+                au*HZinner2,
+                height-1)
+
+        
+    svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" style="fill:red" />' %(
+                0.,
+                height/2,
+                au*stellarr*0.0046524726,
+                au*stellarr*0.0046524726)
+    
+    svg += '<g style="stroke:black;">'
+    for planet in planets:
+        name = getText(planet,"./name")
+        semimajoraxis = getFloat(planet,"./semimajoraxis")
+        if semimajoraxis is None:
+            hostmass = getFloat(star,"./mass",1.)
+            period = getFloat(planet,"./period",265.25)
+            semimajoraxis = pow(pow(period/6.283/365.25,2)*39.49/hostmass,1.0/3.0) 
+        idnum += 1
+        size= 12
+        textx=semimajoraxis*au+2
+        texty=last_text_y+size
+        last_text_y = texty
+
+        svg += '<g>'
+        svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" style="fill:none" />' %(
+                    0.,
+                    height/2,
+                    semimajoraxis*au,
+                    semimajoraxis*au)
+        svg += '<text x="%f" y="%f" font-family="sans-serif" font-weight="normal"  font-size="%f" stroke="none" >%s</text>' %(
+                    textx,
+                    texty,
+                    size,
+                    name)
+        svg += '</g>'
+    
     return svg

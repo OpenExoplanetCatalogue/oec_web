@@ -181,8 +181,10 @@ This is only an estimate, using the star's spectral type and mass.
 Note that if no green band is shown in the plot, then the planet's orbit is far outside the habitable zone.
 The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">Selsis, Kasting et al</a> are used to draw the inner and outer boundaries. 
 </p>
-<object data="./habitablezone.php?id=<?=urlencode($requestname)?>" width="600" height="100" type="image/svg+xml"></object>
-<?  //show_svg("./habitablezone.php?id=".urlencode($requestname),600,100,"png"); ?>
+<svg width="600" height="100">
+{{ vizhabitable|safe }}
+</svg>
+
 
 {{ super() }}
 
