@@ -20,12 +20,11 @@ def getRadius(planet):
     return 0.
 
 pl_i=0
-pl_id=0
 texty = 0.
-space = 0.
+space=10
 earth = 1.
-def plotplanet(radius,name,ss=True):
-    global earth,pl_i,texty,pl_id, space
+def plotplanet(radius,name,ss,todooooooo=1):
+    global earth,pl_i,texty
     svg = ""
     size= 12
     textx=pl_i+2
@@ -58,22 +57,16 @@ def plotplanet(radius,name,ss=True):
                 size,
                 name)
     pl_i += 2*earth*radius+2+space
-    pl_id +=1
     return svg
 
 def size(xmlPair):
-    global earth,pl_i,texty,pl_id, space
+    global earth,pl_i,texty
     system, planet, filename = xmlPair 
     planets = system.findall(".//planet")
-    maxr = 0.
-    for p in planets:
-        r = getRadius(p)
-        if r>maxr:
-            maxr = r
+    maxr = max(map(getRadius,planets))
 
     pl_i=0
     textx=0
-    space=10
 
 
     earth 	= 1.0/ maxr*height*0.4
@@ -103,15 +96,15 @@ def size(xmlPair):
     """
     texty=height
     pl_i=0
-    svg += plotplanet(    1160.0/71490.0, "Pluto" ,True)
-    svg += plotplanet(    2439.0/71490.0, "Mercury" ,True)
-    svg += plotplanet(    3397.0/71490.0, "Mars" ,True)
-    svg += plotplanet(    6052.0/71490.0, "Venus" ,True)
-    svg += plotplanet(    6378.0/71490.0, "Earth" ,True)
-    svg += plotplanet(   25269.0/71490.0, "Neptune" ,True)
-    svg += plotplanet(   25559.0/71490.0, "Uranus" ,True)
-    svg += plotplanet(   60268.0/71490.0, "Saturn"  ,True)
-    svg += plotplanet(   71490.0/71490.0, "Jupiter" ,True)
+    svg += plotplanet(    1160.0/71490.0, "Pluto" ,     True, 0)
+    svg += plotplanet(    2439.0/71490.0, "Mercury" ,   True, 1)
+    svg += plotplanet(    3397.0/71490.0, "Mars" ,      True, 2)
+    svg += plotplanet(    6052.0/71490.0, "Venus" ,     True, 3)
+    svg += plotplanet(    6378.0/71490.0, "Earth" ,     True, 4)
+    svg += plotplanet(   25269.0/71490.0, "Neptune" ,   True, 5)
+    svg += plotplanet(   25559.0/71490.0, "Uranus" ,    True, 6)
+    svg += plotplanet(   60268.0/71490.0, "Saturn"  ,   True, 7)
+    svg += plotplanet(   71490.0/71490.0, "Jupiter" ,   True, 8)
     texty=0.0
     pl_i=0
     for p in planets:
