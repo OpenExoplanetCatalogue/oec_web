@@ -255,6 +255,8 @@ def page_systems():
     return render_template("systems.html",
         columns=[title[field] for field in fields],
         planets=p,
+        available_fields=title,
+        fields=fields,
         debugtxt=debugtxt)
 
 

@@ -1,7 +1,29 @@
 {% extends "layout.html" %}
 {% block title %}- List of all extrasolar planets{% endblock title %}
 {% block content %}
-{{ debugtxt }}
+
+<form action="./" method="GET">
+<table cellspacing="0" summary="Settings">
+<thead>
+	<tr>
+		<th scope="col">Available fields<br/></th>
+	</tr>
+</thead>
+<tbody>
+	{% for key in available_fields %}
+	<tr>
+		<td><label><input name="fields" type="checkbox" value="{{key}}" {%if key in fields%}checked{%endif%}/>{{available_fields[key]|safe}}</label> </td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td><input type="submit" /></td>
+	</tr>
+</tbody>
+</table>
+</form>
+
+
+
 <table cellspacing="0" summary="List of exoplanets" id="systemtable" class="tablesorter">
 <thead>
 	<tr id="systemtablehead">
