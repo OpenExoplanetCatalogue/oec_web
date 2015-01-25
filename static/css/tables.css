@@ -26,6 +26,10 @@ th {
 	background: 	#f5fafa;
 }
 
+tr.odd {
+	background: 	#fafcfc;
+}
+
 .nobg {
 	background: 	#fff;
     	border-width: 	0;

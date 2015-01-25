@@ -5,20 +5,19 @@ width = 480
 height= 200
 
 def getRadius(planet):
-    radiustag = planet.find("./radius")
-    if radiustag:
-        return float(radiustag.text)
-    else:
-        masstag = planet.find("./mass")
-        if masstag is not None:
-            m = float(masstag.text)*317.894
-            if m>0.:
-                # This is based on Lissauer et al 2011 b
-                if m>30.:
-                    return pow(m,1./3.)*0.0911302
-                else:
-                    return pow(m,1./2.06)*0.0911302
-    return 0.
+    radius = getFloat(planet,"./radius")
+    if radius is not None:
+        return radius
+
+    mass = getFloat(planet,"./mass")
+    if mass is not None:
+        m *= 317.894
+        # This is based on Lissauer et al 2011 b
+        if m>30.:
+            return pow(m,1./3.)*0.0911302
+        else:
+            return pow(m,1./2.06)*0.0911302
+    return None
 
 pl_i=0
 texty = 0.
@@ -65,10 +64,11 @@ def size(xmlPair):
     system, planet, filename = xmlPair 
     planets = system.findall(".//planet")
     maxr = max(map(getRadius,planets))
-
     pl_i=0
     textx=0
 
+    if maxr<=0.:
+        return None
 
     earth 	= 1.0/ maxr*height*0.4
     if space*8+earth*2.8257378 *2 > width:
@@ -110,7 +110,7 @@ def size(xmlPair):
     pl_i=0
     for p in planets:
         radius = getRadius(p)
-        if radius>0.:
+        if radius is not None:
             svg += plotplanet(radius, p.find("./name").text, False)
     
     svg += " </g>"
@@ -186,9 +186,6 @@ def habitable(xmlPair):
     HZinner  = (linsun1 -2.7619e-9*temperature-3.8095e-9*temperature*temperature) *sqrt(luminosity)
     HZouter  = (loutsun1-1.3786e-4*temperature-1.4286e-9*temperature*temperature) *sqrt(luminosity)
 
-    idnum=0
-
-
     width = 600
     height= 100
     au 	= 2.0/ maxa*(width-100)*0.49
@@ -224,13 +221,11 @@ def habitable(xmlPair):
     
     svg += '<g style="stroke:black;">'
     for planet in planets:
-        name = getText(planet,"./name")
         semimajoraxis = getFloat(planet,"./semimajoraxis")
         if semimajoraxis is None:
             hostmass = getFloat(star,"./mass",1.)
             period = getFloat(planet,"./period",265.25)
             semimajoraxis = pow(pow(period/6.283/365.25,2)*39.49/hostmass,1.0/3.0) 
-        idnum += 1
         size= 12
         textx=semimajoraxis*au+2
         texty=last_text_y+size
@@ -246,7 +241,7 @@ def habitable(xmlPair):
                     textx,
                     texty,
                     size,
-                    name)
+                    getText(planet,"./name"))
         svg += '</g>'
     
     return svg

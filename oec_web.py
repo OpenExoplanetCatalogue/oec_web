@@ -3,7 +3,7 @@ import glob
 import urllib
 import visualizations 
 from numberformat import renderFloat, renderText, notAvailableString
-from flask import Flask, abort, render_template, send_from_directory
+from flask import Flask, abort, render_template, send_from_directory, request
 
 
 OEC_PATH = "open_exoplanet_catalogue/"
@@ -48,6 +48,7 @@ print "Parsing OEC done"
 """ Array of title of propoerties """
 title = {
     "name":                         "Primary planet name",
+    "namelink":                     "Primary planet name",
     "alternativenames":             "Alternative planet names",
     "starname":                     "Star name",
     "staralternativenames":         "Alternative star names",
@@ -116,6 +117,9 @@ def render(xmlPair,type):
         return renderText(planet.find("./description"))
     if type=="name":
         return renderText(planet.find("./name"))
+    if type=="namelink":
+        planetname = planet.find("./name").text
+        return "<a href=\"/planet/%s/\">%s</a>"%(urllib.quote(planetname),planetname)
     if type=="discoveryyear":
         return renderText(planet.find("./discoveryyear"))
     if type=="discoverymethod":
@@ -224,25 +228,34 @@ def page_main():
             numbinaries=len(binaries),
         )
 
-@app.route('/systems/')
+@app.route('/systems/',methods=["POST","GET"])
 def page_systems():
     p = []
-    fields = ["systemname","name","mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
+    debugtxt = ""
+    fields = ["namelink"]
+    if "fields" in request.args:
+        listfields = request.args.getlist("fields")
+        for field in listfields:
+            if field in title:
+                fields.append(field) 
+    else:
+        fields += ["mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
     lastfilename = ""
+    tablecolour = 0
     for xmlPair in planets:
         system,planet,filename = xmlPair
-        systemname = "&nbsp;"
         if lastfilename!=filename:
             lastfilename = filename
-            systemname = render(xmlPair,"systemname")
-            systemname = "<a href=\"/system/%s/\">%s</a>"%(urllib.quote(systemname),systemname)
+            tablecolour = not tablecolour
         d = {}
-        planetname = render(xmlPair,"name")
-        d["fields"] = [systemname,"<a href=\"/planet/%s/\">%s</a>"%(urllib.quote(planetname),planetname)]
-        for field in fields[2:]:
+        d["fields"] = [tablecolour]
+        for field in fields:
             d["fields"].append(render(xmlPair,field))
         p.append(d)
-    return render_template("systems.html",columns=[title[field] for field in fields],planets=p)
+    return render_template("systems.html",
+        columns=[title[field] for field in fields],
+        planets=p,
+        debugtxt=debugtxt)
 
 
 @app.route('/planet/<planetname>')
@@ -293,21 +306,22 @@ def page_planet(planetname):
         )
     #abort(404)
 
-@app.route('/system/<systemname>')
-@app.route('/system/<systemname>/')
-def page_system(systemname):
-    xmlPair = systemXmlPairs[systemname]
-    system,planet,filename = xmlPair
-    
-    systemtable = []
-    for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
-        systemtable.append((title[row],render(xmlPair,row)))
-
-    return render_template("system.html",
-        systemname=render(xmlPair,"systemname"),
-        systemtable=systemtable,
-        systemcategory=render(xmlPair,"systemcategory"),
-        )
+# Implement later
+#@app.route('/system/<systemname>')
+#@app.route('/system/<systemname>/')
+#def page_system(systemname):
+#    xmlPair = systemXmlPairs[systemname]
+#    system,planet,filename = xmlPair
+#    
+#    systemtable = []
+#    for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
+#        systemtable.append((title[row],render(xmlPair,row)))
+#
+#    return render_template("system.html",
+#        systemname=render(xmlPair,"systemname"),
+#        systemtable=systemtable,
+#        systemcategory=render(xmlPair,"systemcategory"),
+#        )
 
 if __name__ == '__main__':
     app.run(debug=True)

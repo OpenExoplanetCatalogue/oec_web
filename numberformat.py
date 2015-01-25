@@ -88,7 +88,7 @@ def renderFloat(tag, factor=1.):
         else:
             significantdigits = 0
         if error_plus is not None and error_minus is not None and error_plus!=0. and error_minus!=0.:
-            error_significantdigits = max(-floor(log10(error_plus/2.)),-floor(log10(error_minus/2.)))
+            error_significantdigits = max(-floor(log10(fabs(error_plus/2.))),-floor(log10(fabs(error_minus/2.))))
             significantdigits = max(error_significantdigits,significantdigits)
         else:
             significantdigits +=2
@@ -177,9 +177,8 @@ def renderFloat(tag, factor=1.):
 def getFloat(obj,tag,default=None):
     v = obj.find(tag)
     if v is not None:
-        v2 = v.text
         try:
-           v3 = float(v2)
+            return float(v.text)
         except:
             return default
     return default

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}- List of all extrasolar planets{% endblock title %}
 {% block content %}
-
+{{ debugtxt }}
 <table cellspacing="0" summary="List of exoplanets" id="systemtable" class="tablesorter">
 <thead>
 	<tr id="systemtablehead">
@@ -14,8 +14,8 @@
 </thead>
 <tbody id="systemtablebody">
 	{% for planet in planets %}
-	<tr>
-		{% for field in planet.fields %}
+	<tr {%if planet.fields[0]%} class="odd" {%endif%}>
+		{% for field in planet.fields[1:] %}
 		<td>
 			{{ field|safe  }}
 		</td>
