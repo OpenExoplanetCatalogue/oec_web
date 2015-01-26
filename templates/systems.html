@@ -13,25 +13,28 @@ $(document).ready(function(){
 {% block content %}
 
 <button id="fieldsbutton" class="btn" style="background-image:url('/static/img/database.png');">Show options</button>
-<div id="fields" style="display:none;">
+<div id="fields" style="display:none; vertical-align=top;">
 <form action="./" method="GET">
-<table cellspacing="0" summary="Settings">
-<thead>
-	<tr>
-		<th scope="col">Available fields<br/></th>
-	</tr>
-</thead>
+<table cellspacing="0" style="display: inline-table">
+<thead> <tr> <th scope="col">Available fields<br/></th> </tr> </thead>
 <tbody>
-	{% for key in available_fields %}
-	<tr>
+	{% for key in available_fields %} <tr>
 		<td><label><input name="fields" type="checkbox" value="{{key}}" {%if key in fields%}checked{%endif%}/>{{available_fields[key]|safe}}</label> </td>
-	</tr>
-	{% endfor %}
+	</tr> {% endfor %}
+</tbody>
+</table>
+<table cellspacing="0" style="display: inline-table">
+<thead> <tr> <th scope="col">Filters<br/></th> </tr> </thead>
+<tbody>
+	{% for key in available_filters %} <tr>
+		<td><label><input name="filters" type="checkbox" value="{{key}}" {%if key in filters%}checked{%endif%}/>{{available_filters[key]|safe}}</label> </td>
+	</tr> {% endfor %}
 </tbody>
 </table>
 <input type="submit"  class="btn" style="background-image:url('/static/img/link.png');"/>
 </div>
 </form>
+
 
 
 
@@ -54,6 +57,8 @@ $(document).ready(function(){
 		</td>
 		{% endfor %}
 	</tr>
+	{% else %}
+	<tr> <td colspan="{{columns|length}}"> No planets found.  Check filter options. </td> </tr>
 	{% endfor %}
 </tbody>
 </table>

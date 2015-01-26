@@ -2,6 +2,8 @@ import xml.etree.ElementTree as ET
 import glob
 import urllib
 import visualizations 
+import oec_filters
+import oec_fields
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request
 
@@ -45,163 +47,6 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
 
 print "Parsing OEC done"
 
-""" Array of title of propoerties """
-title = {
-    "name":                         "Primary planet name",
-    "namelink":                     "Primary planet name",
-    "alternativenames":             "Alternative planet names",
-    "starname":                     "Star name",
-    "staralternativenames":         "Alternative star names",
-    "systemname":                   "Primary system name",
-    "systemalternativenames":       "Alternative system names",
-    "distance":                     "Distance [parsec]",
-    "distancelightyears":           "Distance [lightyears]",
-    "numberofplanets":              "Number of planets in system",
-    "numberofstars":                "Number of stars in system",
-    "rightascension":               "Right ascension",
-    "declination":                  "Declination",
-    "image":                        "Image",
-    "imagedescription":             "Image description",
-    "starmass":                     "Mass [M<sub>Sun</sub>]",
-    "starradius":                   "Radius [R<sub>Sun</sub>]",
-    "starage":                      "Age [Gyr]",
-    "starmetallicity":              "Metallicity [Fe/H]",
-    "starspectraltype":             "Spectral type",
-    "startemperature":              "Temperature [K]",
-    "starvisualmagnitude":          "Visual magnitude",
-    "period":                       "Orbital period [days]",
-    "semimajoraxis":                "Semi-major axis [AU]",
-    "eccentricity":                 "Eccentricity",
-    "temperature":                  "Equilibrium temperature [K]",
-    "lists":                        "Lists",
-    "description":                  "Description",
-    "discoveryyear":                "Discovery year",
-    "discoverymethod":              "Discovery method",
-    "lastupdate":                   "Last updated [yy/mm/dd]",
-    "mass":                         "Mass [M<sub>jup</sub>]",
-    "radius":                       "Radius [R<sub>jup</sub>]",
-    "massEarth":                    "Mass [M<sub>earth</sub>]",
-    "radiusEarth":                  "Radius [R<sub>earth</sub>]"
-}
-
-def render(xmlPair,type):
-    system, planet, filename = xmlPair
-    if type=="numberofplanets":
-        return "%d"%len(system.findall(".//planet"))
-    if type=="numberofstars":
-        return "%d"%len(system.findall(".//star"))
-    if type=="distance":
-        return renderFloat(system.find("./distance"))
-    if type=="distancelightyears":
-        return renderFloat(system.find("./distance"),3.2615638)
-    if type=="massEarth":
-        return renderFloat(planet.find("./mass"),317.8942)
-    if type=="radiusEarth":
-        return renderFloat(planet.find("./radius"),10.973299)
-    # Text based object
-    if type=="rightascension":
-        return renderText(system.find("./rightascension"))
-    if type=="declination":
-        return renderText(system.find("./declination"))
-    if type=="image":
-        try:
-            return planet.find("./image").text
-        except:
-            return None
-    if type=="imagedescription":
-        try:
-            return planet.find("./imagedescription").text
-        except:
-            return None
-    if type=="description":
-        return renderText(planet.find("./description"))
-    if type=="name":
-        return renderText(planet.find("./name"))
-    if type=="namelink":
-        planetname = planet.find("./name").text
-        return "<a href=\"/planet/%s/\">%s</a>"%(urllib.quote(planetname),planetname)
-    if type=="discoveryyear":
-        return renderText(planet.find("./discoveryyear"))
-    if type=="discoverymethod":
-        return renderText(planet.find("./discoverymethod"))
-    if type=="lastupdate":
-        return renderText(planet.find("./lastupdate"))
-    if type=="systemname":
-        return renderText(system.find("./name"))
-    if type=="alternativenames":
-        alternativenames = notAvailableString 
-        names = planet.findall("./name")
-        for i,name in enumerate(names[1:]):
-            if i==0:
-                alternativenames = ""
-            else:
-                alternativenames += ", "
-            alternativenames += name.text
-        return alternativenames
-    if type=="systemalternativenames":
-        systemalternativenames = notAvailableString 
-        systemnames = system.findall("./name")
-        for i,name in enumerate(systemnames[1:]):
-            if i==0:
-                systemalternativenames = ""
-            else:
-                systemalternativenames += ", "
-            systemalternativenames += name.text
-        return systemalternativenames
-    if type=="lists":
-        lists = notAvailableString 
-        ls = planet.findall("./list")
-        for i,l in enumerate(ls):
-            if i==0:
-                lists = ""
-            else:
-                lists += "; "
-            lists += l.text
-        return lists
-    # Host star fields
-    if type[0:4]=="star":
-        stars = system.findall("./star")
-        star = None
-        for s in stars:
-            if planet in s:
-                star = s
-                break
-        if star is None:
-            return notAvailableString
-        type = type[4:]
-        # Text based object
-        if type=="spectraltype":
-            return renderText(star.find("./spectraltype"))
-        if type=="name":
-            return renderText(star.find("./name"))
-        if type=="alternativenames":
-            alternativenames = notAvailableString 
-            names = star.findall("./name")
-            for i,name in enumerate(names[1:]):
-                if i==0:
-                    alternativenames = ""
-                else:
-                    alternativenames += ", "
-                alternativenames += name.text
-            return alternativenames
-        # Default: just search for the property in the planet xml. 
-        return renderFloat(star.find("./"+type))
-    # Long texts
-    if type=="systemcategory":
-        systemcategory = ""
-        systemname = renderText(system.find("./name"))
-        if len(system.findall(".//planet"))==1:
-            systemcategory += "The planetary system "+systemname+" hosts at least one planet. "
-        elif len(system.findall(".//planet"))>1:
-            systemcategory += "The planetary system "+systemname+" hosts at least %d planets. " % len(system.findall(".//planet"))
-        if len(system.findall(".//star"))>1:
-            systemcategory += "Note that the system is a multiple star system. It hosts at least %d stellar components. "% len(system.findall(".//star"))
-        elif len(system.findall(".//star"))==0:
-            systemcategory += "The planet is a so called orphan planet and not associated with any star. "
-        return systemcategory
-
-    # Default: just search for the property in the planet xml. 
-    return renderFloat(planet.find("./"+type))
 
 app = Flask(__name__)
 
@@ -233,16 +78,24 @@ def page_systems():
     p = []
     debugtxt = ""
     fields = ["namelink"]
+    filters = []
+    if "filters" in request.args:
+        listfilters = request.args.getlist("filters")
+        for filter in listfilters:
+            if filter in oec_filters.titles:
+                filters.append(filter) 
     if "fields" in request.args:
         listfields = request.args.getlist("fields")
         for field in listfields:
-            if field in title:
+            if field in oec_fields.titles:
                 fields.append(field) 
     else:
         fields += ["mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
     lastfilename = ""
     tablecolour = 0
     for xmlPair in planets:
+        if oec_filters.isFiltered(xmlPair,filters):
+            continue
         system,planet,filename = xmlPair
         if lastfilename!=filename:
             lastfilename = filename
@@ -250,13 +103,15 @@ def page_systems():
         d = {}
         d["fields"] = [tablecolour]
         for field in fields:
-            d["fields"].append(render(xmlPair,field))
+            d["fields"].append(oec_fields.render(xmlPair,field))
         p.append(d)
     return render_template("systems.html",
-        columns=[title[field] for field in fields],
+        columns=[oec_fields.titles[field] for field in fields],
         planets=p,
-        available_fields=title,
+        available_fields=oec_fields.titles,
+        available_filters=oec_filters.titles,
         fields=fields,
+        filters=filters,
         debugtxt=debugtxt)
 
 
@@ -268,15 +123,15 @@ def page_planet(planetname):
 
     systemtable = []
     for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
-        systemtable.append((title[row],render(xmlPair,row)))
+        systemtable.append((oec_fields.titles[row],oec_fields.render(xmlPair,row)))
     
     planettable = []
     for row in ["name","alternativenames","description","lists","mass","massEarth","radius","radiusEarth","period","semimajoraxis","eccentricity","temperature","discoverymethod","discoveryyear","lastupdate"]:
-        planettable.append((title[row],render(xmlPair,row)))
+        planettable.append((oec_fields.titles[row],oec_fields.render(xmlPair,row)))
     
     startable = []
     for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starvisualmagnitude"]:
-        startable.append((title[row],render(xmlPair,row)))
+        startable.append((oec_fields.titles[row],oec_fields.render(xmlPair,row)))
 
     references = []
     contributors = []
@@ -297,14 +152,14 @@ def page_planet(planetname):
         planetname=planetname,
         vizsize=vizsize,
         vizhabitable=vizhabitable,
-        systemname=render(xmlPair,"systemname"),
+        systemname=oec_fields.render(xmlPair,"systemname"),
         systemtable=systemtable,
-        image=(render(xmlPair,"image"),render(xmlPair,"imagedescription")),
+        image=(oec_fields.render(xmlPair,"image"),oec_fields.render(xmlPair,"imagedescription")),
         planettable=planettable,
         startable=startable,
         references=references,
         contributors=contributors,
-        systemcategory=render(xmlPair,"systemcategory"),
+        systemcategory=oec_fields.render(xmlPair,"systemcategory"),
         )
     #abort(404)
 
@@ -317,7 +172,7 @@ def page_planet(planetname):
 #    
 #    systemtable = []
 #    for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
-#        systemtable.append((title[row],render(xmlPair,row)))
+#        systemtable.append((fieldtitles[row],render(xmlPair,row)))
 #
 #    return render_template("system.html",
 #        systemname=render(xmlPair,"systemname"),
