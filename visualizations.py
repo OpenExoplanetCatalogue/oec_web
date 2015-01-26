@@ -8,9 +8,8 @@ def getRadius(planet):
     radius = getFloat(planet,"./radius")
     if radius is not None:
         return radius
-
-    mass = getFloat(planet,"./mass")
-    if mass is not None:
+    m = getFloat(planet,"./mass")
+    if m is not None:
         m *= 317.894
         # This is based on Lissauer et al 2011 b
         if m>30.:
