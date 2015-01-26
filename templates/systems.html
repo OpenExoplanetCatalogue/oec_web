@@ -4,16 +4,18 @@
 <script>
 $(document).ready(function(){
 	$("#fieldsbutton").click(function(){
-		$("#fields").toggle();
+		$("#fields").toggle(0);
+		$("#fieldsbutton").toggle();
 	});
 });
 </script>
 {% endblock header %}
 {% block content %}
 
-<button id="fieldsbutton">Show/hide available fields</button>
+<button id="fieldsbutton" class="btn" style="background-image:url('/static/img/database.png');">Show options</button>
+<div id="fields" style="display:none;">
 <form action="./" method="GET">
-<table id="fields" style="display:none;" cellspacing="0" summary="Settings">
+<table cellspacing="0" summary="Settings">
 <thead>
 	<tr>
 		<th scope="col">Available fields<br/></th>
@@ -25,11 +27,10 @@ $(document).ready(function(){
 		<td><label><input name="fields" type="checkbox" value="{{key}}" {%if key in fields%}checked{%endif%}/>{{available_fields[key]|safe}}</label> </td>
 	</tr>
 	{% endfor %}
-	<tr>
-		<td><input type="submit" /></td>
-	</tr>
 </tbody>
 </table>
+<input type="submit"  class="btn" style="background-image:url('/static/img/link.png');"/>
+</div>
 </form>
 
 

@@ -225,3 +225,16 @@ span.NA {
 		box-shadow:4px 4px 10px rgba(0,0,0,0.8);
 	}
 }
+
+
+
+
+.btn {
+	margin: 10px 0px 10px 0px;
+	font-size: 1em;
+  	padding: 10px 20px 10px 42px;
+  	border: 1px solid #C1DAD7;
+  	background-position: 10px center;
+  	background-repeat: no-repeat;
+	background-color: 	#f5fafa;
+}
