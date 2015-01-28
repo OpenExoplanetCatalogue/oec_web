@@ -12,58 +12,28 @@
 
 <!-- ########################### -->
 <h2><img src="/static/img/info.png" alt="info" />Statistics</h2>
-<script type="text/javascript">
-var source = "oec_meta/statistics.xml";
-
-var xmldata = null;
-d3.xml(source, "application/xml", function(xml) {
-	xmldata = xml;
-	updateTable(true);	
-});
-
-var updateTable = function(first){ 
-	// Body
-	$("#confirmedplanets").html($("confirmedplanets",xmldata).text());
-	$("#planets").html($("planets",xmldata).text());
-	$("#binaries").html($("binaries",xmldata).text());
-	$("#systems").html($("systems",xmldata).text());
-	$("#commits").html($("commits",xmldata).text());
-	var isfirstcontributor = true;
-	var contributors = $("contributor",xmldata);
-	for (var i=0; i<contributors.length; i++){
-		if (i!=0){
-			$("#contributors").append(", ");
-		}else{
-			$("#contributors").html("");
-		}
-		$("#contributors").append($(contributors[i]).text());
-	}
-
-
-};
-</script>
 
 <table cellspacing="0" summary="Statistics">
 <tr>
-	<td>Number of confirmed exoplanets</td>
+	<th>Number of confirmed exoplanets</th>
 	<td>{{numconfirmedplanets}}</td>
 <tr></tr>
-	<td>Total number of planets (including Solar System objects and unconfirmed exoplanets)</td>
+	<th>Total number of planets (including Solar System objects and unconfirmed exoplanets)</th>
 	<td>{{numplanets}}</td>
 <tr></tr>
-	<td>Number of planetary systems</td>
+	<th>Number of planetary systems</th>
 	<td>{{numsystems}}</td>
 <tr></tr>
-	<td>Number of binary systems</td>
+	<th>Number of binary systems</th>
 	<td>{{numbinaries}}</td>
 </tr>
 <tr></tr>
-	<td>Number of commits</td>
+	<th>Number of commits</th>
 	<td>{{numcommits}}</td>
 </tr>
 <tr></tr>
-	<td>List of contributors</td>
-	<td>{{contributors}}</td>
+	<th>List of contributors</th>
+	<td>{%for contributor in contributors%}{{contributor}}{%if not loop.last%}, {%endif%}{%endfor%}</td>
 </tr>
 </table>
 </p>

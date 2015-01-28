@@ -41,8 +41,9 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     binaries += root.findall(".//binary")
     f.close()
 
-print "Parsing OEC done"
-
+print "Parsing OEC META ..."
+with open(OEC_META_PATH+"statistics.xml", 'rt') as f:
+    oec_meta_statistics = ET.parse(f).getroot()
 
 app = Flask(__name__)
 
@@ -62,11 +63,16 @@ def static_oec_outreach(filename):
 @app.route('/')
 @app.route('/index.html')
 def page_main():
+    contributors = []
+    for c in oec_meta_statistics.findall(".//contributor"):
+        contributors.append(c.text)
     return render_template("index.html",
             numplanets=len(planets),
             numsystems=numsystems,
             numconfirmedplanets=numconfirmedplanets,
             numbinaries=len(binaries),
+            numcommits=int(oec_meta_statistics.find("./commits").text),
+            contributors=contributors,
         )
 
 @app.route('/systems/',methods=["POST","GET"])
