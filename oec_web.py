@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import glob
+import os
 import urllib
 import visualizations 
 import oec_filters
@@ -7,9 +8,9 @@ import oec_fields
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request
 
-
-OEC_PATH = "open_exoplanet_catalogue/"
-OEC_META_PATH = "oec_meta/"
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
+OEC_META_PATH = APP_ROOT+"/oec_meta/"
 
 print "Parsing OEC ..."
 numconfirmedplanets = 0
@@ -26,24 +27,19 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     f = open(filename, 'rt')
     filename = filename[len(OEC_PATH):]
     # Try to parse file
-    try:
-        root = ET.parse(f).getroot()
-        numsystems +=1
-        for p in root.findall(".//planet"):
-            for l in p.findall("./list"):
-                if l.text == "Confirmed planets":
-                    numconfirmedplanets += 1
-            planets.append((root,p,filename))
-            name = p.find("./name").text
-            planetXmlPairs[name] = (root,p,filename)
-        systemXmlPairs[root.find("./name").text] = (root,None,filename)
-        stars += root.findall(".//star")
-        binaries += root.findall(".//binary")
-    except ET.ParseError as error:
-        print '{}, {}'.format(filename, error)
-        continue
-    finally:
-        f.close()
+    root = ET.parse(f).getroot()
+    numsystems +=1
+    for p in root.findall(".//planet"):
+        for l in p.findall("./list"):
+            if l.text == "Confirmed planets":
+                numconfirmedplanets += 1
+        planets.append((root,p,filename))
+        name = p.find("./name").text
+        planetXmlPairs[name] = (root,p,filename)
+    systemXmlPairs[root.find("./name").text] = (root,None,filename)
+    stars += root.findall(".//star")
+    binaries += root.findall(".//binary")
+    f.close()
 
 print "Parsing OEC done"
 
