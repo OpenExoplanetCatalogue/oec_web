@@ -112,10 +112,16 @@ This list shows all planetary and stellar components in the system. It gives a q
 		<th scope="col" class="nobg">&nbsp;</th>
 		<th scope="col">Planet parameters</th>
 	</tr>
-	{% for title,value in planettable: %}
+	{% for values in planettable: %}
 	<tr>
-		<th scope="row">{{title|safe}}</th>
-		<td>{{value|safe}}</td>
+		<th scope="row">{{planettablefields[loop.index0]|safe}}</th>
+		{% if values |islist %}
+			{% for value in values: %}
+				<td>{{value|safe}}</td>
+			{% endfor %}
+		{% else %}
+			<td colspan="{{planettable[0]|length}}">{{values|safe}}</td>
+		{% endif %}
 	</tr>
 	{% endfor %}
 </table>

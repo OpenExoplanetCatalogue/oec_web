@@ -46,6 +46,10 @@ with open(OEC_META_PATH+"statistics.xml", 'rt') as f:
     oec_meta_statistics = ET.parse(f).getroot()
 
 app = Flask(__name__)
+def is_list(value):
+    return isinstance(value, list)
+app.jinja_env.filters['islist'] = is_list
+
 
 @app.route('/open_exoplanet_catalogue/<path:filename>')
 def static_oec(filename):
@@ -122,14 +126,22 @@ def page_systems():
 def page_planet(planetname):
     xmlPair = planetXmlPairs[planetname]
     system,planet,filename = xmlPair
+    planets=system.findall(".//planet")
 
     systemtable = []
     for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
         systemtable.append((oec_fields.titles[row],oec_fields.render(xmlPair,row)))
     
     planettable = []
+    planettablefields = []
     for row in ["name","alternativenames","description","lists","mass","massEarth","radius","radiusEarth","period","semimajoraxis","eccentricity","temperature","discoverymethod","discoveryyear","lastupdate"]:
-        planettable.append((oec_fields.titles[row],oec_fields.render(xmlPair,row)))
+        planettablefields.append(oec_fields.titles[row])
+        rowdata = []
+        for p in planets:
+            rowdata.append(oec_fields.render((system,p,filename),row))
+        if len(set(rowdata)) <= 1: # all fields identical:
+            rowdata = rowdata[0]
+        planettable.append(rowdata)
     
     startable = []
     for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starvisualmagnitude"]:
@@ -157,6 +169,7 @@ def page_planet(planetname):
         systemname=oec_fields.render(xmlPair,"systemname"),
         systemtable=systemtable,
         image=(oec_fields.render(xmlPair,"image"),oec_fields.render(xmlPair,"imagedescription")),
+        planettablefields=planettablefields,
         planettable=planettable,
         startable=startable,
         references=references,
