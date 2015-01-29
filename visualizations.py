@@ -1,5 +1,5 @@
 from math import *
-from numberformat import getFloat, getText
+from numberformat import getFloat, getText, renderFloat
 
 width = 480
 height= 200
@@ -69,7 +69,7 @@ def size(xmlPair):
     if maxr<=0.:
         return None
 
-    earth 	= 1.0/ maxr*height*0.4
+    earth     = 1.0/ maxr*height*0.4
     if space*8+earth*2.8257378 *2 > width:
         earth = (width - (space+2)*8 )/ (2.8257378 * 2.0  )
 
@@ -162,7 +162,7 @@ def habitable(xmlPair):
     temperature -= 5700
         
         
-    linsun2  = 0.68	
+    linsun2  = 0.68    
     linsun1  = 0.95
     loutsun1 = 1.67
     loutsun2 = 1.95
@@ -181,7 +181,7 @@ def habitable(xmlPair):
 
     width = 600
     height= 100
-    au 	= 2.0/ maxa*(width-100)*0.49
+    au     = 2.0/ maxa*(width-100)*0.49
     last_text_y=12
 
     svg = """
@@ -201,7 +201,7 @@ def habitable(xmlPair):
                 height/2,
                 au*HZouter2,
                 au*HZouter2)
-        svg += '<text 	x="%f"" y="%f" font-family="sans-serif" font-weight="normal"  font-size="12" stroke="none" style="fill:green">Habitable zone</text>' %(
+        svg += '<text     x="%f"" y="%f" font-family="sans-serif" font-weight="normal"  font-size="12" stroke="none" style="fill:green">Habitable zone</text>' %(
                 au*HZinner2,
                 height-1)
 
@@ -238,3 +238,45 @@ def habitable(xmlPair):
         svg += '</g>'
     
     return svg
+
+def textArchitecture(o,stype=0):
+    architecture = ""
+    if stype==1:
+        architecture += "<ul style=\"padding: 0; margin: 0;\">"
+    else:
+        architecture += "<ul style=\"padding-left: 1em; margin-left: 1em;\">"
+
+    bs = o.findall("./binary")
+    for b in bs:
+        architecture += "<li><img src=\"/static/img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
+        a = b.find("./semimajoraxis")
+        if a is not None:
+            architecture += ", semi-major axis: "+renderFloat(a)+" AU"
+        period = b.find("./period")
+        if period is not None:
+            if period>1000.:
+                 architecture += ", "+renderFloat(period,0.002737909)+" years"
+            else:
+                 architecture += ", "+renderFloat(period)+" days"
+        architecture += textArchitecture(b,2)
+   
+    ss = o.findall("./star")
+    for s in ss:
+        architecture += "<li><img src=\"/static/img/star.png\" width=\"16\" height=\"16\" />&nbsp;"+s.find("./name").text+", stellar object"
+        architecture += textArchitecture(s)         
+
+    ps = o.findall("./planet")
+    for p in ps:
+        architecture += "<li><img src=\"/static/img/planet.png\" width=\"16\" height=\"16\" />&nbsp;"+p.find("./name").text
+        if stype==0:
+            architecture += ", planet"
+        if stype==1:
+            architecture += ", orphan planet"
+        if stype==2:
+            architecture += ", circumbinary planet, P-type"
+        a = getFloat(p,"./semimajoraxis")
+        if a:
+            architecture += ", semi-major axis: "+renderFloat(p.find("./semimajoraxis"))+" AU"
+        architecture += textArchitecture(p)
+    architecture += "</ul>"
+    return architecture

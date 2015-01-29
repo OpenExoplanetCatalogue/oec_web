@@ -182,6 +182,8 @@ def page_planet(planetname):
 
     vizsize = visualizations.size(xmlPair)
     vizhabitable = visualizations.habitable(xmlPair)
+    vizarchitecture = visualizations.textArchitecture(system)
+
 
     return render_template("planet.html",
         system=system,
@@ -190,6 +192,7 @@ def page_planet(planetname):
         planetname=planetname,
         vizsize=vizsize,
         vizhabitable=vizhabitable,
+        architecture=vizarchitecture,
         systemname=oec_fields.render(xmlPair,"systemname"),
         systemtable=systemtable,
         image=(oec_fields.render(xmlPair,"image"),oec_fields.render(xmlPair,"imagedescription")),

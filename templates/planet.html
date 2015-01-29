@@ -2,64 +2,6 @@
 {% block title %}- {{planetname}}{% endblock title %}
 {% block content %}
 
-<script type="text/javascript">
-var subSystemString = "";
-function setupArchitecture(o,stype){
-	stype = typeof stype !== 'undefined' ? stype : 0;
-	if (stype==1){
-		subSystemString += "<ul style=\"padding: 0; margin: 0;\">";
-	}else{
-		subSystemString += "<ul style=\"padding-left: 1em; margin-left: 1em;\">";
-	}
-	var binaries = $("> binary",o);
-	for(var i=0;i<binaries.length;i++){
-		var binary = binaries.eq(i);
-		subSystemString += "<li><img src=\"/static/img/binary.png\" width=\"16\" height=\"16\" />&nbsp;Stellar binary";
-		var semia = $("> semimajoraxis",binary);
-		if (semia){
-			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
-		}
-		var period = $("> period",binary);
-		if (period){
-			if (parseFloat(period.text())>1000){
-				subSystemString += ", " +getFormatForTag(period,0.002737909)+" years";
-			}else{
-				subSystemString += ", " +getFormatForTag(period)+" days";
-			}
-		}
-		setupArchitecture(binary,2);
-	}
-	var stars = $("> star",o);
-	for(var i=0;i<stars.length;i++){
-		var star = stars.eq(i);
-		subSystemString += "<li><img src=\"/static/img/star.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",star).first().text()+", stellar object";
-		setupArchitecture(star);
-	}
-	var planets = $("> planet",o);
-	for(var i=0;i<planets.length;i++){
-		var planet = planets.eq(i);
-		subSystemString += "<li><img src=\"/static/img/planet.png\" width=\"16\" height=\"16\" />&nbsp;"+$("name",planet).first().text();
-		if (stype==0){
-			subSystemString += ", planet";
-		}
-		if (stype==1){
-			subSystemString += ", orphan planet";
-		}
-		if (stype==2){
-			subSystemString += ", circumbinary planet, P-type";
-		}
-		var semia = $("> semimajoraxis",planet);
-		if (semia){
-			subSystemString += ", semi-major axis: "+getFormatForTag(semia)+" AU";
-		}
-		setupArchitecture(planet);
-	}
-	subSystemString += "</ul>";
-}
-
-</script>
-
-
 <!-- ########################### -->
 <!-- ########################### -->
 <h1>{{systemname|safe}}</h1>
@@ -100,6 +42,7 @@ function setupArchitecture(o,stype){
 <p>
 This list shows all planetary and stellar components in the system. It gives a quick overview of the hierarchical architecture.
 </p>
+{{architecture|safe}}
 
 
 <!-- ########################### -->
