@@ -67,26 +67,14 @@ app.jinja_env.filters['islist'] = isList
 app.jinja_env.filters['getFirst'] = getFirst
 
 
-@app.route('/open_exoplanet_catalogue/<path:filename>')
-def static_oec(filename):
-    return send_from_directory(APP_ROOT+'/open_exoplanet_catalogue', filename)
+#################
 
-@app.route('/oec_meta/<path:filename>')
-def static_oec_meta(filename):
-    return send_from_directory(APP_ROOT+'/oec_meta', filename)
+@app.route('/system.html')
+def page_planet_redirect():
+    planetname = request.args.get("id")
+    return redirect("planet/"+planetname, 301)
 
-@app.route('/oec_outreach/<path:filename>')
-def static_oec_outreach(filename):
-    return send_from_directory(APP_ROOT+'/oec_outreach', filename)
-
-@app.route('/oec_iphone/<path:filename>')
-def static_oec_iphone(filename):
-    return send_from_directory(APP_ROOT+'/oec_iphone', filename)
-
-@app.route('/iphone/<path:filename>')
-def static_iphone(filename):
-    return send_from_directory(APP_ROOT+'/iphone', filename)
-
+#################
 
 @app.route('/')
 @app.route('/index.html')
@@ -145,13 +133,6 @@ def page_systems():
         debugtxt=debugtxt)
 
 
-
-
-@app.route('/system.html')
-def page_planet_redirect():
-    planetname = request.args.get("id")
-    
-    return redirect("planet/"+planetname, 301)
 
 
 @app.route('/planet/<planetname>')
