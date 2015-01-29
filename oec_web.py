@@ -176,8 +176,14 @@ def page_planet(planetname):
         contributors=contributors,
         systemcategory=oec_fields.render(xmlPair,"systemcategory"),
         )
-    #abort(404)
 
+@app.route('/correlations/')
+@app.route('/correlations.html')
+def page_correlations():
+    return render_template("correlations.html",
+        )
+
+#abort(404)
 # Implement later
 #@app.route('/system/<systemname>')
 #@app.route('/system/<systemname>/')
