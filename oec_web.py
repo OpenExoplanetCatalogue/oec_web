@@ -79,6 +79,10 @@ def static_oec_meta(filename):
 def static_oec_outreach(filename):
     return send_from_directory('oec_outreach', filename)
 
+@app.route('/oec_iphone/<path:filename>')
+def static_oec_iphone(filename):
+    return send_from_directory('oec_iphone', filename)
+
 
 @app.route('/')
 @app.route('/index.html')
