@@ -33,15 +33,22 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     # Try to parse file
     root = ET.fromstring(xml)
     numsystems +=1
+    pstars = root.findall("./star")
     for p in root.findall(".//planet"):
         for l in p.findall("./list"):
             if l.text == "Confirmed planets":
                 numconfirmedplanets += 1
-        planets.append((root,p,filename))
+        star = None
+        for s in pstars:
+            if p in s:
+                star = s
+                break
+        xmlPair = (root,p,star,filename)
+        planets.append(xmlPair)
         name = p.find("./name").text
-        planetXmlPairs[name] = (root,p,filename)
+        planetXmlPairs[name] = xmlPair
     systemXmlPairs[root.find("./name").text] = (root,None,filename)
-    stars += root.findall(".//star")
+    stars += pstars
     binaries += root.findall(".//binary")
 fullxml += "</systems>\n"
 
@@ -106,7 +113,7 @@ def page_systems():
     for xmlPair in planets:
         if oec_filters.isFiltered(xmlPair,filters):
             continue
-        system,planet,filename = xmlPair
+        system,planet,star,filename = xmlPair
         if lastfilename!=filename:
             lastfilename = filename
             tablecolour = not tablecolour
@@ -129,8 +136,9 @@ def page_systems():
 @app.route('/planet/<planetname>/')
 def page_planet(planetname):
     xmlPair = planetXmlPairs[planetname]
-    system,planet,filename = xmlPair
+    system,planet,star,filename = xmlPair
     planets=system.findall(".//planet")
+    stars=system.findall(".//star")
 
     systemtable = []
     for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
@@ -142,14 +150,21 @@ def page_planet(planetname):
         planettablefields.append(oec_fields.titles[row])
         rowdata = []
         for p in planets:
-            rowdata.append(oec_fields.render((system,p,filename),row))
+            rowdata.append(oec_fields.render((system,p,star,filename),row))
         if len(set(rowdata)) <= 1: # all fields identical:
             rowdata = rowdata[0]
         planettable.append(rowdata)
     
     startable = []
+    startablefields = []
     for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starvisualmagnitude"]:
-        startable.append((oec_fields.titles[row],oec_fields.render(xmlPair,row)))
+        startablefields.append(oec_fields.titles[row])
+        rowdata = []
+        for s in stars:
+            rowdata.append(oec_fields.render((system,planet,s,filename),row))
+        if len(set(rowdata)) <= 1: # all fields identical:
+            rowdata = rowdata[0]
+        startable.append(rowdata)
 
     references = []
     contributors = []
@@ -175,6 +190,7 @@ def page_planet(planetname):
         image=(oec_fields.render(xmlPair,"image"),oec_fields.render(xmlPair,"imagedescription")),
         planettablefields=planettablefields,
         planettable=planettable,
+        startablefields=startablefields,
         startable=startable,
         references=references,
         contributors=contributors,

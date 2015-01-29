@@ -110,11 +110,13 @@ This list shows all planetary and stellar components in the system. It gives a q
 <table cellspacing="0" summary="Details of the planetary system">
 	<tr>
 		<th scope="col" class="nobg">&nbsp;</th>
-		<th scope="col">Planet parameters</th>
+		{% for planetname in planettable[0]: %}
+		<th scope="col">{{planetname}}</th>
+		{% endfor %}
 	</tr>
-	{% for values in planettable: %}
+	{% for values in planettable[1:]: %}
 	<tr>
-		<th scope="row">{{planettablefields[loop.index0]|safe}}</th>
+		<th scope="row">{{planettablefields[loop.index]|safe}}</th>
 		{% if values |islist %}
 			{% for value in values: %}
 				<td>{{value|safe}}</td>
@@ -135,12 +137,20 @@ This list shows all planetary and stellar components in the system. It gives a q
 <table cellspacing="0" summary="Details of the star system">
 	<tr>
 		<th scope="col" class="nobg">&nbsp;</th>
-		<th scope="col">Stellar parameters</th>
+		{% for starname in startable[0]: %}
+		<th scope="col">{{starname}}</th>
+		{% endfor %}
 	</tr>
-	{% for title,value in startable: %}
+	{% for values in startable[1:]: %}
 	<tr>
-		<th scope="row">{{title|safe}}</th>
-		<td>{{value|safe}}</td>
+		<th scope="row">{{startablefields[loop.index]|safe}}</th>
+		{% if values |islist %}
+			{% for value in values: %}
+				<td>{{value|safe}}</td>
+			{% endfor %}
+		{% else %}
+			<td colspan="{{startable[0]|length}}">{{values|safe}}</td>
+		{% endif %}
 	</tr>
 	{% endfor %}
 </table>

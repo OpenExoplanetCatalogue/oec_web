@@ -60,7 +60,7 @@ def plotplanet(radius,name,ss,todooooooo=1):
 
 def size(xmlPair):
     global earth,pl_i,texty
-    system, planet, filename = xmlPair 
+    system, planet, star, filename = xmlPair 
     planets = system.findall(".//planet")
     maxr = max(map(getRadius,planets))
     pl_i=0
@@ -117,14 +117,8 @@ def size(xmlPair):
 
 
 def habitable(xmlPair):
-    system, planet, filename = xmlPair 
+    system, planet, star, filename = xmlPair 
 
-    stars = system.findall(".//star")
-    star = None
-    for s in stars:
-        if planet in s:
-            star = s
-            break
     if star is None:
         return None # cannot draw diagram for binary systems yet
 

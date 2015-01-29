@@ -41,7 +41,7 @@ titles = {
 }
 
 def render(xmlPair,type):
-    system, planet, filename = xmlPair
+    system, planet, star, filename = xmlPair
     if type=="numberofplanets":
         return "%d"%len(system.findall(".//planet"))
     if type=="numberofstars":
@@ -116,12 +116,6 @@ def render(xmlPair,type):
         return lists
     # Host star fields
     if type[0:4]=="star":
-        stars = system.findall("./star")
-        star = None
-        for s in stars:
-            if planet in s:
-                star = s
-                break
         if star is None:
             return notAvailableString
         type = type[4:]

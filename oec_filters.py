@@ -9,7 +9,7 @@ titles = {
 }
 
 def isFiltered(xmlPair,filters):
-    system, planet, filename = xmlPair
+    system, planet, star, filename = xmlPair
     for filter in filters:
         if filter=="confirmed":
             confirmed = False
