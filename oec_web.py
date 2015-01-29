@@ -6,7 +6,7 @@ import visualizations
 import oec_filters
 import oec_fields
 from numberformat import renderFloat, renderText, notAvailableString
-from flask import Flask, abort, render_template, send_from_directory, request
+from flask import Flask, abort, render_template, send_from_directory, request, redirect
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
@@ -109,7 +109,7 @@ def page_systems():
     if "fields" in request.args:
         listfields = request.args.getlist("fields")
         for field in listfields:
-            if field in oec_fields.titles:
+            if field in oec_fields.titles and field!="namelink":
                 fields.append(field) 
     else:
         fields += ["mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
@@ -137,8 +137,18 @@ def page_systems():
         debugtxt=debugtxt)
 
 
+
+
+@app.route('/system.html')
+def page_planet_redirect():
+    planetname = request.args.get("id")
+    
+    return redirect("planet/"+planetname, 301)
+
+
 @app.route('/planet/<planetname>')
 @app.route('/planet/<planetname>/')
+@app.route('/system/<planetname>/')
 def page_planet(planetname):
     xmlPair = planetXmlPairs[planetname]
     system,planet,star,filename = xmlPair
