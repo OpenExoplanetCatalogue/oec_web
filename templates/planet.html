@@ -190,6 +190,7 @@ Note that unless the radius has been determined through a transit observation, t
 </svg>
 
 
+{% if vizhabitable %}
 <h3>Habitable zone</h3>
 <p>
 The following plot shows the approximate location of the planets in this system with respect to the habitable zone (green) and the size of the star (red).
@@ -200,6 +201,7 @@ The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">S
 <svg width="600" height="100">
 {{ vizhabitable|safe }}
 </svg>
+{% endif  %}
 
 
 {{ super() }}

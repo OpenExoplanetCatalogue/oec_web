@@ -57,9 +57,14 @@ with open(OEC_META_PATH+"statistics.xml", 'rt') as f:
     oec_meta_statistics = ET.parse(f).getroot()
 
 app = Flask(__name__)
-def is_list(value):
+def isList(value):
     return isinstance(value, list)
-app.jinja_env.filters['islist'] = is_list
+def getFirst(value):
+    if isList(value):
+        return value[0]
+    return value
+app.jinja_env.filters['islist'] = isList
+app.jinja_env.filters['getFirst'] = getFirst
 
 
 @app.route('/open_exoplanet_catalogue/<path:filename>')
@@ -151,7 +156,7 @@ def page_planet(planetname):
         rowdata = []
         for p in planets:
             rowdata.append(oec_fields.render((system,p,star,filename),row))
-        if len(set(rowdata)) <= 1: # all fields identical:
+        if len(set(rowdata)) <= 1 and row!="name": # all fields identical:
             rowdata = rowdata[0]
         planettable.append(rowdata)
     
@@ -162,7 +167,7 @@ def page_planet(planetname):
         rowdata = []
         for s in stars:
             rowdata.append(oec_fields.render((system,planet,s,filename),row))
-        if len(set(rowdata)) <= 1: # all fields identical:
+        if len(set(rowdata)) <= 1 and row!="starname": # all fields identical:
             rowdata = rowdata[0]
         startable.append(rowdata)
 
