@@ -13,6 +13,7 @@ OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
 OEC_META_PATH = APP_ROOT+"/oec_meta/"
 
 print "Parsing OEC ..."
+fullxml = "<systems>\n"
 numconfirmedplanets = 0
 numsystems = 0
 planets = []
@@ -25,9 +26,12 @@ systemXmlPairs = {}
 for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     # Open file
     f = open(filename, 'rt')
+    xml = f.read()
+    f.close()
+    fullxml+=xml
     filename = filename[len(OEC_PATH):]
     # Try to parse file
-    root = ET.parse(f).getroot()
+    root = ET.fromstring(xml)
     numsystems +=1
     for p in root.findall(".//planet"):
         for l in p.findall("./list"):
@@ -39,7 +43,7 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     systemXmlPairs[root.find("./name").text] = (root,None,filename)
     stars += root.findall(".//star")
     binaries += root.findall(".//binary")
-    f.close()
+fullxml += "</systems>\n"
 
 print "Parsing OEC META ..."
 with open(OEC_META_PATH+"statistics.xml", 'rt') as f:
@@ -180,8 +184,16 @@ def page_planet(planetname):
 @app.route('/correlations/')
 @app.route('/correlations.html')
 def page_correlations():
-    return render_template("correlations.html",
-        )
+    return render_template("correlations.html")
+
+@app.route('/histogram/')
+@app.route('/histogram.html')
+def page_histogram():
+    return render_template("histogram.html",)
+
+@app.route('/systems.xml')
+def page_systems_xml():
+    return fullxml
 
 #abort(404)
 # Implement later

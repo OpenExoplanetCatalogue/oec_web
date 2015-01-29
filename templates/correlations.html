@@ -1,0 +1,711 @@
+{% extends "detail.html" %}
+{% block title %}- Correlation Plots{% endblock title %}
+{% block content %}
+<!-- ########################### -->
+<h2><img src="/static/img/kig.png" alt="kig" />Correlation diagrams</h2>
+<p>This page is currently under development. 
+It uses the d3 javascript library to render correlation plots directly in your browser. 
+Once you've loaded this page, you can change the plot even without an internet connection.
+The plots shows a scatter plot of all discovered planets.
+Hover over a circle to see to which planet it corresponds. Click on it to view the planet's page.
+</p>
+
+<!-- ########################### -->
+<div id="viz" style="float:left; font-size:12px;"></div>
+<div id="pop-up">
+        <div id="pop-up-title">Title</div>
+        <div id="pop-up-description">Description</div>
+        <div id="pop-up-values">Values</div>
+</div>
+<!-- ########################### -->
+<div class="spacer"></div>
+<table cellspacing="0" summary="Settings" style="float:left">
+<thead>
+<tr>
+	<th scope="col" class="nobg"> </th>
+	<th scope="col">Options<br/> <small>The plot updates automatically when an option is changed.</small> </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th rowspan="4" scope="row">
+		<label>x-axis</label>
+	</th>
+	<td>
+		<select name="xaxis" id="xaxis" onchange="updatePlot()">
+		<option selected="selected" value="semimajoraxis">Semi-major axis [AU]</option>
+		<option value="mass">Mass [MJup]</option>
+		<option value="radius">Radius [RJup]</option>
+		<option value="period">Period [days]</option>
+		<option value="eccentricity">Eccentricity</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
+		<option value="age">Stellar age [Gyrs]</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="logscalex"><input checked="checked" name="logscale" type="checkbox" value="x" id="logscalex" onclick="updatePlot()"/>Logarithmic scale</label>
+
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="xrangeauto"><input checked="checked" name="xrangeauto" type="checkbox" value="a" id="xrangeauto" onclick="xrangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td id="xrangerow" style="display:none;">
+		range = [<input type="text" name="xrangel" size="8" value="0" onkeyup="xrangeUpdate()"/>,
+		<input type="text" name="xranger" size="8" value="0" onkeyup="xrangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<th rowspan="4" scope="row">
+		<label>y-axis</label>
+	</th>
+	<td>
+		<select name="yaxis" id="yaxis" onchange="updatePlot()">
+		<option value="semimajoraxis">Semi-major axis [AU]</option>
+		<option selected="selected" value="mass">Mass [MJup]</option>
+		<option value="radius">Radius [RJup]</option>
+		<option value="eccentricity">Eccentricity</option>
+		<option value="period">Period [days]</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
+		<option value="age">Stellar age [Gyrs]</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="logscaley"><input checked="checked" name="logscale" type="checkbox" value="y" id="logscaley" onclick="updatePlot()"/>Logarithmic scale</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="yrangeauto"><input checked="checked" name="yrangeauto" type="checkbox" value="a" id="yrangeauto" onclick="yrangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td id="yrangerow" style="display:none;">
+		range = [<input type="text" name="yrangel" size="8" value="0" onkeyup="yrangeUpdate()"/>,
+		<input type="text" name="yranger" size="8" value="0" onkeyup="yrangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<th rowspan="4" scope="row">
+		<label>Color</label>
+	</th>
+	<td>
+		<select name="coloraxis" id="coloraxis" onchange="updatePlot();colorrangeUpdate();">
+		<option value="none">Constant</option>
+		<option value="discoverymethod">Discoverymethod</option>
+		<option value="semimajoraxis">Semi-major axis [AU]</option>
+		<option value="mass">Mass [MJup]</option>
+		<option selected="selected" value="radius">Radius [RJup]</option>
+		<option value="eccentricity">Eccentricity</option>
+		<option value="period">Period [days]</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
+		<option value="age">Stellar age [Gyrs]</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td id="logscalecolorrow">
+		<label for="logscalecolor"><input name="logscalecolor" type="checkbox" value="color" id="logscalecolor" onclick="updatePlot()"/>Logarithmic scale</label>
+
+	</td>
+</tr>
+<tr>
+	<td id="colorrangeautorow">
+		<label for="colorrangeauto"><input checked="checked" name="colorrangeauto" type="checkbox" value="a" id="colorrangeauto" onclick="colorrangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td id="colorrangerow" style="display:none;">
+		range = [<input type="text" name="colorrangel" size="8" value="0" onkeyup="colorrangeUpdate()"/>,
+		<input type="text" name="colorranger" size="8" value="0" onkeyup="colorrangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<th rowspan="5" scope="row">
+		<label>Point size</label>
+	</th>
+	<td>
+		<select name="sizeaxis" id="sizeaxis" onchange="updatePlot();sizerangeUpdate();">
+		<option selected="selected" value="none">Constant</option>
+		<option value="semimajoraxis">Semi-major axis [AU]</option>
+		<option value="mass">Mass [MJup]</option>
+		<option value="radius">Radius [RJup]</option>
+		<option value="eccentricity">Eccentricity</option>
+		<option value="period">Period [days]</option>
+		<option value="temperature">Temperature [K]</option>
+		<option value="inclination">Inclination [deg]</option>
+		<option value="discoveryyear">Discoveryyear</option>
+		<option value="numberofplanetsinsystem">Number of planets in system</option>
+		<option value="numberofstarsinsystem">Number of stars in system</option>
+		<option value="declination">Declination [deg]</option>
+		<option value="rightascension">Right ascension [h]</option>
+		<option value="distance">Distance from Earth [pc]</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td id="logscalesizerow" style="display:none;">
+		<label for="logscalesize"><input name="logscalesize" type="checkbox" value="size" id="logscalesize" onclick="updatePlot()"/>Logarithmic scale</label>
+
+	</td>
+</tr>
+<tr>
+	<td id="sizerangeautorow" style="display:none;">
+		<label for="sizerangeauto"><input checked="checked" name="sizerangeauto" type="checkbox" value="a" id="sizerangeauto" onclick="sizerangeUpdate()"/>Automatic range</label>
+	</td>
+</tr>
+<tr>
+	<td id="sizerangerow" style="display:none;">
+		range = [<input type="text" name="sizerangel" size="8" value="0" onkeyup="sizerangeUpdate()"/>,
+		<input type="text" name="sizeranger" size="8" value="0" onkeyup="sizerangeUpdate()"/>]
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="sizemax">Maximum point size = <input type="text" name="sizemax" id="sizemax" size="3" value="4" onkeyup="sizerangeUpdate()"/></label>
+		
+	</td>
+</tr>
+<tr>
+	<th rowspan="6" scope="row">
+	Detection methods
+	</th>
+	<td>
+		<label for="filter_transit"><input checked="checked" name="discoveryfilter" type="checkbox" value="transit" id="filter_transit" onclick="updatePlot()"/>Transiting planets</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="filter_rv"><input checked="checked" name="discoveryfilter" type="checkbox" value="RV" id="filter_rv" onclick="updatePlot()"/>Radial velocity planets</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="filter_microlensing"><input checked="checked" name="discoveryfilter" type="checkbox" value="microlensing" id="filter_microlensing" onclick="updatePlot()"/>Microlensing planets</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="filter_imaged"><input checked="checked" name="discoveryfilter" type="checkbox" value="imaging" id="filter_imaged" onclick="updatePlot()"/>Directly imaged planets</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="filter_timing"><input checked="checked" name="discoveryfilter" type="checkbox" value="timing" id="filter_timing" onclick="updatePlot()"/>Planets found by pulsar timing</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="filter_other"><input checked="checked" name="discoveryfilter" type="checkbox" value="" id="filter_other" onclick="updatePlot()"/>Planets found by other methods</label>
+	</td>
+</tr>
+<tr>
+	<th rowspan="3" scope="row">
+	Stellar multiplicity
+	</th>
+	<td>
+		<label for="stellarmultiplicity_all"><input checked="checked" name="stellarmultiplicity" type="radio" value="all" id="stellarmultiplicity_all" onclick="updatePlot()"/>All planets</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="stellarmultiplicity_ptype"><input name="stellarmultiplicity" type="radio" value="ptype" id="stellarmultiplicity_circumbinary" onclick="updatePlot()"/>Only circumbinary planets, P-type</label>
+	</td>
+</tr>
+<tr>
+	<td>
+		<label for="stellarmultiplicity_stype"><input name="stellarmultiplicity" type="radio" value="stype" id="stellarmultiplicity_stype" onclick="updatePlot()"/>Only planets around stars with<br />a wide binary companion, S-type</label>
+	</td>
+</tr>
+<tr>
+	<th rowspan="1" scope="row">
+	Export
+	</th>
+	<td>
+		<input type="button" onclick="saveaspng()" value="Save plot as png file" />
+	</td>
+</tr>
+</tbody>
+</table>
+<!-- ########################### -->
+<script type="text/javascript">
+// This specifies the data source.
+// github is fast and reliable. The file in this repository is always up-to-date.
+// github uses gzip compression which reduces the size of the entire database to only 100KB.
+// However, your browser must allow script to be loaded from other websites.
+//var source = "https://raw.github.com/hannorein/oec_iphone/master/data_iphone_9.1/systems.xml";
+// You can always load a file in the same directory. This also works with local files if you do
+// not have access to the internet. 
+var source = "/systems.xml";
+
+// Load data and update plot for the first time.
+var xmldata = null;
+d3.xml(source, "application/xml", function(xml) {
+	xmldata = xml;
+	updatePlot(true);	
+});
+
+
+// Function returning the value specified by key for a given planet 
+function getValueForPlanetAndKey(planet,key,returnhtml){
+	returnhtml = (typeof returnhtml === "undefined") ? false : returnhtml;
+
+	switch (key){
+		case "numberofplanetsinsystem":
+			var system = $(planet).parents("system");
+			return system.find("planet").length;
+		
+		case "numberofstarsinsystem":
+			var system = $(planet).parents("system");
+			return system.find("star").length;
+			
+		case "declination":
+		case "rightascension":
+			var system = $(planet).parents("system");
+			var vals = $(key,system).text().split(" ");
+			return parseFloat(vals[0]) + parseFloat(vals[1])/60. + parseFloat(vals[2])/3600.;
+
+		case "distance":
+			var system = $(planet).parents("system");
+			return parseFloat($(key,system).text());
+		
+		case "age":
+			var star = $(planet).parents("star");
+			return parseFloat($(key,star).text());
+
+		case "discoverymethod":
+ 			var discoverymethod = $("> "+key,planet).text();
+			if (discoverymethod.length){
+				return discoverymethod;
+			}else{
+				return notAvailableString;
+			}
+			
+
+		default:
+			if (returnhtml){
+ 				return getFormatForTag($("> "+key,planet));
+			}else{
+ 				return parseFloat($("> "+key,planet).text());
+			}
+
+	}
+}
+
+// Function to save the svg data (vector graphic) as a png file (bitmap). 
+// It draws the content to an HTML5 canvas and then redirects the bowser to a data url.
+function saveaspng(){
+	d3.select("body").append("canvas")
+		.attr("width",width)	
+		.attr("height",height)	
+		.attr("id","canvas")
+		.style("display","none")
+		;	
+	canvg('canvas', $("#viz").html());
+	window.location = document.getElementById("canvas").toDataURL("image/png");
+}
+
+// *** Setting up the SVG ***
+var width 	= 600;
+var height 	= 500;
+var paddingt 	= 10;
+var paddingb 	= 35;
+var paddingl 	= 65;
+var paddingr 	= 10;
+
+var viz = d3.select("#viz")
+	.append("svg")
+	.attr("width", width)
+	.attr("height", height)
+	;    
+
+// *** Setup Axis ***
+var gxaxis = viz.append("g")
+	.attr("transform", "translate(0," + (height - paddingb-paddingt) + ")");
+	;
+var gyaxis = viz.append("g")
+	.attr("transform", "translate(" + paddingl + ", 0)")
+	;
+var gxaxislabel = viz.append("text")
+	.attr("text-anchor", "middle")
+	.attr("x", width/2.)
+	.attr("y", height - 6)
+	;
+var gyaxislabel = viz.append("text")
+	.attr("text-anchor", "middle")
+	.attr("x", -height/2.)
+	.attr("y", 12)
+	.attr("transform", "rotate(-90)")
+	;
+	
+	
+// *** Setup Domains ***
+var xDomain;
+var yDomain;
+var colorDomain;
+var sizeDomain;  
+var sizemax;
+
+function xrangeUpdate(){
+	if($("#xrangeauto").is(":checked")){
+		$("#xrangerow").hide();
+		updatePlot();
+	}else{
+		$("#xrangerow").show();
+		var xrangel = $("input[name=xrangel]").val();
+		var xranger = $("input[name=xranger]").val();
+		if (xrangel!=xDomain[0] || xranger!=xDomain[1]){
+			xDomain = [xrangel,xranger];
+			updatePlot();
+		}
+	}
+}
+function yrangeUpdate(){
+	if($("#yrangeauto").is(":checked")){
+		$("#yrangerow").hide();
+		updatePlot();
+	}else{
+		$("#yrangerow").show();
+		var yrangel = $("input[name=yrangel]").val();
+		var yranger = $("input[name=yranger]").val();
+		if (yrangel!=yDomain[0] || yranger!=yDomain[1]){
+			yDomain = [yrangel,yranger];
+			updatePlot();
+		}
+	}
+}
+function colorrangeUpdate(){
+	if(colorkey=="none"){
+		$("#colorrangeautorow").hide();
+		$("#logscalecolorrow").hide();
+	}else{
+		$("#colorrangeautorow").show();
+		$("#logscalecolorrow").show();
+	}
+	if(d3.select("#colorrangeauto").node().checked){
+		$("#colorrangerow").hide();
+		updatePlot();
+	}else{
+		$("#colorrangerow").show();
+		var newcolorDomain = [ parseFloat(d3.select("[name=colorrangel]").node().value), parseFloat(d3.select("[name=colorranger]").node().value) ];
+		if (newcolorDomain[0]!=colorDomain[0] || newcolorDomain[1]!=colorDomain[1]){
+			colorDomain = newcolorDomain;
+			updatePlot();
+		}
+	}
+}
+
+function sizerangeUpdate(){
+	if(sizekey=="none"){
+		$("#sizerangeautorow").hide();
+		$("#logscalesizerow").hide();
+	}else{
+		$("#sizerangeautorow").show();
+		$("#logscalesizerow").show();
+	}
+	if(d3.select("#sizerangeauto").node().checked){
+		$("#sizerangerow").hide();
+		updatePlot();
+	}else{
+		$("#sizerangerow").show();
+		var newsizeDomain = [ parseFloat(d3.select("[name=sizerangel]").node().value), parseFloat(d3.select("[name=sizeranger]").node().value) ];
+		var newsizemax = parseFloat($("#sizemax").val());
+		if (newsizeDomain[0]!=sizeDomain[0] || newsizeDomain[1]!=sizeDomain[1] || newsizemax!=sizemax){
+			sizeDomain = newsizeDomain;
+			updatePlot();
+		}
+	}
+}
+
+var colorkey;
+var colorScale;
+var sizekey;
+var sizeScale;
+var logscalesize;
+var logscalecolor;
+var i = 0;
+
+function getColor(planet){
+	switch (colorkey){
+		case "discoverymethod":
+ 			var text = $(colorkey,planet).text();
+			if (text=="RV") return "red";
+			if (text=="transit") return "green";
+			if (text=="imaging") return "blue";
+			if (text=="timing") return "yellow";
+			if (text=="microlensing") return "purple";
+			return "gray";
+		default:
+			var val = getValueForPlanetAndKey(planet,colorkey);
+			if (isNaN(val)) return "gray";
+			if (logscalecolor && val<=0.) return "#eee";
+			return d3.hsl(120.-colorScale(val), 1, 0.5);
+	}
+
+}
+
+function getSize(planet){
+	switch (sizekey){
+		case "none":
+			return sizemax; // will set all points sizes to sizemax
+
+		default:
+			var val = getValueForPlanetAndKey(planet,sizekey);
+			if (isNaN(val)) return 0;
+			return sizeScale(val);
+	}
+}
+
+var updatePlot = function(first){ 
+	var discoveryfilter = d3.selectAll("input[name=discoveryfilter]:checked");
+	var stellarmultiplicity = $("input:radio[name=stellarmultiplicity]:checked").val();
+
+	var xkey 	= $("#xaxis option:selected").val();
+	var ykey 	= $("#yaxis option:selected").val();
+	colorkey 	= $("#coloraxis option:selected").val();
+	sizekey  	= $("#sizeaxis option:selected").val();
+
+	var xlabel 	= $("#xaxis option:selected").text();
+	var ylabel    	= $("#yaxis option:selected").text();
+	var colorlabel	= $("#coloraxis option:selected").text();
+	var sizelabel 	= $("#sizeaxis option:selected").text();
+
+	var logscalex 	= $("#logscalex").is(":checked");
+	var logscaley 	= $("#logscaley").is(":checked");
+	logscalecolor 	= $("#logscalecolor").is(":checked");
+	logscalesize  	= $("#logscalesize").is(":checked");
+
+	sizemax = parseFloat($("#sizemax").val());
+
+	var planets;
+	switch(stellarmultiplicity){
+		case "all":
+			planets = $("planet",xmldata);
+			break;
+		case "ptype":
+			planets = $("binary > planet",xmldata);
+			break;
+		case "stype":
+			planets = $("binary > star > planet",xmldata);
+			break;
+	}
+	var planetsCache =  Array();
+	var planetsFilteredN = 0;
+	
+	var planetsFiltered = jQuery.grep(planets,function(d,i) {
+		var discoverymethod = $("discoverymethod",d).text();
+		var isInSelection = false;
+		discoveryfilter[0].forEach(function(d){
+			if(d.value==discoverymethod){
+				isInSelection = true;
+			}
+		});
+		if (!isInSelection){
+			return false;
+		}
+		var valx = getValueForPlanetAndKey(d,xkey);
+		if(isNaN(valx)) return false;
+		if(logscalex && valx<=0.) return false;
+		var valy = getValueForPlanetAndKey(d,ykey);
+		if(isNaN(valy)) return false;
+		if(logscaley && valy<=0.) return false;
+		planetsCache[planetsFilteredN] = [valx,valy];
+		planetsFilteredN = planetsFilteredN + 1;
+		return true;
+	});
+	if($("#xrangeauto").is(":checked")){
+		xDomain = d3.extent(planetsFiltered, function(d,i) { 
+				return planetsCache[i][0];
+			});
+		$("input[name=xrangel]").val(xDomain[0]);
+		$("input[name=xranger]").val(xDomain[1]);
+	}
+
+	if($("#yrangeauto").is(":checked")){
+		yDomain = d3.extent(planetsFiltered, function(d,i) { 
+				return planetsCache[i][1];
+			});
+		$("input[name=yrangel]").val(yDomain[0]);
+		$("input[name=yranger]").val(yDomain[1]);
+	}
+	if(d3.select("#colorrangeauto").node().checked){
+		colorDomain = d3.extent(planetsFiltered, function(d) { 
+				return getValueForPlanetAndKey(d,colorkey); 
+			});
+		d3.select("[name=colorrangel]").node().value = colorDomain[0];
+		d3.select("[name=colorranger]").node().value = colorDomain[1];
+	}
+	if(d3.select("#sizerangeauto").node().checked){
+		sizeDomain = d3.extent(planetsFiltered, function(d) { 
+				return getValueForPlanetAndKey(d,sizekey); 
+			});
+		d3.select("[name=sizerangel]").node().value = sizeDomain[0];
+		d3.select("[name=sizeranger]").node().value = sizeDomain[1];
+	}
+
+	var xScale;
+	if (logscalex){
+		xScale = d3.scale.log();
+	}else{
+		xScale = d3.scale.linear();
+	}
+	xScale.domain(xDomain)
+		.clamp(true)
+		.range([paddingl, width-paddingl-paddingr]);
+	var yScale;
+	if (logscaley){
+		yScale = d3.scale.log();
+	}else{
+		yScale = d3.scale.linear();
+	}
+	yScale.domain(yDomain)
+		.clamp(true)
+		.range([height - paddingb-paddingt,paddingt]);
+	if (logscalecolor){
+		colorScale = d3.scale.log();
+	}else{
+		colorScale = d3.scale.linear();
+	}
+	colorScale.domain(colorDomain)
+		.clamp(true)
+		.range([0,120]);
+	if (logscalesize){
+		sizeScale = d3.scale.log();
+	}else{
+		sizeScale = d3.scale.linear();
+	}
+	sizeScale.domain(sizeDomain)
+		.clamp(true)
+		.range([0,sizemax]);
+
+
+  	var circle = viz.selectAll("circle")
+		.data(planetsFiltered,function(d) {return $("name:first",d).text(); });
+
+	circle.enter().append("circle")
+		.attr("cx", 	function(d,i) { return xScale(planetsCache[i][0]); })
+		.attr("cy", 	function(d,i) { return yScale(planetsCache[i][1]); })
+		.attr("r",  	function(d) { return getSize(d); })
+		.style("fill", 	function(d) { return getColor(d); })
+		.style("stroke", "black")
+		.style("opacity",(first?1:0))
+		.on("click", function(d) {
+			document.location.href = "/system.html?id=" + $(d.getElementsByTagName("name")[0]).text();
+		})
+		.on("mouseout", function(d){
+			d3.select("#pop-up").style("display","none");
+		})
+		.on("mousemove", function(){
+			d3.select("#pop-up").style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+		})
+		;
+
+
+	circle
+		.on("mouseover", function(d){
+			var name = $(d.getElementsByTagName("name")[0]).text();
+			var description = $(d.getElementsByTagName("description")[0]).text();
+			d3.select("#pop-up").style("display","inline");
+			d3.select("#pop-up-title").html(name);
+			if (description){
+				d3.select("#pop-up-description").html(description);
+			}else{
+				d3.select("#pop-up-description").html("");
+			}
+			var values = "";
+			values += 		 "<span class=\"popupvalue\">" +	xlabel + ":</span>" + getValueForPlanetAndKey(d,xkey,true)
+					+  "<br /><span class=\"popupvalue\">" +	ylabel + ":</span>" + getValueForPlanetAndKey(d,ykey,true);
+			if (colorkey!="none"){
+				values +=  "<br /><span class=\"popupvalue\">" +	colorlabel + ":</span>" + getValueForPlanetAndKey(d,colorkey,true);
+			}
+			if (sizekey!="none"){
+				values +=  "<br /><span class=\"popupvalue\">" +	sizelabel + ":</span>" + getValueForPlanetAndKey(d,sizekey,true);
+			}
+
+			$("#pop-up-values").html(values);
+
+		})
+		.transition()
+		.duration( (first?0:500) )
+		.attr("cx", 	function(d,i) { return xScale(planetsCache[i][0]); })
+		.attr("cy", 	function(d,i) { return yScale(planetsCache[i][1]); })
+		.attr("r",  	function(d) { return getSize(d); })
+		.style("fill", 	function(d) { return getColor(d); })
+		.style("opacity",1)
+		;
+
+	circle.exit()
+		.transition()
+		.style("opacity",0)
+		.remove();
+
+
+	
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.ticks(5)
+		.orient("bottom");
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.ticks(5)
+		.orient("left");
+
+	if (first){
+		gxaxis.call(xAxis);
+		gyaxis.call(yAxis);
+	}else{
+		gxaxis.transition().call(xAxis);
+		gyaxis.transition().call(yAxis);
+	}
+	gxaxis.selectAll("path,line")
+		.style("fill","none")
+		.style("stroke","black");
+	gyaxis.selectAll("path,line")
+		.style("fill","none")
+		.style("stroke","black");
+			
+	gxaxislabel.text(xlabel);
+	gyaxislabel.text(ylabel);
+
+};
+
+    
+</script>
+<div class="spacer" style="clear:left"></div>
+
+<!-- ########################### -->
+<h2><img src="/static/img/xml.png" alt="star" />Data download</h2>
+<p>
+The data presented in this plot is taken from the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a>. All information on this page is directly generated from the XML files in the catalogue. If you are interested in how, look at the source code. You can download the entire catalogue on <a href="https://github.com/hannorein/open_exoplanet_catalogue/">github</a>. You can also find ASCII tables of the same catalogue <a href="https://github.com/hannorein/oec_tables/">in a separate repository</a>. Some information, especially in the case of a binary system cannot be easily represented in an ASCII table. You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
+</p>
+
+
+{% endblock content %}
