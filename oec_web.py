@@ -216,23 +216,6 @@ def page_histogram():
 def page_systems_xml():
     return fullxml
 
-#abort(404)
-# Implement later
-#@app.route('/system/<systemname>')
-#@app.route('/system/<systemname>/')
-#def page_system(systemname):
-#    xmlPair = systemXmlPairs[systemname]
-#    system,planet,filename = xmlPair
-#    
-#    systemtable = []
-#    for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
-#        systemtable.append((fieldtitles[row],render(xmlPair,row)))
-#
-#    return render_template("system.html",
-#        systemname=render(xmlPair,"systemname"),
-#        systemtable=systemtable,
-#        systemcategory=render(xmlPair,"systemcategory"),
-#        )
 
 if __name__ == '__main__':
     app.run(debug=True)
