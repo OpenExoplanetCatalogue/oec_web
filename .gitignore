@@ -2,6 +2,6 @@
 *.swp
 venv/
 *.pyc
-open_exoplanet_catalogue/
-oec_meta/
+open_exoplanet_catalogue
+oec_meta
 oec_outreach
