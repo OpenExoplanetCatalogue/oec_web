@@ -5,8 +5,9 @@ import urllib
 import visualizations 
 import oec_filters
 import oec_fields
+import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
-from flask import Flask, abort, render_template, send_from_directory, request, redirect
+from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
@@ -76,12 +77,20 @@ def page_planet_redirect():
 
 #################
 
+@app.route('/plot/<plotname>/')
+@app.route('/plot/<plotname>')
+@app.route('/plot/<plotname>.svg')
+def page_plot(plotname):
+    plotFunction = getattr(oec_plots, plotname)
+    return  Response(plotFunction(oec_meta_statistics),  mimetype='image/svg+xml')
+
 @app.route('/')
 @app.route('/index.html')
 def page_main():
     contributors = []
     for c in oec_meta_statistics.findall(".//contributor"):
         contributors.append(c.text)
+
     return render_template("index.html",
             numplanets=len(planets),
             numsystems=numsystems,
