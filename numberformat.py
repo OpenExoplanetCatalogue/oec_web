@@ -1,7 +1,7 @@
 # Formats a number tag in the OEC XML format.
 # <tag errorplus="0.1" errorminus="0.2">1.0</tag>
-
 from math import *
+
 def toFixed(f,digits):
     formatstring = "%%.%df"%digits
     return formatstring % f
@@ -188,3 +188,22 @@ def getText(obj,tag,default=None):
     if v is not None:
         return v.text
     return default 
+
+def getCoordinates(obj):
+    ra = obj.find("./rightascension")
+    dec = obj.find("./declination")
+    if ra is None or dec is None:
+        return None
+    ra = ra.text.split(" ")
+    dec = dec.text.split(" ")
+    raf = float(ra[0])
+    decf = float(dec[0])
+    sign = 1.
+    if decf<0.:
+        sign = -1.
+    raf += float(ra[1])/24.
+    decf += sign*float(dec[1])/60.
+    raf += float(ra[2])/24./60.
+    decf += sign*float(dec[2])/60./60.
+    return raf/24.*2.*pi,decf/360.*2.*pi
+

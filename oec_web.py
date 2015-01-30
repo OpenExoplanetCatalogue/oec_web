@@ -20,6 +20,7 @@ numsystems = 0
 planets = []
 stars = []
 binaries = []
+systems = []
 planetXmlPairs = {}
 systemXmlPairs = {}
 
@@ -33,6 +34,7 @@ for filename in glob.glob(OEC_PATH + "systems/*.xml"):
     filename = filename[len(OEC_PATH):]
     # Try to parse file
     root = ET.fromstring(xml)
+    systems.append(root)
     numsystems +=1
     pstars = root.findall("./star")
     for p in root.findall(".//planet"):
@@ -81,8 +83,11 @@ def page_planet_redirect():
 @app.route('/plot/<plotname>')
 @app.route('/plot/<plotname>.svg')
 def page_plot(plotname):
-    plotFunction = getattr(oec_plots, plotname)
-    return  Response(plotFunction(oec_meta_statistics),  mimetype='image/svg+xml')
+    if plotname=="discoveryyear":
+        return  Response(oec_plots.discoveryyear(oec_meta_statistics),  mimetype='image/svg+xml')
+    if plotname=="skypositions":
+        return  Response(oec_plots.skypositions(systems),  mimetype='image/svg+xml')
+    abort(404)
 
 @app.route('/')
 @app.route('/index.html')
