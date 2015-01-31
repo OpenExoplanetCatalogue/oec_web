@@ -41,29 +41,17 @@ function getShader ( gl, id ){
    return shader;
 }
 
-var gl, line_prog, 
-    delay = 50, transl = -50, xOffs = yOffs = 0,  drag  = 0,  xRot = yRot = 0, zOff =  0, 
-     lines = [];
-var I;
-var r0 = 0.02, G = 1.1774e-4;
-var r03 = r0*r0*r0;
-var dt = .001;
-var t = 0;
-var x = [], y = [], z = [], vx = [], vy = [], vz = [], ax = [], ay = [], az = [];
-var m = [];
-m[0] = 1/G; m[1] = 1/G; m[2] = 1/G;
+var gl, line_prog, transl = -50, xOffs = yOffs = 0,  drag  = 0,  xRot = yRot = 0, lines = [];
 var mvMatrix = new CanvasMatrix4(),
     prMatrix = new CanvasMatrix4(),
     rotMat = new CanvasMatrix4();
 var mvMatLoc = [], mvMatLine, lineLoc;
 var M=60, N=3, K=12;
-var support=true;
 
 function webGLStart() {
    var canvas1 = document.getElementById("canvas1");
    try { gl = canvas1.getContext("experimental-webgl");
    } catch(e) {}
-   if ( !gl ) { var support=false; return support;} else { var support = true; }
 
    line_prog  = gl.createProgram();
    gl.attachShader(line_prog, getShader( gl, "line-vs" ));
@@ -72,44 +60,39 @@ function webGLStart() {
    gl.bindAttribLocation(line_prog, lineLoc, "aPos");
    gl.linkProgram(line_prog);
 
-
    rotMat.makeIdentity();
    prMatrix.perspective(3, 1, 1, 1000);
 
-
    mvMatLine = gl.getUniformLocation(line_prog,"mvMatrix");
    gl.useProgram(line_prog);
-   gl.uniformMatrix4fv( gl.getUniformLocation(line_prog,"prMatrix"),
-      false, new Float32Array(prMatrix.getAsArray()) );
+   gl.uniformMatrix4fv( gl.getUniformLocation(line_prog,"prMatrix"), false, new Float32Array(prMatrix.getAsArray()) );
    init();
 
-  canvas1.onmousedown = function ( ev ){
-     drag  = 1;
-     xOffs = ev.clientX;  yOffs = ev.clientY;
-  }
-  canvas1.onmouseup = function ( ev ){
-     drag  = 0;
-     xOffs = ev.clientX;  yOffs = ev.clientY;
-  }
-  canvas1.onmousemove = function ( ev ){
-     if ( drag == 0 ) return;
-     if ( ev.shiftKey ) {
-        transl *= 1 + (ev.clientY - yOffs)/100;
-     } else {
-        yRot = - xOffs + ev.clientX;  
-	xRot = - yOffs + ev.clientY; 
-     }
-     xOffs = ev.clientX;  yOffs = ev.clientY;
-  }
+   canvas1.onmousedown = function ( ev ){
+      drag  = 1;
+      xOffs = ev.clientX;  yOffs = ev.clientY;
+   }
+   canvas1.onmouseup = function ( ev ){
+      drag  = 0;
+      xOffs = ev.clientX;  yOffs = ev.clientY;
+   }
+   canvas1.onmousemove = function ( ev ){
+      if ( drag == 0 ) return;
+      if ( ev.shiftKey ) {
+         transl *= 1 + (ev.clientY - yOffs)/100;
+      } else {
+         yRot = - xOffs + ev.clientX;  
+ 	xRot = - yOffs + ev.clientY; 
+      }
+      xOffs = ev.clientX;  yOffs = ev.clientY;
+   }
 
-  return support;
 }
 
 function init(){
-   delay = 50; transl = -50; 
+   transl = -50; 
    xRot = 0; yRot = 0;
    xOffs = 0; yOffs = 0;  
-   zOff =  0;
    drag  = 0;  
    var as = [];
    var ac = [];
@@ -163,56 +146,25 @@ function init(){
    }
 
    lines = [];
-   x[0]=  0.000000; y[0]= -0.070947; z[0] = 0; 
-   x[1]= -0.000000; y[1]=  1.075903; z[1] = 0; 
-   x[2]= -0.000000; y[2]= -1.004957; z[2] = 0; 
-   vx[0]=  1.231869; vy[0]=  0.000000; vz[0] = 0; 
-   vx[1]= -0.195090; vy[1]=  0.000000; vz[1] = 0; 
-   vx[2]= -1.036779; vy[2]= -0.000000; vz[2] = 0; 
-
-   for (var j=0; j<N; j++) {
-	ax[j] = 0; ay[j] = 0; az[j] = 0; 
-	for (var i=0; i<N; i++) {
-	    if (i != j) {
-		xdiff = x[j] - x[i];
-		ydiff = y[j] - y[i];
-		zdiff = z[j] - z[i];
-		r = Math.sqrt(xdiff*xdiff + ydiff*ydiff + zdiff*zdiff);
-		r3 = r*r*r;
-		if (r3<r03) r3=r03;
-		ax[j] -= G * m[i] * (x[j] - x[i])/r3;
-		ay[j] -= G * m[i] * (y[j] - y[i])/r3;
-		az[j] -= G * m[i] * (z[j] - z[i])/r3;
-	    }
-	}
-   }
 
    for (var i = 0; i < N; i++ ){
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
      for (var j=0; j<M; j++) {
-       lines.push( pathx[i][j], pathy[i][j], pathz[i][j] + zOff);
+       lines.push( pathx[i][j], pathy[i][j], pathz[i][j] );
      }
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
    }
-   lines.push( 0,0,zOff, 1.3,0,zOff, 0,0,zOff, 0,1.3,zOff, pathx[0][0],0,zOff, 0,0,1.3+zOff);
 
    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array( lines ),gl.STATIC_DRAW);
    gl.vertexAttribPointer(lineLoc, 3, gl.FLOAT, false, 0, 0);
-   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
 
    gl.enableVertexAttribArray( lineLoc );
 
-   gl.enable(gl.DEPTH_TEST);
-   gl.depthFunc(gl.LEQUAL);
-   gl.clearDepth(1.0);
    gl.clearColor(0, 0, 0, 1);
-   z[0] += zOff;
-   z[1] += zOff;
-   z[2] += zOff;
-   timer = setInterval(draw3d, delay);
+   timer = setInterval(draw3d, 1./60.*1000.);
 }
 
 function draw3d(){
