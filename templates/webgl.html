@@ -1,0 +1,519 @@
+<html><head>
+<script src="/static/js/CanvasMatrix.js" type="text/javascript"></script>
+
+<script id="shader-vs-c" type="x-shader/x-vertex"> 
+  attribute vec3 aPos; // Normals = Pos
+  uniform mat4 mvMatrix;
+  uniform mat4 prMatrix;
+  varying vec4 colorc, colorm, colory;
+  const vec4 dirDif = vec4(0., 0., 1., 0.);
+void main(void) {
+   gl_Position = prMatrix * mvMatrix * vec4( 0.3451*aPos, 1.);
+   vec4 rotNorm = mvMatrix * vec4(aPos, .0);
+   float c = 4.;
+   float i = max( 0., dot(rotNorm, dirDif) );
+   colorc = vec4(i, c*i, c*i, 1.);
+   colorm = vec4(c*i, i, c*i, 1.);
+   colory = vec4(c*i, c*i, i, 1.);
+}
+</script> 
+ 
+<script id="shader-fs-c" type="x-shader/x-fragment"> 
+precision mediump float;
+  varying vec4 colorc;
+void main(void) {
+   gl_FragColor = colorc;
+}
+</script> 
+
+<script id="line-vs" type="x-shader/x-vertex"> 
+  attribute vec3 aPos;
+  attribute vec3 aColor;
+  uniform mat4 mvMatrix;
+  uniform mat4 prMatrix;
+  varying vec4 color;
+void main(void) {
+   gl_Position = prMatrix * mvMatrix * vec4( aPos, 1.);
+   color = vec4(aColor, 1.);
+}
+</script> 
+ 
+<script id="line-fs" type="x-shader/x-fragment"> 
+precision mediump float;
+  varying vec4 color;
+void main(void) {
+   gl_FragColor = color;
+}
+</script> 
+
+<script type="text/javascript"> 
+
+function getShader ( gl, id ){
+   var shaderScript = document.getElementById ( id );
+   var str = "";
+   var k = shaderScript.firstChild;
+   while ( k ){
+     if ( k.nodeType == 3 ) str += k.textContent;
+     k = k.nextSibling;
+   }
+   var shader;
+   if ( shaderScript.type == "x-shader/x-fragment" )
+           shader = gl.createShader ( gl.FRAGMENT_SHADER );
+   else if ( shaderScript.type == "x-shader/x-vertex" )
+           shader = gl.createShader(gl.VERTEX_SHADER);
+   else return null;
+   gl.shaderSource(shader, str);
+   gl.compileShader(shader);
+   if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) == 0)
+      alert(gl.getShaderInfoLog(shader));
+   return shader;
+}
+
+var gl, prog = [], line_prog, 
+    delay = 50, transl = -50, xOffs = yOffs = 0,  drag  = 0,  xRot = yRot = 0, zOff =  0, 
+    nFaces, lines = [];
+var I;
+var r0 = 0.02, G = 1.1774e-4;
+var r03 = r0*r0*r0;
+var dt = .001;
+var t = 0;
+var showTraj = true;
+var counterRot = false;
+var pauseRun = true;
+var warp = 1e-1;
+var x = [], y = [], z = [], vx = [], vy = [], vz = [], ax = [], ay = [], az = [];
+var m = [];
+m[0] = 1/G; m[1] = 1/G; m[2] = 1/G;
+var mvMatrix = new CanvasMatrix4(),
+    prMatrix = new CanvasMatrix4(),
+    rotMat = new CanvasMatrix4();
+var mvMatLoc = [], mvMatLine, posLoc, lineLoc, colorLoc;
+var M=60, N=3, K=12;
+var oldtheta=0;
+var support=true;
+
+function webGLStart() {
+   var canvas1 = document.getElementById("canvas1");
+   try { gl = canvas1.getContext("experimental-webgl");
+   } catch(e) {}
+   if ( !gl ) {alert("Your browser does not support WebGL"); 
+	   document.write("To download a WebGL enabled browser, ");
+	   document.write("visit:  <a href='http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation'>http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation</a> ");
+	   return;
+   }
+
+
+   for (var j=0; j<3; j++){
+     prog[j]  = gl.createProgram();
+       gl.attachShader(prog[j], getShader( gl, "shader-vs-c" ));
+       gl.attachShader(prog[j], getShader( gl, "shader-fs-c" ));
+     posLoc = 2;
+     gl.bindAttribLocation(prog[j], posLoc, "aPos");
+     gl.linkProgram(prog[j]);
+   }
+   line_prog  = gl.createProgram();
+   gl.attachShader(line_prog, getShader( gl, "line-vs" ));
+   gl.attachShader(line_prog, getShader( gl, "line-fs" ));
+   lineLoc = 0;
+   colorLoc = 1;
+   gl.bindAttribLocation(line_prog, lineLoc, "aPos");
+   gl.bindAttribLocation(line_prog, colorLoc, "aColor");
+   gl.linkProgram(line_prog);
+
+   var vertices = [], ind = [];
+   var nPhi = 20, nTheta = 10,
+     dPhi = 2*Math.PI/nPhi, dTheta = Math.PI/nTheta;
+   nFaces = nPhi * nTheta;
+   for (var i = 0; i <= nPhi; i++ ){
+      var Phi    = i * dPhi;
+      var cosPhi = Math.cos ( Phi );
+      var sinPhi = Math.sin ( Phi );
+      for (var j = 0; j <= nTheta; j++ ){
+         var Theta    = j * dTheta;
+         var cosTheta = Math.cos ( Theta );
+         var sinTheta = Math.sin ( Theta );
+         vertices.push( 0.2*cosPhi * sinTheta, -0.2*sinPhi * sinTheta, 0.2*cosTheta );
+      }
+   }
+   for (var i = 0; i < nPhi; i++ )
+      for (var j = 0; j < nTheta; j++ ){
+         ind.push( i*(nTheta+1) + j );
+         ind.push( (i+1)*(nTheta+1) + j );
+         ind.push( (i+1)*(nTheta+1) + j + 1 );
+         ind.push( i*(nTheta+1) + j + 1 );
+      }
+   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+   gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+
+   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(ind),
+     gl.STATIC_DRAW);
+
+   rotMat.makeIdentity();
+   prMatrix.perspective(3, 1, 1, 1000);
+
+   for (var j=0; j<3; j++){
+     mvMatLoc[j] = gl.getUniformLocation(prog[j],"mvMatrix");
+     gl.useProgram(prog[j]);
+     gl.uniformMatrix4fv( gl.getUniformLocation(prog[j],"prMatrix"),
+      false, new Float32Array(prMatrix.getAsArray()) );
+   }
+
+   mvMatLine = gl.getUniformLocation(line_prog,"mvMatrix");
+   gl.useProgram(line_prog);
+   gl.uniformMatrix4fv( gl.getUniformLocation(line_prog,"prMatrix"),
+      false, new Float32Array(prMatrix.getAsArray()) );
+   init();
+
+  canvas1.onmousedown = function ( ev ){
+     drag  = 1;
+     xOffs = ev.clientX;  yOffs = ev.clientY;
+  }
+  canvas1.onmouseup = function ( ev ){
+     drag  = 0;
+     xOffs = ev.clientX;  yOffs = ev.clientY;
+  }
+  canvas1.onmousemove = function ( ev ){
+     if ( drag == 0 ) return;
+     if ( ev.shiftKey ) {
+        transl *= 1 + (ev.clientY - yOffs)/100;
+//        yRot = - xOffs + ev.clientX; 
+     } else {
+        yRot = - xOffs + ev.clientX;  
+	xRot = - yOffs + ev.clientY; 
+     }
+     xOffs = ev.clientX;  yOffs = ev.clientY;
+  }
+
+  return support;
+}
+
+function getSupport() {
+   var canvas1 = document.getElementById("supportcanvas");
+   try { var gl = canvas1.getContext("experimental-webgl");
+   } catch(e) {}
+   if ( !gl ) { var support=false; return support;} else { var support = true; }
+   return support;
+}
+
+function init(){
+   delay = 50; transl = -50; 
+   xRot = 0; yRot = 0;
+   xOffs = 0; yOffs = 0;  
+   zOff =  0;
+   drag  = 0;  
+   var as = [];
+   var ac = [];
+   var bs = [];
+   var bc = [];
+   for (var i=0; i<N; i++){
+      as[i] = new Array(K);
+      ac[i] = new Array(K);
+      bs[i] = new Array(K);
+      bc[i] = new Array(K);
+   }
+   as[0][ 1]= 1.097640051076110; bc[0][ 1]=-0.108957450183278;
+   as[0][ 3]= 0.028090182332076; bc[0][ 3]= 0.032506096677853;
+   as[0][ 5]= 0.007235718283341; bc[0][ 5]= 0.003762748006231;
+   as[0][ 7]= 0.001210181377945; bc[0][ 7]= 0.001308690517932;
+   as[0][ 9]= 0.000397710135507; bc[0][ 9]= 0.000289369558798;
+   as[0][11]= 0.000096328571545; bc[0][11]= 0.000101643863860;
+
+   as[1][ 1]=-0.108957450183278; bc[1][ 1]= 1.097640051076109;
+   as[1][ 3]=-0.032506096677853; bc[1][ 3]=-0.028090182332075;
+   as[1][ 5]= 0.003762748006231; bc[1][ 5]= 0.007235718283341;
+   as[1][ 7]=-0.001308690517932; bc[1][ 7]=-0.001210181377945;
+   as[1][ 9]= 0.000289369558798; bc[1][ 9]= 0.000397710135507;
+   as[1][11]=-0.000101643863860; bc[1][11]=-0.000096328571545;
+
+   as[2][ 1]=-0.988682600892831; bc[2][ 1]=-0.988682600892830;
+   as[2][ 3]= 0.004415914345778; bc[2][ 3]=-0.004415914345778;
+   as[2][ 5]=-0.010998466289572; bc[2][ 5]=-0.010998466289572;
+   as[2][ 7]= 0.000098509139987; bc[2][ 7]=-0.000098509139987;
+   as[2][ 9]=-0.000687079694304; bc[2][ 9]=-0.000687079694304;
+   as[2][11]= 0.000005315292314; bc[2][11]=-0.000005315292314;
+
+   var pathx = [];
+   var pathy = [];
+   var pathz = [];
+   for (var i=0; i<N; i++){
+      pathx[i] = new Array(M);
+      pathy[i] = new Array(M);
+      pathz[i] = new Array(M);
+   }
+   for (var i=0; i<N; i++) {
+     for (var j=0; j<M; j++) {
+       pathx[i][j] = 0.0;
+       pathy[i][j] = 0.0;
+       pathz[i][j] = 0.0;
+       for (var k=1; k<K; k+=2) {
+         pathx[i][j] += as[i][k]*Math.sin(k*j*2*Math.PI/M);
+         pathy[i][j] += bc[i][k]*Math.cos(k*j*2*Math.PI/M);
+       }
+     }
+   }
+
+   var color = [];  
+   lines = [];
+   x[0]=  0.000000; y[0]= -0.070947; z[0] = 0; 
+   x[1]= -0.000000; y[1]=  1.075903; z[1] = 0; 
+   x[2]= -0.000000; y[2]= -1.004957; z[2] = 0; 
+   vx[0]=  1.231869; vy[0]=  0.000000; vz[0] = 0; 
+   vx[1]= -0.195090; vy[1]=  0.000000; vz[1] = 0; 
+   vx[2]= -1.036779; vy[2]= -0.000000; vz[2] = 0; 
+
+   for (var j=0; j<N; j++) {
+	ax[j] = 0; ay[j] = 0; az[j] = 0; 
+	for (var i=0; i<N; i++) {
+	    if (i != j) {
+		xdiff = x[j] - x[i];
+		ydiff = y[j] - y[i];
+		zdiff = z[j] - z[i];
+		r = Math.sqrt(xdiff*xdiff + ydiff*ydiff + zdiff*zdiff);
+		r3 = r*r*r;
+		if (r3<r03) r3=r03;
+		ax[j] -= G * m[i] * (x[j] - x[i])/r3;
+		ay[j] -= G * m[i] * (y[j] - y[i])/r3;
+		az[j] -= G * m[i] * (z[j] - z[i])/r3;
+	    }
+	}
+   }
+
+   for (var i = 0; i < N; i++ ){
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
+     color.push(0.0, 0.0, 0.0);
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
+     color.push(1.0, 1.0, 1.0);
+     for (var j=0; j<M; j++) {
+       lines.push( pathx[i][j], pathy[i][j], pathz[i][j] + zOff);
+       color.push( 0.6, 0.6, 0.6);
+     }
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
+     color.push(1.0, 1.0, 1.0);
+     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] + zOff);  
+     color.push(0.0, 0.0, 0.0);
+   }
+   lines.push( 0,0,zOff, 1.3,0,zOff, 0,0,zOff, 0,1.3,zOff, pathx[0][0],0,zOff, 0,0,1.3+zOff);
+//   lines.push( 0,0,zOff, 0.0,0,zOff, 0,0,zOff, 0,0.0,zOff, pathx[0][0],0,zOff, 0,0,0.0+zOff);
+   color.push(.0,.0,.0, .3,.3,.3, .3,.3,.3, .3,.3,.3, .3,.3,.3, .3,.3,.3);
+
+   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array( lines ),gl.STATIC_DRAW);
+   gl.vertexAttribPointer(lineLoc, 3, gl.FLOAT, false, 0, 0);
+   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array( color ),gl.STATIC_DRAW);
+   gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+
+   gl.enableVertexAttribArray( lineLoc );
+   gl.enableVertexAttribArray( colorLoc );
+   gl.enableVertexAttribArray( posLoc );
+
+   gl.enable(gl.DEPTH_TEST);
+   gl.depthFunc(gl.LEQUAL);
+   gl.clearDepth(1.0);
+   gl.clearColor(0, 0, 0, 1);
+//   draw();
+   z[0] += zOff;
+   z[1] += zOff;
+   z[2] += zOff;
+   timer = setInterval(draw3d, delay);
+}
+
+var theta;
+function draw3d(){
+   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+   rotMat.rotate(xRot, 1,0,0);  rotMat.rotate(yRot, 0,1,0);
+   yRot = 0;  xRot = 0;
+   theta = Math.atan2(y[2],x[2]); 
+   if (counterRot) {
+       rotMat.rotate(180*(oldtheta-theta)/Math.PI, 0,0,1);  
+   }
+   oldtheta = theta;
+
+   gl.useProgram(line_prog);
+   mvMatrix.load( rotMat );
+   mvMatrix.translate(0, 0, transl);
+   gl.uniformMatrix4fv( mvMatLine, false, new Float32Array(mvMatrix.getAsArray()) );
+   if (showTraj) {
+     gl.drawArrays(gl.LINE_STRIP, 0, lines.length/3);
+   }
+		var t0 = t;
+		
+		while (t < t0+warp) {
+		    I = 0;
+		    for (var j=0; j<N; j++) {
+			r = Math.sqrt(x[j]*x[j] + y[j]*y[j] + z[j]*z[j]);
+			I += m[j]*r*r;
+		    }
+		    for (var j=0; j<N; j++) {
+			vx[j] += ax[j] * dt/2;
+			vy[j] += ay[j] * dt/2;
+			vz[j] += az[j] * dt/2;
+		    }
+		    for (var j=0; j<N; j++) {
+			x[j] += vx[j] * dt;
+			y[j] += vy[j] * dt;
+			z[j] += vz[j] * dt;
+		    }
+		    for (var j=0; j<N; j++) {
+			ax[j] = 0; ay[j] = 0; az[j] = 0; 
+			for (var i=0; i<N; i++) {
+			    if (i != j) {
+				xdiff = x[j] - x[i];
+				ydiff = y[j] - y[i];
+				zdiff = z[j] - z[i];
+				r = Math.sqrt(xdiff*xdiff + ydiff*ydiff + zdiff*zdiff);
+				r3 = r*r*r;
+				if (r3<r03) r3=r03;
+				ax[j] -= G * m[i] * (x[j] - x[i])/r3;
+				ay[j] -= G * m[i] * (y[j] - y[i])/r3;
+				az[j] -= G * m[i] * (z[j] - z[i])/r3;
+			    }
+			}
+		    }
+		    for (var j=0; j<N; j++) {
+			vx[j] += ax[j] * dt/2;
+			vy[j] += ay[j] * dt/2;
+			vz[j] += az[j] * dt/2;
+		    }
+		    t += dt;
+		}
+
+   for (var j=0; j<3; j++){
+     var xx, yy;
+     gl.useProgram(prog[j]);
+     mvMatrix.makeIdentity();
+     /*
+     if (counterRot) {
+       var theta = Math.atan2(y[2],x[2]); 
+       var costh = Math.cos(theta), sinth = Math.sin(theta);
+       xx =  costh*x[j] + sinth*y[j];
+       yy = -sinth*x[j] + costh*y[j];
+     } else {
+       xx =  x[j];
+       yy =  y[j];
+     }
+     mvMatrix.translate(xx, yy, z[j]);
+     */
+     mvMatrix.translate(x[j], y[j], z[j]);
+
+     mvMatrix.multRight( rotMat );
+     mvMatrix.translate(0, 0, transl);
+     gl.uniformMatrix4fv( mvMatLoc[j], false, new Float32Array(mvMatrix.getAsArray()) );
+     for(var i=0; i<nFaces; i++)
+      gl.drawElements(gl.TRIANGLE_FAN, 4, gl.UNSIGNED_SHORT, 8*i);
+   }
+
+}
+</script> 
+</head>
+
+<body style="background-color:black; color:gray" onload="webGLStart();"> 
+<canvas id="supportcanvas" width="1" height="1"></canvas>
+<script type="text/javascript">
+   support = getSupport();
+</script>
+
+
+<script type="text/javascript">
+   if ( !this.support ) {
+	document.write(" \
+	<IMG SRC=\"Ducati.gif\" ALT=\"Ducati\"> <br> \
+	Shown here is an animated gif. <br> \
+	For an interactive dynamic simulation, you need to \"enable webgl\".  <br> \
+	The steps depend on your browser: \
+	<ul> \
+	  <li>Safari \
+	    <ul> \
+	      <li>Click on Safari->Preferences->Advanced</li> \
+	      <li>In the \"Advanced\" window, click on \"Show Develop menu in menu bar\"</li> \
+	      <li>Click on \"Develop\" menu item in menu bar and click on \"Enable WebGL\"</li> \
+	      <li>Revisit/reload this page</li> \
+	    </ul> \
+	  </li> \
+	  <li>Google Chrome \
+	    <ul> \
+	      <li>In the address bar, type \"chrome://flags/\" (without the quotes)</li> \
+	      <li>Scroll down to \"Disable WebGL\" and click on \"Disable\" (disabling its disablement)</li> \
+	      <li>Click on \"Relaunch Now\"</li> \
+	      <li>Revisit/reload this page</li> \
+	    </ul> \
+	  </li> \
+	  <li>Firefox \
+	    <ul> \
+	      <li>In the address bar, type \"about:config\" (without the quotes) </li> \
+	      <li>Search for \"webgl\", and double-click \"webgl.enabled_for_all_sites\" </li>  \
+	      <li>Revisit/reload this page</li> \
+	      </li> \
+	    </ul> \
+	  </li> \
+	  <li>Internet Explorer \
+	    <ul> \
+	      <li>WebGL will be supported in forthcoming Internet Explorer 11</li> \
+	    </ul> \
+	  </li> \
+	</ul> \
+	");
+   } else {
+	document.write(" \
+	<table> \
+	  <tr><td> <canvas id=\"canvas2\" width=\"500\" height=\"25\"></canvas> </td></tr> \
+	  <tr><td> <canvas id=\"canvas1\" width=\"500\" height=\"500\"></canvas> </td> \
+	  <td>  \
+	    <table> \
+	    <tr> \
+	    Other orbit collections: <br> \
+	    <ul> \
+		<li> <a href=\"OuyangXie.html\">Ouyang-Xie Examples</a></li> \
+		<li> <a href=\"New.html\"><b>New Periodic Solutions (Three Ellipses, \
+				Triangle, Four Corners)</b></a></li> \
+		<li> <a href=\"nBody.html\"><b>Old Periodic Solutions \
+				</b></a></li> \
+		<li> <a href=\"Suki.html\">Suvakov-Dmitrasinovic Examples</a></li> \
+		<li> <a href=\"Henon.html\">Henon's Examples</a></li> \
+		<li> <a href=\"ducati3_alluneq2\">Ducati w/ Unequal Mass</a></li> \
+		<li> <a href=\"ducati3_alluneq2_nonplanar\">Nonplanar Ducati w/ Unequal Mass</a></li> \
+		<li> <a href=\"UranusCoorbital.html\">Uranus w/ coorbital body</a></li> \
+		<li> <a href=\"KOI-730.html\">KOI-730</a></li> \
+		<li> <a href=\"KOI-961.html\">KOI-961</a></li> \
+		<li> <a href=\"LissauerExample.html\">Lissauer Example</a></li> \
+		</ul> \
+	    </ul> \
+	    <ul> \
+		<li> <a href=\"SolarSystem.html\">Solar System</a></li> \
+		<li> <a href=\"EarthCoorbital.html\">Earth Coorbital Asteroids</a></li> \
+		<li> <a href=\"Janus.html\">Horseshoe orbit (Janus, Epimetheus, and Saturn)</a></li> \
+	    </ul> \
+	    <ul> \
+		<li> <a href=\"MapOfUniv.html\">Map of the Universe</a></li> \
+	    </ul> \
+	    <ul> \
+		<li> <a href=\"StableRings2.html\">Stable Rings</a></li> \
+		<li> <a href=\"Bracelet.html\">Gravitional Bracelet</a></li> \
+		<li> <a href=\"Accretion2D.html\">Disk Accretion</a></li> \
+	    </ul> \
+	    </tr> \
+	    </table> \
+	  </td> \
+	</tr></table> \
+	<br> \
+	 \
+	<br>Drag mouse to rotate 3D model. Hold <i>shift</i> key to zoom in and out. \
+	");
+   }
+</script>
+
+<hr>
+<i>Updated</i> 2013 Jul 21 
+
+&nbsp <p>
+&nbsp <p>
+&nbsp <p>
+&nbsp <p>
+&nbsp <p>
+&nbsp <p>
+
+</body></html>
+
+

@@ -150,6 +150,10 @@ def page_systems():
         debugtxt=debugtxt)
 
 
+@app.route('/webgl.html')
+def page_webgl():
+    return render_template("webgl.html")
+
 
 
 @app.route('/planet/<planetname>')
