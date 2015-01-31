@@ -4,6 +4,7 @@ import os
 import urllib
 import visualizations 
 import oec_filters
+import datetime
 import oec_fields
 import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
@@ -95,12 +96,14 @@ def page_main():
     contributors = []
     for c in oec_meta_statistics.findall(".//contributor"):
         contributors.append(c.text)
+    commitdate = datetime.datetime.fromtimestamp(int(oec_meta_statistics.find(".//lastcommittimestamp").text))
 
     return render_template("index.html",
             numplanets=len(planets),
             numsystems=numsystems,
             numconfirmedplanets=numconfirmedplanets,
             numbinaries=len(binaries),
+            lastupdate=commitdate.strftime("%c"),
             numcommits=int(oec_meta_statistics.find("./commits").text),
             contributors=contributors,
         )
