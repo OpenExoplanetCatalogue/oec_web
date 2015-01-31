@@ -1,189 +1,400 @@
-<html><head>
-<script src="/static/js/CanvasMatrix.js" type="text/javascript"></script>
+<html>
 
-<script id="line-vs" type="x-shader/x-vertex"> 
-  attribute vec3 aPos;
-  attribute vec3 aColor;
-  uniform mat4 mvMatrix;
-  uniform mat4 prMatrix;
-void main(void) {
-   gl_Position = prMatrix * mvMatrix * vec4( aPos, 1.);
-}
-</script> 
- 
-<script id="line-fs" type="x-shader/x-fragment"> 
-precision mediump float;
-void main(void) {
-   gl_FragColor = vec4(1.,0.,0.,1.);
-}
-</script> 
+<head>
+<title>Learning WebGL &mdash; lesson 11</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
-<script type="text/javascript"> 
+<script type="text/javascript">
+//<![CDATA[
+try{if (!window.CloudFlare) {var CloudFlare=[{verbose:0,p:0,byc:0,owlid:"cf",bag2:1,mirage2:0,oracle:0,paths:{cloudflare:"/cdn-cgi/nexp/dok3v=1613a3a185/"},atok:"bbd91c5b397c913c696eb568a3bcdd6e",petok:"4b4db8e31937de84ebb261dda6ec04521c23fe4b-1422739841-1800",zone:"learningwebgl.com",rocket:"0",apps:{}}];CloudFlare.push({"apps":{"ape":"128c9f08eaf09ff870914f8756aadf4e"}});!function(a,b){a=document.createElement("script"),b=document.getElementsByTagName("script")[0],a.async=!0,a.src="//ajax.cloudflare.com/cdn-cgi/nexp/dok3v=919620257c/cloudflare.min.js",b.parentNode.insertBefore(a,b)}()}}catch(e){};
+//]]>
+</script>
+<script type="text/javascript" src="static/js/glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="static/js/webgl-utils.js"></script>
 
-function getShader ( gl, id ){
-   var shaderScript = document.getElementById ( id );
-   var str = "";
-   var k = shaderScript.firstChild;
-   while ( k ){
-     if ( k.nodeType == 3 ) str += k.textContent;
-     k = k.nextSibling;
-   }
-   var shader;
-   if ( shaderScript.type == "x-shader/x-fragment" )
-           shader = gl.createShader ( gl.FRAGMENT_SHADER );
-   else if ( shaderScript.type == "x-shader/x-vertex" )
-           shader = gl.createShader(gl.VERTEX_SHADER);
-   else return null;
-   gl.shaderSource(shader, str);
-   gl.compileShader(shader);
-   if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) == 0)
-      alert(gl.getShaderInfoLog(shader));
-   return shader;
-}
+<script id="shader-fs" type="x-shader/x-fragment">
+    precision mediump float;
 
-var gl, line_prog, transl = -50, xOffs = yOffs = 0,  drag  = 0,  xRot = yRot = 0, lines = [];
-var mvMatrix = new CanvasMatrix4(),
-    prMatrix = new CanvasMatrix4(),
-    rotMat = new CanvasMatrix4();
-var mvMatLoc = [], mvMatLine, lineLoc;
-var M=60, N=3, K=12;
+    varying vec2 vTextureCoord;
+    varying vec3 vLightWeighting;
 
-function webGLStart() {
-   var canvas1 = document.getElementById("canvas1");
-   try { gl = canvas1.getContext("experimental-webgl");
-   } catch(e) {}
+    uniform sampler2D uSampler;
 
-   line_prog  = gl.createProgram();
-   gl.attachShader(line_prog, getShader( gl, "line-vs" ));
-   gl.attachShader(line_prog, getShader( gl, "line-fs" ));
-   lineLoc = 0;
-   gl.bindAttribLocation(line_prog, lineLoc, "aPos");
-   gl.linkProgram(line_prog);
+    void main(void) {
+        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
+    }
+</script>
 
-   rotMat.makeIdentity();
-   prMatrix.perspective(3, 1, 1, 1000);
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec3 aVertexNormal;
+    attribute vec2 aTextureCoord;
 
-   mvMatLine = gl.getUniformLocation(line_prog,"mvMatrix");
-   gl.useProgram(line_prog);
-   gl.uniformMatrix4fv( gl.getUniformLocation(line_prog,"prMatrix"), false, new Float32Array(prMatrix.getAsArray()) );
-   init();
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat3 uNMatrix;
 
-   canvas1.onmousedown = function ( ev ){
-      drag  = 1;
-      xOffs = ev.clientX;  yOffs = ev.clientY;
-   }
-   canvas1.onmouseup = function ( ev ){
-      drag  = 0;
-      xOffs = ev.clientX;  yOffs = ev.clientY;
-   }
-   canvas1.onmousemove = function ( ev ){
-      if ( drag == 0 ) return;
-      if ( ev.shiftKey ) {
-         transl *= 1 + (ev.clientY - yOffs)/100;
-      } else {
-         yRot = - xOffs + ev.clientX;  
- 	xRot = - yOffs + ev.clientY; 
-      }
-      xOffs = ev.clientX;  yOffs = ev.clientY;
-   }
+    uniform vec3 uAmbientColor;
 
-}
+    uniform vec3 uLightingDirection;
+    uniform vec3 uDirectionalColor;
 
-function init(){
-   transl = -50; 
-   xRot = 0; yRot = 0;
-   xOffs = 0; yOffs = 0;  
-   drag  = 0;  
-   var as = [];
-   var ac = [];
-   var bs = [];
-   var bc = [];
-   for (var i=0; i<N; i++){
-      as[i] = new Array(K);
-      ac[i] = new Array(K);
-      bs[i] = new Array(K);
-      bc[i] = new Array(K);
-   }
-   as[0][ 1]= 1.097640051076110; bc[0][ 1]=-0.108957450183278;
-   as[0][ 3]= 0.028090182332076; bc[0][ 3]= 0.032506096677853;
-   as[0][ 5]= 0.007235718283341; bc[0][ 5]= 0.003762748006231;
-   as[0][ 7]= 0.001210181377945; bc[0][ 7]= 0.001308690517932;
-   as[0][ 9]= 0.000397710135507; bc[0][ 9]= 0.000289369558798;
-   as[0][11]= 0.000096328571545; bc[0][11]= 0.000101643863860;
+    uniform bool uUseLighting;
 
-   as[1][ 1]=-0.108957450183278; bc[1][ 1]= 1.097640051076109;
-   as[1][ 3]=-0.032506096677853; bc[1][ 3]=-0.028090182332075;
-   as[1][ 5]= 0.003762748006231; bc[1][ 5]= 0.007235718283341;
-   as[1][ 7]=-0.001308690517932; bc[1][ 7]=-0.001210181377945;
-   as[1][ 9]= 0.000289369558798; bc[1][ 9]= 0.000397710135507;
-   as[1][11]=-0.000101643863860; bc[1][11]=-0.000096328571545;
+    varying vec2 vTextureCoord;
+    varying vec3 vLightWeighting;
 
-   as[2][ 1]=-0.988682600892831; bc[2][ 1]=-0.988682600892830;
-   as[2][ 3]= 0.004415914345778; bc[2][ 3]=-0.004415914345778;
-   as[2][ 5]=-0.010998466289572; bc[2][ 5]=-0.010998466289572;
-   as[2][ 7]= 0.000098509139987; bc[2][ 7]=-0.000098509139987;
-   as[2][ 9]=-0.000687079694304; bc[2][ 9]=-0.000687079694304;
-   as[2][11]= 0.000005315292314; bc[2][11]=-0.000005315292314;
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
 
-   var pathx = [];
-   var pathy = [];
-   var pathz = [];
-   for (var i=0; i<N; i++){
-      pathx[i] = new Array(M);
-      pathy[i] = new Array(M);
-      pathz[i] = new Array(M);
-   }
-   for (var i=0; i<N; i++) {
-     for (var j=0; j<M; j++) {
-       pathx[i][j] = 0.0;
-       pathy[i][j] = 0.0;
-       pathz[i][j] = 0.0;
-       for (var k=1; k<K; k+=2) {
-         pathx[i][j] += as[i][k]*Math.sin(k*j*2*Math.PI/M);
-         pathy[i][j] += bc[i][k]*Math.cos(k*j*2*Math.PI/M);
-       }
-     }
-   }
+        if (!uUseLighting) {
+            vLightWeighting = vec3(1.0, 1.0, 1.0);
+        } else {
+            vec3 transformedNormal = uNMatrix * aVertexNormal;
+            float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+            vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
+        }
+    }
+</script>
 
-   lines = [];
 
-   for (var i = 0; i < N; i++ ){
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
-     for (var j=0; j<M; j++) {
-       lines.push( pathx[i][j], pathy[i][j], pathz[i][j] );
-     }
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
-     lines.push( pathx[i][0], pathy[i][0], pathz[i][0] );  
-   }
+<script type="text/javascript">
 
-   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array( lines ),gl.STATIC_DRAW);
-   gl.vertexAttribPointer(lineLoc, 3, gl.FLOAT, false, 0, 0);
+    var gl;
 
-   gl.enableVertexAttribArray( lineLoc );
+    function initGL(canvas) {
+        try {
+            gl = canvas.getContext("experimental-webgl");
+            gl.viewportWidth = canvas.width;
+            gl.viewportHeight = canvas.height;
+        } catch (e) {
+        }
+        if (!gl) {
+            alert("Could not initialise WebGL, sorry :-(");
+        }
+    }
 
-   gl.clearColor(0, 0, 0, 1);
-   timer = setInterval(draw3d, 1./60.*1000.);
-}
 
-function draw3d(){
-   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-   rotMat.rotate(xRot, 1,0,0);  rotMat.rotate(yRot, 0,1,0);
-   yRot = 0;  xRot = 0;
-   gl.useProgram(line_prog);
-   mvMatrix.load( rotMat );
-   mvMatrix.translate(0, 0, transl);
-   gl.uniformMatrix4fv( mvMatLine, false, new Float32Array(mvMatrix.getAsArray()) );
-   gl.drawArrays(gl.LINE_STRIP, 0, lines.length/3);
-}
-</script> 
+    function getShader(gl, id) {
+        var shaderScript = document.getElementById(id);
+        if (!shaderScript) {
+            return null;
+        }
+
+        var str = "";
+        var k = shaderScript.firstChild;
+        while (k) {
+            if (k.nodeType == 3) {
+                str += k.textContent;
+            }
+            k = k.nextSibling;
+        }
+
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment") {
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+
+        return shader;
+    }
+
+
+    var shaderProgram;
+
+    function initShaders() {
+        var fragmentShader = getShader(gl, "shader-fs");
+        var vertexShader = getShader(gl, "shader-vs");
+
+        shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            alert("Could not initialise shaders");
+        }
+
+        gl.useProgram(shaderProgram);
+
+        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+        gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+        shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
+        gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
+
+        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+        shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
+        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+        shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, "uUseLighting");
+        shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
+        shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection");
+        shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
+    }
+
+
+    function handleLoadedTexture(texture) {
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D);
+
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+
+    var moonTexture;
+
+    function initTexture() {
+        moonTexture = gl.createTexture();
+        moonTexture.image = new Image();
+        moonTexture.image.onload = function () {
+            handleLoadedTexture(moonTexture)
+        }
+
+        moonTexture.image.src = "/static/img/moon.gif";
+    }
+
+
+    var mvMatrix = mat4.create();
+    var mvMatrixStack = [];
+    var pMatrix = mat4.create();
+
+    function mvPushMatrix() {
+        var copy = mat4.create();
+        mat4.set(mvMatrix, copy);
+        mvMatrixStack.push(copy);
+    }
+
+    function mvPopMatrix() {
+        if (mvMatrixStack.length == 0) {
+            throw "Invalid popMatrix!";
+        }
+        mvMatrix = mvMatrixStack.pop();
+    }
+
+    function setMatrixUniforms() {
+        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+
+        var normalMatrix = mat3.create();
+        mat4.toInverseMat3(mvMatrix, normalMatrix);
+        mat3.transpose(normalMatrix);
+        gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
+    }
+
+
+    function degToRad(degrees) {
+        return degrees * Math.PI / 180;
+    }
+
+
+    var mouseDown = false;
+    var lastMouseX = null;
+    var lastMouseY = null;
+
+    var moonRotationMatrix = mat4.create();
+    mat4.identity(moonRotationMatrix);
+
+    function handleMouseDown(event) {
+        mouseDown = true;
+        lastMouseX = event.clientX;
+        lastMouseY = event.clientY;
+    }
+
+
+    function handleMouseUp(event) {
+        mouseDown = false;
+    }
+
+
+    function handleMouseMove(event) {
+        if (!mouseDown) {
+            return;
+        }
+        var newX = event.clientX;
+        var newY = event.clientY;
+
+        var deltaX = newX - lastMouseX
+        var newRotationMatrix = mat4.create();
+        mat4.identity(newRotationMatrix);
+        mat4.rotate(newRotationMatrix, degToRad(deltaX / 10), [0, 1, 0]);
+
+        var deltaY = newY - lastMouseY;
+        mat4.rotate(newRotationMatrix, degToRad(deltaY / 10), [1, 0, 0]);
+
+        mat4.multiply(newRotationMatrix, moonRotationMatrix, moonRotationMatrix);
+
+        lastMouseX = newX
+        lastMouseY = newY;
+    }
+
+
+
+    var moonVertexPositionBuffer;
+    var moonVertexNormalBuffer;
+    var moonVertexTextureCoordBuffer;
+    var moonVertexIndexBuffer;
+
+    function initBuffers() {
+        var latitudeBands = 30;
+        var longitudeBands = 30;
+        var radius = 2;
+
+        var vertexPositionData = [];
+        var normalData = [];
+        var textureCoordData = [];
+        for (var latNumber=0; latNumber <= latitudeBands; latNumber++) {
+            var theta = latNumber * Math.PI / latitudeBands;
+            var sinTheta = Math.sin(theta);
+            var cosTheta = Math.cos(theta);
+
+            for (var longNumber=0; longNumber <= longitudeBands; longNumber++) {
+                var phi = longNumber * 2 * Math.PI / longitudeBands;
+                var sinPhi = Math.sin(phi);
+                var cosPhi = Math.cos(phi);
+
+                var x = cosPhi * sinTheta;
+                var y = cosTheta;
+                var z = sinPhi * sinTheta;
+                var u = 1 - (longNumber / longitudeBands);
+                var v = 1 - (latNumber / latitudeBands);
+
+                normalData.push(x);
+                normalData.push(y);
+                normalData.push(z);
+                textureCoordData.push(u);
+                textureCoordData.push(v);
+                vertexPositionData.push(radius * x);
+                vertexPositionData.push(radius * y);
+                vertexPositionData.push(radius * z);
+            }
+        }
+
+        var indexData = [];
+        for (var latNumber=0; latNumber < latitudeBands; latNumber++) {
+            for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
+                var first = (latNumber * (longitudeBands + 1)) + longNumber;
+                var second = first + longitudeBands + 1;
+                indexData.push(first);
+                indexData.push(second);
+                indexData.push(first + 1);
+
+                indexData.push(second);
+                indexData.push(second + 1);
+                indexData.push(first + 1);
+            }
+        }
+
+        moonVertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+        moonVertexNormalBuffer.itemSize = 3;
+        moonVertexNormalBuffer.numItems = normalData.length / 3;
+
+        moonVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
+        moonVertexTextureCoordBuffer.itemSize = 2;
+        moonVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
+
+        moonVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+        moonVertexPositionBuffer.itemSize = 3;
+        moonVertexPositionBuffer.numItems = vertexPositionData.length / 3;
+
+        moonVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
+        moonVertexIndexBuffer.itemSize = 1;
+        moonVertexIndexBuffer.numItems = indexData.length;
+    }
+
+
+    function drawScene() {
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+
+        mat4.identity(mvMatrix);
+
+        mat4.translate(mvMatrix, [0, 0, -6]);
+
+        mat4.multiply(mvMatrix, moonRotationMatrix);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, moonTexture);
+        gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, moonVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, moonVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexNormalBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, moonVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
+        setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, moonVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    }
+
+
+    function tick() {
+        requestAnimFrame(tick);
+        drawScene();
+    }
+
+
+    function webGLStart() {
+        var canvas = document.getElementById("lesson11-canvas");
+        initGL(canvas);
+        initShaders();
+        initBuffers();
+        initTexture();
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+
+        canvas.onmousedown = handleMouseDown;
+        document.onmouseup = handleMouseUp;
+        document.onmousemove = handleMouseMove;
+
+        tick();
+    }
+
+</script>
+
+
 </head>
 
-<body onload="webGLStart();"> 
 
-<canvas id="canvas1" width="500" height="500"></canvas> 
+<body onload="webGLStart();">
 
-</body></html>
+    <canvas id="lesson11-canvas" style="border: none;" width="500" height="500"></canvas>
 
+</body>
 
+</html>
