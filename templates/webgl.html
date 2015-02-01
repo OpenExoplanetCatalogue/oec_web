@@ -8,16 +8,14 @@ precision highp float;
 uniform sampler2D Sampler;
 
 void main(){
-    gl_FragColor = vec4(1.,1.,1.,texture2D(Sampler, gl_PointCoord));
+    gl_FragColor = vec4(1.,1.,1.,texture2D(Sampler, gl_PointCoord).r);
 }
-
 </script>
 
 <script id="ConstellationPoints-vs" type="x-shader/x-vertex">
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
-// In
 attribute vec4 Position;
 attribute float PointSize;
 
@@ -35,14 +33,28 @@ void main(){
 		newPointSize = 20.;
 	}
 	
-	
-	// Distance measured to the focus, measured in UserScales
-	
 	gl_Position = projectionMatrix * vec4(normalize(modelViewPosition.xyz)*2.,1.);
-	
 	gl_PointSize = newPointSize;
-	//gl_PointSize = 10.;
 
+}
+</script>
+<script id="ConstellationLines-fs" type="x-shader/x-fragment">
+precision highp float;
+
+void main(){
+    gl_FragColor = vec4(1.,1.,1.,1.);
+}
+</script>
+
+<script id="ConstellationLines-vs" type="x-shader/x-vertex">
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+attribute vec4 Position;
+
+void main(){
+	vec4 modelViewPosition = modelViewMatrix * Position;
+	gl_Position = projectionMatrix * vec4(normalize(modelViewPosition.xyz)*2.,1.);
 }
 </script>
 
@@ -100,32 +112,47 @@ void main(){
     }
 
 
-    var shaderProgram;
+    var shaderConstellationPoints;
+    var shaderConstellationLines;
 
-    function initShaders() {
-        var fragmentShader = getShader(gl, "ConstellationPoints-fs");
-        var vertexShader = getShader(gl, "ConstellationPoints-vs");
+    function initShader(name){
+        var fragmentShader = getShader(gl, name+"-fs");
+        var vertexShader = getShader(gl, name+"-vs");
 
-        shaderProgram = gl.createProgram();
-        gl.attachShader(shaderProgram, vertexShader);
-        gl.attachShader(shaderProgram, fragmentShader);
-        gl.linkProgram(shaderProgram);
+        shader = gl.createProgram();
+        gl.attachShader(shader, vertexShader);
+        gl.attachShader(shader, fragmentShader);
+        gl.linkProgram(shader);
 
-        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        if (!gl.getProgramParameter(shader, gl.LINK_STATUS)) {
             alert("Could not initialise shaders");
         }
+	return shader;
+    }
+	
+	
+    function initShaders() {
+	shaderConstellationPoints = initShader("ConstellationPoints");
+        gl.useProgram(shaderConstellationPoints);
 
-        gl.useProgram(shaderProgram);
+        shaderConstellationPoints.positionAttribute = gl.getAttribLocation(shaderConstellationPoints, "Position");
+        gl.enableVertexAttribArray(shaderConstellationPoints.positionAttribute);
 
-        shaderProgram.positionAttribute = gl.getAttribLocation(shaderProgram, "Position");
-        gl.enableVertexAttribArray(shaderProgram.positionAttribute);
+        shaderConstellationPoints.pointSizeAttribute = gl.getAttribLocation(shaderConstellationPoints, "PointSize");
+        gl.enableVertexAttribArray(shaderConstellationPoints.pointSizeAttribute);
 
-        shaderProgram.pointSizeAttribute = gl.getAttribLocation(shaderProgram, "PointSize");
-        gl.enableVertexAttribArray(shaderProgram.pointSizeAttribute);
+        shaderConstellationPoints.projectionMatrixUniform = gl.getUniformLocation(shaderConstellationPoints, "projectionMatrix");
+        shaderConstellationPoints.modelViewMatrixUniform = gl.getUniformLocation(shaderConstellationPoints, "modelViewMatrix");
+        shaderConstellationPoints.samplerUniform = gl.getUniformLocation(shaderConstellationPoints, "Sampler");
+	
+	shaderConstellationLines = initShader("ConstellationLines");
+	gl.useProgram(shaderConstellationLines);
 
-        shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, "projectionMatrix");
-        shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, "modelViewMatrix");
-        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "Sampler");
+        shaderConstellationLines.positionAttribute = gl.getAttribLocation(shaderConstellationLines, "Position");
+        gl.enableVertexAttribArray(shaderConstellationLines.positionAttribute);
+
+        shaderConstellationLines.projectionMatrixUniform = gl.getUniformLocation(shaderConstellationLines, "projectionMatrix");
+        shaderConstellationLines.modelViewMatrixUniform = gl.getUniformLocation(shaderConstellationLines, "modelViewMatrix");
 
     }
 
@@ -158,12 +185,6 @@ void main(){
     var mvMatrix = mat4.create();
     var mvMatrixStack = [];
     var pMatrix = mat4.create();
-
-
-    function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, mvMatrix);
-    }
 
 
     function degToRad(degrees) {
@@ -200,10 +221,10 @@ void main(){
         var deltaX = newX - lastMouseX
         var newRotationMatrix = mat4.create();
         mat4.identity(newRotationMatrix);
-        mat4.rotate(newRotationMatrix, degToRad(deltaX / 10), [0, 1, 0]);
+        mat4.rotate(newRotationMatrix, degToRad(-deltaX / 10), [0, 1, 0]);
 
         var deltaY = newY - lastMouseY;
-        mat4.rotate(newRotationMatrix, degToRad(deltaY / 10), [1, 0, 0]);
+        mat4.rotate(newRotationMatrix, degToRad(-deltaY / 10), [1, 0, 0]);
 
         mat4.multiply(newRotationMatrix, moonRotationMatrix, moonRotationMatrix);
 
@@ -213,32 +234,44 @@ void main(){
 
     var starVertexBuffer;
     var numStars;
-
+    var linesVertexBuffer;
+    var numLines;
     function initBuffers() {
-	
-
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", "/static/hip.binary", true);
-	oReq.responseType = "arraybuffer";
-	oReq.onload = function (oEvent) {
-	  var arrayBuffer = oReq.response; 
-	  if (arrayBuffer) {
-	    var byteArray = new Float32Array(arrayBuffer);
-            starVertexBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, starVertexBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, byteArray, gl.STATIC_DRAW);
-            numStars = byteArray.length/(4);
-	  }
-	};
-	oReq.send(null);
-		
+		var reqStars = new XMLHttpRequest();
+		reqStars.open("GET", "/static/hip.binary", true);
+		reqStars.responseType = "arraybuffer";
+		reqStars.onload = function (oEvent) {
+		  var arrayBuffer = reqStars.response; 
+		  if (arrayBuffer) {
+		    var byteArray = new Float32Array(arrayBuffer);
+		    starVertexBuffer = gl.createBuffer();
+		    gl.bindBuffer(gl.ARRAY_BUFFER, starVertexBuffer);
+		    gl.bufferData(gl.ARRAY_BUFFER, byteArray, gl.STATIC_DRAW);
+		    numStars = byteArray.length/4;
+		  }
+		};
+		reqStars.send(null);
+		var reqLines = new XMLHttpRequest();
+		reqLines.open("GET", "/static/const.coordinates.3d.binary", true);
+		reqLines.responseType = "arraybuffer";
+		reqLines.onload = function (oEvent) {
+		  var arrayBuffer = reqLines.response; 
+		  if (arrayBuffer) {
+		    var byteArray = new Float32Array(arrayBuffer);
+		    linesVertexBuffer = gl.createBuffer();
+		    gl.bindBuffer(gl.ARRAY_BUFFER, linesVertexBuffer);
+		    gl.bufferData(gl.ARRAY_BUFFER, byteArray, gl.STATIC_DRAW);
+		    numLines = byteArray.length/3;
+		  }
+		};
+		reqLines.send(null);
     }
 
 
     function drawScene() {
- 	if(typeof numStars === 'undefined'){
-		return;
-	}
+ 	if(typeof numStars === 'undefined'){ return; }
+ 	if(typeof numLines === 'undefined'){ return; }
+
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.enable(gl.BLEND);
@@ -248,21 +281,32 @@ void main(){
 
         mat4.identity(mvMatrix);
 
-
-
         mat4.multiply(mvMatrix, moonRotationMatrix);
         mat4.translate(mvMatrix, [0, 8.3, 0]);
+       
+	// Lines 
+	gl.useProgram(shaderConstellationLines);
+        gl.uniformMatrix4fv(shaderConstellationLines.projectionMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderConstellationLines.modelViewMatrixUniform, false, mvMatrix);
 
+        gl.bindBuffer(gl.ARRAY_BUFFER, linesVertexBuffer);
+        gl.vertexAttribPointer(shaderConstellationLines.positionAttribute, 3, gl.FLOAT, false, 3*4, 0);
+        gl.drawArrays(gl.LINES, 0, numLines);
+
+	// Points
+        gl.useProgram(shaderConstellationPoints);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, blobTexture);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
+        gl.uniform1i(shaderConstellationPoints.samplerUniform, 0);
+        gl.uniformMatrix4fv(shaderConstellationPoints.projectionMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderConstellationPoints.modelViewMatrixUniform, false, mvMatrix);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, starVertexBuffer);
-        gl.vertexAttribPointer(shaderProgram.positionAttribute, 3, gl.FLOAT, false, 4*4, 0);
-        gl.vertexAttribPointer(shaderProgram.pointSizeAttribute, 1, gl.FLOAT, false, 4*4, 4*3);
+        gl.vertexAttribPointer(shaderConstellationPoints.positionAttribute, 3, gl.FLOAT, false, 4*4, 0);
+        gl.vertexAttribPointer(shaderConstellationPoints.pointSizeAttribute, 1, gl.FLOAT, false, 4*4, 4*3);
 
-        setMatrixUniforms();
         gl.drawArrays(gl.POINTS, 0, numStars);
+
 
     }
 
