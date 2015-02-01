@@ -239,6 +239,10 @@ def page_histogram():
 def page_systems_xml():
     return fullxml
 
+@app.route('/robots.txt')
+def page_robots_txt():
+    return "User-agent: *\nDisallow:\n"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
