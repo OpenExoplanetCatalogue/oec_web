@@ -3,31 +3,47 @@
 <script type="text/javascript" src="static/js/glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="static/js/webgl-utils.js"></script>
 
-<script id="shader-fs" type="x-shader/x-fragment">
-    precision mediump float;
-    varying vec2 vTextureCoord;
+<script id="ConstellationPoints-fs" type="x-shader/x-fragment">
+precision highp float;
+uniform sampler2D Sampler;
 
-    uniform sampler2D uSampler;
+void main(){
+    gl_FragColor = vec4(1.,1.,1.,texture2D(Sampler, gl_PointCoord));
+}
 
-    void main(void) {
-        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-        gl_FragColor = vec4(textureColor.rgb, textureColor.a);
-    }
 </script>
 
-<script id="shader-vs" type="x-shader/x-vertex">
-    attribute vec3 aVertexPosition;
-    attribute vec2 aTextureCoord;
+<script id="ConstellationPoints-vs" type="x-shader/x-vertex">
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
 
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
+// In
+attribute vec4 Position;
+attribute float PointSize;
 
-    varying vec2 vTextureCoord;
+void main(){
+	vec4 modelViewPosition = modelViewMatrix * Position;
+	highp float distanceToFocus = length(modelViewPosition.xyz); //kpc
+	highp float M = PointSize;
+	
+	highp float newPointSize = sqrt(pow(10.,-M/2.5)/(distanceToFocus*distanceToFocus)*0.0001)*40.;
+	
+	if (newPointSize<1.){
+		newPointSize = 1.;
+	}
+	if (newPointSize>20.){
+		newPointSize = 20.;
+	}
+	
+	
+	// Distance measured to the focus, measured in UserScales
+	
+	gl_Position = projectionMatrix * vec4(normalize(modelViewPosition.xyz)*2.,1.);
+	
+	gl_PointSize = newPointSize;
+	//gl_PointSize = 10.;
 
-    void main(void) {
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        vTextureCoord = aTextureCoord;
-    }
+}
 </script>
 
 
@@ -87,8 +103,8 @@
     var shaderProgram;
 
     function initShaders() {
-        var fragmentShader = getShader(gl, "shader-fs");
-        var vertexShader = getShader(gl, "shader-vs");
+        var fragmentShader = getShader(gl, "ConstellationPoints-fs");
+        var vertexShader = getShader(gl, "ConstellationPoints-vs");
 
         shaderProgram = gl.createProgram();
         gl.attachShader(shaderProgram, vertexShader);
@@ -101,15 +117,16 @@
 
         gl.useProgram(shaderProgram);
 
-        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+        shaderProgram.positionAttribute = gl.getAttribLocation(shaderProgram, "Position");
+        gl.enableVertexAttribArray(shaderProgram.positionAttribute);
 
-        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-        gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+        shaderProgram.pointSizeAttribute = gl.getAttribLocation(shaderProgram, "PointSize");
+        gl.enableVertexAttribArray(shaderProgram.pointSizeAttribute);
 
-        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+        shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, "projectionMatrix");
+        shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, "modelViewMatrix");
+        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "Sampler");
+
     }
 
 
@@ -125,16 +142,16 @@
     }
 
 
-    var moonTexture;
+    var blobTexture;
 
     function initTexture() {
-        moonTexture = gl.createTexture();
-        moonTexture.image = new Image();
-        moonTexture.image.onload = function () {
-            handleLoadedTexture(moonTexture)
+        blobTexture = gl.createTexture();
+        blobTexture.image = new Image();
+        blobTexture.image.onload = function () {
+            handleLoadedTexture(blobTexture)
         }
 
-        moonTexture.image.src = "/static/img/moon.gif";
+        blobTexture.image.src = "/static/img/blob.png";
     }
 
 
@@ -144,8 +161,8 @@
 
 
     function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+        gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, mvMatrix);
     }
 
 
@@ -194,13 +211,8 @@
         lastMouseY = newY;
     }
 
-
-
-    var moonVertexPositionBuffer;
-    var moonVertexTextureCoordBuffer;
-    var moonVertexIndexBuffer;
-    
     var starVertexBuffer;
+    var numStars;
 
     function initBuffers() {
 	
@@ -215,100 +227,43 @@
             starVertexBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, starVertexBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, byteArray, gl.STATIC_DRAW);
+            numStars = byteArray.length/(4);
 	  }
 	};
 	oReq.send(null);
-
-        var latitudeBands = 30;
-        var longitudeBands = 30;
-        var radius = 2;
-
-        var vertexPositionData = [];
-        var textureCoordData = [];
-        for (var latNumber=0; latNumber <= latitudeBands; latNumber++) {
-            var theta = latNumber * Math.PI / latitudeBands;
-            var sinTheta = Math.sin(theta);
-            var cosTheta = Math.cos(theta);
-
-            for (var longNumber=0; longNumber <= longitudeBands; longNumber++) {
-                var phi = longNumber * 2 * Math.PI / longitudeBands;
-                var sinPhi = Math.sin(phi);
-                var cosPhi = Math.cos(phi);
-
-                var x = cosPhi * sinTheta;
-                var y = cosTheta;
-                var z = sinPhi * sinTheta;
-                var u = 1 - (longNumber / longitudeBands);
-                var v = 1 - (latNumber / latitudeBands);
-
-                textureCoordData.push(u);
-                textureCoordData.push(v);
-                vertexPositionData.push(radius * x);
-                vertexPositionData.push(radius * y);
-                vertexPositionData.push(radius * z);
-            }
-        }
-
-        var indexData = [];
-        for (var latNumber=0; latNumber < latitudeBands; latNumber++) {
-            for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
-                var first = (latNumber * (longitudeBands + 1)) + longNumber;
-                var second = first + longitudeBands + 1;
-                indexData.push(first);
-                indexData.push(second);
-                indexData.push(first + 1);
-
-                indexData.push(second);
-                indexData.push(second + 1);
-                indexData.push(first + 1);
-            }
-        }
-
-        moonVertexTextureCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordData), gl.STATIC_DRAW);
-        moonVertexTextureCoordBuffer.itemSize = 2;
-        moonVertexTextureCoordBuffer.numItems = textureCoordData.length / 2;
-
-        moonVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
-        moonVertexPositionBuffer.itemSize = 3;
-        moonVertexPositionBuffer.numItems = vertexPositionData.length / 3;
-
-        moonVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STATIC_DRAW);
-        moonVertexIndexBuffer.itemSize = 1;
-        moonVertexIndexBuffer.numItems = indexData.length;
+		
     }
 
 
     function drawScene() {
+ 	if(typeof numStars === 'undefined'){
+		return;
+	}
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 10.0, pMatrix);
 
         mat4.identity(mvMatrix);
 
-        mat4.translate(mvMatrix, [0, 0, -6]);
+
 
         mat4.multiply(mvMatrix, moonRotationMatrix);
+        mat4.translate(mvMatrix, [0, 8.3, 0]);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, moonTexture);
+        gl.bindTexture(gl.TEXTURE_2D, blobTexture);
         gl.uniform1i(shaderProgram.samplerUniform, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, moonVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, starVertexBuffer);
+        gl.vertexAttribPointer(shaderProgram.positionAttribute, 3, gl.FLOAT, false, 4*4, 0);
+        gl.vertexAttribPointer(shaderProgram.pointSizeAttribute, 1, gl.FLOAT, false, 4*4, 4*3);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, moonVertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, moonVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, moonVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawArrays(gl.POINTS, 0, numStars);
+
     }
 
 
@@ -322,7 +277,6 @@
         var canvas = document.getElementById("canvas");
         initGL(canvas);
         initShaders();
-        initBuffers();
         initTexture();
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -332,6 +286,7 @@
         document.onmouseup = handleMouseUp;
         document.onmousemove = handleMouseMove;
 
+        initBuffers();
         tick();
     }
 
