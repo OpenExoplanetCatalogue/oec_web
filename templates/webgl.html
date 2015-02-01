@@ -199,8 +199,26 @@
     var moonVertexPositionBuffer;
     var moonVertexTextureCoordBuffer;
     var moonVertexIndexBuffer;
+    
+    var starVertexBuffer;
 
     function initBuffers() {
+	
+
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", "/static/hip.binary", true);
+	oReq.responseType = "arraybuffer";
+	oReq.onload = function (oEvent) {
+	  var arrayBuffer = oReq.response; 
+	  if (arrayBuffer) {
+	    var byteArray = new Float32Array(arrayBuffer);
+            starVertexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, starVertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, byteArray, gl.STATIC_DRAW);
+	  }
+	};
+	oReq.send(null);
+
         var latitudeBands = 30;
         var longitudeBands = 30;
         var radius = 2;
