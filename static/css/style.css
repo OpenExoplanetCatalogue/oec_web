@@ -101,7 +101,7 @@ span.errorplus {
 }
 
 span.errorminus {
-	position:absolute;
+	position:relative;
 	z-index: 2;
 	top:0.3em;
 }
