@@ -166,13 +166,15 @@ def page_webgl():
     return render_template("webgl.html")
 
 
-
 @app.route('/planet/<planetname>')
 @app.route('/planet/<planetname>/')
 @app.route('/system/<planetname>/')
 def page_planet(planetname):
     oec = app.oec
-    xmlPair = oec.planetXmlPairs[planetname]
+    try:
+        xmlPair = oec.planetXmlPairs[planetname]
+    except:
+        abort(404)
     system,planet,star,filename = xmlPair
     planets=system.findall(".//planet")
     stars=system.findall(".//star")
@@ -236,6 +238,10 @@ def page_planet(planetname):
         contributors=contributors,
         systemcategory=oec_fields.render(xmlPair,"systemcategory"),
         )
+
+@app.route('/planet/<planetname>/edit/<path:xmlpath>')
+def page_planet_editform(planetname,xmlpath):
+    return "edit form"
 
 
 @app.route('/correlations/')

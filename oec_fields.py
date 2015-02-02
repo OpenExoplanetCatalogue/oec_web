@@ -47,7 +47,7 @@ def getEditButton(system,o):
     else:
         path = ET.ElementTree(system).getpath(o)
         if path is not None:
-            return "<a href='#' class='editbutton' id='xmlpath:"+path+"'>edit</a>"
+            return "<a class='editbutton' href='edit"+path+"'>edit</a>"
     return ""
 
 def render(xmlPair,type):

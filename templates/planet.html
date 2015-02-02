@@ -1,4 +1,15 @@
 {% extends "detail.html" %}
+{% block header %}
+<script>
+$(document).ready(function(){
+	$(".editbutton").click(function(event) {
+		event.preventDefault();
+		var xmlpath = encodeURIComponent($(this).attr('href'));
+		$(this).parent().load(xmlpath);
+	});
+});
+</script>
+{% endblock header %}
 {% block title %}- {{planetname}}{% endblock title %}
 {% block content %}
 
