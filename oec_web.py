@@ -11,54 +11,52 @@ from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
-OEC_META_PATH = APP_ROOT+"/oec_meta/"
 
-print "Parsing OEC ..."
-fullxml = "<systems>\n"
-numconfirmedplanets = 0
-numsystems = 0
-planets = []
-stars = []
-binaries = []
-systems = []
-planetXmlPairs = {}
-systemXmlPairs = {}
+class MyOEC:
+    OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
+    OEC_META_PATH = APP_ROOT+"/oec_meta/"
+    def __init__(self):
+        print "Parsing OEC ..."
+        self.fullxml = "<systems>\n"
+        self.planets = []
+        self.systems = []
+        self.planetXmlPairs = {}
+        self.systemXmlPairs = {}
 
-# Loop over all files and  create new data
-for filename in glob.glob(OEC_PATH + "systems/*.xml"):
-    # Open file
-    f = open(filename, 'rt')
-    xml = f.read()
-    f.close()
-    fullxml+=xml
-    filename = filename[len(OEC_PATH):]
-    # Try to parse file
-    root = ET.fromstring(xml)
-    systems.append(root)
-    numsystems +=1
-    pstars = root.findall("./star")
-    for p in root.findall(".//planet"):
-        for l in p.findall("./list"):
-            if l.text == "Confirmed planets":
-                numconfirmedplanets += 1
-        star = None
-        for s in pstars:
-            if p in s:
-                star = s
-                break
-        xmlPair = (root,p,star,filename)
-        planets.append(xmlPair)
-        name = p.find("./name").text
-        planetXmlPairs[name] = xmlPair
-    systemXmlPairs[root.find("./name").text] = (root,None,filename)
-    stars += pstars
-    binaries += root.findall(".//binary")
-fullxml += "</systems>\n"
+        # Loop over all files and  create new data
+        for filename in glob.glob(self.OEC_PATH + "systems/*.xml"):
+            # Open file
+            f = open(filename, 'rt')
+            xml = f.read()
+            f.close()
+            self.fullxml+=xml
+            filename = filename[len(self.OEC_PATH):]
+            # Try to parse file
+            root = ET.fromstring(xml)
+            self.systems.append(root)
+            pstars = root.findall("./star")
+            for p in root.findall(".//planet"):
+                star = None
+                for s in pstars:
+                    if p in s:
+                        star = s
+                        break
+                xmlPair = (root,p,star,filename)
+                self.planets.append(xmlPair)
+                name = p.find("./name").text
+                self.planetXmlPairs[name] = xmlPair
+            self.systemXmlPairs[root.find("./name").text] = (root,None,filename)
+        self.fullxml += "</systems>\n"
 
-print "Parsing OEC META ..."
-with open(OEC_META_PATH+"statistics.xml", 'rt') as f:
-    oec_meta_statistics = ET.parse(f).getroot()
+        print "Parsing OEC META ..."
+        with open(self.OEC_META_PATH+"statistics.xml", 'rt') as f:
+            self.oec_meta_statistics = ET.parse(f).getroot()
+        
+        print "Parsing done."
+
+
+oec = MyOEC()
+
 
 app = Flask(__name__)
 def isList(value):
@@ -85,26 +83,26 @@ def page_planet_redirect():
 @app.route('/plot/<plotname>.svg')
 def page_plot(plotname):
     if plotname=="discoveryyear":
-        return  Response(oec_plots.discoveryyear(oec_meta_statistics),  mimetype='image/svg+xml')
+        return  Response(oec_plots.discoveryyear(oec.oec_meta_statistics),  mimetype='image/svg+xml')
     if plotname=="skypositions":
-        return  Response(oec_plots.skypositions(systems),  mimetype='image/svg+xml')
+        return  Response(oec_plots.skypositions(oec.systems),  mimetype='image/svg+xml')
     abort(404)
 
 @app.route('/')
 @app.route('/index.html')
 def page_main():
     contributors = []
-    for c in oec_meta_statistics.findall(".//contributor"):
+    for c in oec.oec_meta_statistics.findall(".//contributor"):
         contributors.append(c.text)
-    commitdate = datetime.datetime.fromtimestamp(int(oec_meta_statistics.find(".//lastcommittimestamp").text))
+    commitdate = datetime.datetime.fromtimestamp(int(oec.oec_meta_statistics.find(".//lastcommittimestamp").text))
 
     return render_template("index.html",
-            numplanets=len(planets),
-            numsystems=numsystems,
-            numconfirmedplanets=numconfirmedplanets,
-            numbinaries=len(binaries),
+            numplanets=len(oec.planets),
+            numsystems=int(oec.oec_meta_statistics.find("./systems").text),
+            numconfirmedplanets=int(oec.oec_meta_statistics.find("./confirmedplanets").text),
+            numbinaries=int(oec.oec_meta_statistics.find("./binaries").text),
             lastupdate=commitdate.strftime("%c"),
-            numcommits=int(oec_meta_statistics.find("./commits").text),
+            numcommits=int(oec.oec_meta_statistics.find("./commits").text),
             contributors=contributors,
         )
 
@@ -128,7 +126,7 @@ def page_systems():
         fields += ["mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
     lastfilename = ""
     tablecolour = 0
-    for xmlPair in planets:
+    for xmlPair in oec.planets:
         if oec_filters.isFiltered(xmlPair,filters):
             continue
         system,planet,star,filename = xmlPair
@@ -160,7 +158,7 @@ def page_webgl():
 @app.route('/planet/<planetname>/')
 @app.route('/system/<planetname>/')
 def page_planet(planetname):
-    xmlPair = planetXmlPairs[planetname]
+    xmlPair = oec.planetXmlPairs[planetname]
     system,planet,star,filename = xmlPair
     planets=system.findall(".//planet")
     stars=system.findall(".//star")
@@ -193,7 +191,7 @@ def page_planet(planetname):
 
     references = []
     contributors = []
-    with open(OEC_META_PATH+filename, 'rt') as f:
+    with open(oec.OEC_META_PATH+filename, 'rt') as f:
         root = ET.parse(f).getroot()
         for l in root.findall(".//link"):
             references.append(l.text) 
@@ -237,7 +235,7 @@ def page_histogram():
 
 @app.route('/systems.xml')
 def page_systems_xml():
-    return fullxml
+    return oec.fullxml
 
 @app.route('/robots.txt')
 def page_robots_txt():
@@ -245,4 +243,4 @@ def page_robots_txt():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,threaded=True)
