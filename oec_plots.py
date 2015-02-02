@@ -1,10 +1,13 @@
 import StringIO
+import matplotlib
+matplotlib.use('svg') # Prevent thread issues from CA
 import matplotlib.pyplot as plt
 import math
 import numpy as np
 from numberformat import getCoordinates, getText
 from matplotlib import rcParams
 import matplotlib.cm as cm
+
 
 def discoveryyear(oec_meta_statistics):
     data_x = []
@@ -25,6 +28,7 @@ def discoveryyear(oec_meta_statistics):
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     svg_dta = imgdata.buf
+    imgdata.close()
     return svg_dta
 
 def skypositions(systems):
@@ -61,5 +65,6 @@ def skypositions(systems):
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     svg_dta = imgdata.buf
+    imgdata.close()
     return svg_dta
     

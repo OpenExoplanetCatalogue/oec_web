@@ -6,6 +6,7 @@ import visualizations
 import oec_filters
 import datetime
 import oec_fields
+import threading
 import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response
@@ -54,8 +55,11 @@ class MyOEC:
         
         print "Parsing done."
 
-
-oec = MyOEC()
+def getOEC():
+    mydata = threading.local()
+    if not hasattr(mydata, "oec"):
+        mydata.oec = MyOEC()
+    return mydata.oec
 
 
 app = Flask(__name__)
@@ -77,11 +81,11 @@ def page_planet_redirect():
     return redirect("planet/"+planetname, 301)
 
 #################
-
 @app.route('/plot/<plotname>/')
 @app.route('/plot/<plotname>')
 @app.route('/plot/<plotname>.svg')
 def page_plot(plotname):
+    oec = getOEC()
     if plotname=="discoveryyear":
         return  Response(oec_plots.discoveryyear(oec.oec_meta_statistics),  mimetype='image/svg+xml')
     if plotname=="skypositions":
@@ -91,6 +95,7 @@ def page_plot(plotname):
 @app.route('/')
 @app.route('/index.html')
 def page_main():
+    oec = getOEC()
     contributors = []
     for c in oec.oec_meta_statistics.findall(".//contributor"):
         contributors.append(c.text)
@@ -108,6 +113,7 @@ def page_main():
 
 @app.route('/systems/',methods=["POST","GET"])
 def page_systems():
+    oec = getOEC()
     p = []
     debugtxt = ""
     fields = ["namelink"]
@@ -158,6 +164,7 @@ def page_webgl():
 @app.route('/planet/<planetname>/')
 @app.route('/system/<planetname>/')
 def page_planet(planetname):
+    oec = getOEC()
     xmlPair = oec.planetXmlPairs[planetname]
     system,planet,star,filename = xmlPair
     planets=system.findall(".//planet")
@@ -235,6 +242,7 @@ def page_histogram():
 
 @app.route('/systems.xml')
 def page_systems_xml():
+    oec = getOEC()
     return oec.fullxml
 
 @app.route('/robots.txt')
