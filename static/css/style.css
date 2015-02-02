@@ -238,3 +238,22 @@ span.NA {
   	background-repeat: no-repeat;
 	background-color: 	#f5fafa;
 }
+
+.editbutton{
+	color: 			#aaa;
+	margin-left: 		1em;
+	padding:		4px;
+	border-radius: 		3px;
+	height:			16px;
+	padding-left:		16px;
+	background: 		url('/static/img/edit.png') no-repeat left center;
+	border:			1px solid #aaa;
+	font-size: 		0.5em;
+	opacity:		0.5;
+	text-decoration:	none;
+
+}
+.editbutton:hover {
+	opacity:		1.0;
+	background-position:	left center;
+}

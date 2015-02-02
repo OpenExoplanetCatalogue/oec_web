@@ -1,4 +1,5 @@
 import urllib
+import lxml.etree as ET
 from numberformat import renderFloat, renderText, notAvailableString
 
 """ Array of title of propoerties """
@@ -40,6 +41,15 @@ titles = {
     "radiusEarth":                  "Radius [R<sub>earth</sub>]",
 }
 
+def getEditButton(system,o):
+    if o is None:
+        return ""
+    else:
+        path = ET.ElementTree(system).getpath(o)
+        if path is not None:
+            return "<a href='#' class='editbutton' id='xmlpath:"+path+"'>edit</a>"
+    return ""
+
 def render(xmlPair,type):
     system, planet, star, filename = xmlPair
     if type=="numberofplanets":
@@ -51,7 +61,9 @@ def render(xmlPair,type):
     if type=="distancelightyears":
         return renderFloat(system.find("./distance"),3.2615638)
     if type=="massEarth":
-        return renderFloat(planet.find("./mass"),317.8942)
+        o = planet.find("./mass")
+        button = getEditButton(system,o)
+        return renderFloat(o,317.8942)+button
     if type=="radiusEarth":
         return renderFloat(planet.find("./radius"),10.973299)
     # Text based object

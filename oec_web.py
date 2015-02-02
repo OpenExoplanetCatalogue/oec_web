@@ -1,4 +1,5 @@
-import xml.etree.ElementTree as ET
+#import xml.etree.ElementTree as ET
+import lxml.etree as ET
 import glob
 import os
 import urllib
@@ -55,14 +56,20 @@ class MyOEC:
         
         print "Parsing done."
 
-def getOEC():
-    mydata = threading.local()
-    if not hasattr(mydata, "oec"):
-        mydata.oec = MyOEC()
-    return mydata.oec
 
 
-app = Flask(__name__)
+class FlaskApp(Flask):
+    def __init__(self, *args, **kwargs):
+        super(FlaskApp, self).__init__(*args, **kwargs)
+        self.oec = self.getOEC()
+
+    def getOEC(self):
+        mydata = threading.local()
+        if not hasattr(mydata, "oec"):
+            mydata.oec = MyOEC()
+        return mydata.oec
+
+app = FlaskApp(__name__)
 def isList(value):
     return isinstance(value, list)
 def getFirst(value):
@@ -85,7 +92,7 @@ def page_planet_redirect():
 @app.route('/plot/<plotname>')
 @app.route('/plot/<plotname>.svg')
 def page_plot(plotname):
-    oec = getOEC()
+    oec = app.oec
     if plotname=="discoveryyear":
         return  Response(oec_plots.discoveryyear(oec.oec_meta_statistics),  mimetype='image/svg+xml')
     if plotname=="skypositions":
@@ -95,7 +102,7 @@ def page_plot(plotname):
 @app.route('/')
 @app.route('/index.html')
 def page_main():
-    oec = getOEC()
+    oec = app.oec
     contributors = []
     for c in oec.oec_meta_statistics.findall(".//contributor"):
         contributors.append(c.text)
@@ -113,7 +120,7 @@ def page_main():
 
 @app.route('/systems/',methods=["POST","GET"])
 def page_systems():
-    oec = getOEC()
+    oec = app.oec
     p = []
     debugtxt = ""
     fields = ["namelink"]
@@ -164,7 +171,7 @@ def page_webgl():
 @app.route('/planet/<planetname>/')
 @app.route('/system/<planetname>/')
 def page_planet(planetname):
-    oec = getOEC()
+    oec = app.oec
     xmlPair = oec.planetXmlPairs[planetname]
     system,planet,star,filename = xmlPair
     planets=system.findall(".//planet")
@@ -230,6 +237,7 @@ def page_planet(planetname):
         systemcategory=oec_fields.render(xmlPair,"systemcategory"),
         )
 
+
 @app.route('/correlations/')
 @app.route('/correlations.html')
 def page_correlations():
@@ -242,7 +250,7 @@ def page_histogram():
 
 @app.route('/systems.xml')
 def page_systems_xml():
-    oec = getOEC()
+    oec = app.oec
     return oec.fullxml
 
 @app.route('/robots.txt')
