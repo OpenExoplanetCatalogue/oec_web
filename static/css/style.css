@@ -285,3 +285,12 @@ span.NA {
   	border: 1px solid #C1DAD7;
 	background-color: 	#f5fafa;
 }
+.editsubmit:hover {
+	background-color: 	#c5cafa;
+}
+
+.editdone {
+	background: 	#e5fae5;
+	padding: 4px; 
+	width:20em;
+}

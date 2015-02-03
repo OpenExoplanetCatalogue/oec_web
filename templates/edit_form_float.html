@@ -1,0 +1,46 @@
+<div class="edit" >
+
+<form id="editform" action="/planet/{{planetnameurl|safe}}/submit-edit/{{xmlpath|safe}}">
+	<label for="value">{{title|safe}}</label>
+	<input type="text" name="value" value="{{value|safe}}">
+	<br>
+	<label for="errorplus">Upper margin of error</label>
+	<input type="text" name="errorplus" value="{{errorplus|safe}}">
+	<br>
+	<label for="errorminus">Lower margin of error</label>
+	<input type="text" name="errorminus" value="{{errorminus|safe}}">
+	<br>
+	<label for="lowerlimit">Lower limit</label>
+	<input type="text" name="lowerlimit" value="{{lowerlimit|safe}}">
+	<br>
+	<label for="upperlimit">Upper limit</label>
+	<input type="text" name="upperlimit" value="{{upperlimit|safe}}">
+	<br>
+	<br>
+	<label for="paper">Link to scientific paper</label>
+	<input type="text" name="paper" value="">
+	<br>
+	<label for="name">Your name (optional)</label>
+	<input type="text" name="name" value="">
+	<br>
+	<br>
+	<div>
+	Note: The submission will be vetted before it is merged into the public version. 
+	It is crucial that you include a link to a scientific article.
+	</div>
+	<br>
+	<input class="editsubmit" type="submit" value="Submit changes">
+</form>
+</div>
+<script>
+// Attach a submit handler to the form
+$( "#editform" ).submit(function( event ) {
+	event.preventDefault();
+  	var form = $( this ),l
+	var url = form.attr( "action" );
+	var posting = $.post( url, form.serialize() ,function( data ) { 
+		$(".edit").empty().append(data).attr('class', 'editdone').delay(2000).fadeOut(1000.);
+
+	});
+});
+</script>

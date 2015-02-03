@@ -3,6 +3,8 @@ import lxml.etree as ET
 import glob
 import os
 import urllib
+import difflib
+import copy
 import visualizations 
 import oec_filters
 import datetime
@@ -253,6 +255,7 @@ def page_planet_editform(planetname,xmlpath):
     except:
         abort(404)
     system,planet,star,filename = xmlPair
+    planetname = planet.find("./name").text
     o = system.find(xmlpath)
     title = ""
     if o.tag in oec_fields.titles:
@@ -260,12 +263,85 @@ def page_planet_editform(planetname,xmlpath):
     return render_template("edit_form_float.html",
         title=title,
         value=o.text,
+        planetnameurl=urllib.quote(planetname),
         errorminus=getAttribText(o,"errorminus"),
         errorplus=getAttribText(o,"errorplus"),
         lowerlimit=getAttribText(o,"lowerlimit"),
         upperlimit=getAttribText(o,"upperlimit"),
         xmlpath=xmlpath,
         )
+
+# Nicely indents the XML output
+def indent(elem, level=0):
+    i = "\n" + level * "\t"
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "\t"
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level + 1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+
+
+editlock = threading.Lock()
+
+@app.route('/planet/<planetname>/submit-edit/<path:xmlpath>',methods=["POST"])
+def page_planet_submiteditform(planetname,xmlpath):
+    oec = app.oec
+    try:
+        xmlPair = oec.planetXmlPairs[planetname]
+    except:
+        abort(404)
+    system,planet,star,filename = xmlPair
+    planetname = planet.find("./name").text
+    new_system = copy.deepcopy(system)
+    o = new_system.find(xmlpath)
+    attribs = ["errorplus", "errorminus","upperlimit", "lowerlimit"]
+    for attrib in attribs:
+        if attrib in request.form:
+            newv = request.form[attrib]
+            if len(newv)==0:
+                if attrib in o.attrib:
+                    o.attrib.pop(attrib)
+            else:
+                o.attrib[attrib] = newv
+    if "value" in request.form:
+        o.text = request.form["value"]
+    
+    
+    indent(new_system)
+    diff = difflib.unified_diff(
+            ET.tostring(new_system, encoding="UTF-8", xml_declaration=False).split("\n"), 
+            ET.tostring(system, encoding="UTF-8", xml_declaration=False).split("\n"), 
+            fromfile=filename, 
+            tofile=filename,
+            lineterm='')
+    
+    with editlock:
+        patchcount = 0
+        with open('patch.count') as f:
+            try:
+                patchcount = int(f.readline())
+            except:
+                patchcount = 0
+        
+        # Just for testing. Needs a proper backend.
+        with open('patch.count',"w") as f:
+            f.write("%i"%(patchcount+1))
+        
+        with open("patches/%05d.patch"%patchcount, "w") as f:
+            f.write('\n'.join(diff))
+        with open("patches/%05d.details"%patchcount, "w") as f:
+            f.write(request.form["name"]+"\n")
+            f.write(request.form["paper"]+"\n")
+            f.write(request.remote_addr+"\n")
+
+    return "Thanks for your contribution. We're checking your commit now."
 
 
 @app.route('/correlations/')
