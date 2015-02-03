@@ -47,7 +47,7 @@ def getEditButton(system,o):
     else:
         path = ET.ElementTree(system).getpath(o)
         if path is not None:
-            return "<a class='editbutton' href='edit"+path+"'>edit</a>"
+            return "<a class='editbutton' href='edit"+path[7:]+"'>edit</a>"
     return ""
 
 def render(xmlPair,type):
@@ -61,9 +61,11 @@ def render(xmlPair,type):
     if type=="distancelightyears":
         return renderFloat(system.find("./distance"),3.2615638)
     if type=="massEarth":
+        return renderFloat(planet.find("./mass"),317.8942)
+    if type=="mass":
         o = planet.find("./mass")
         button = getEditButton(system,o)
-        return renderFloat(o,317.8942)+button
+        return renderFloat(o)+button
     if type=="radiusEarth":
         return renderFloat(planet.find("./radius"),10.973299)
     # Text based object

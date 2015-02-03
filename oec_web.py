@@ -239,9 +239,33 @@ def page_planet(planetname):
         systemcategory=oec_fields.render(xmlPair,"systemcategory"),
         )
 
+def getAttribText(o,a):
+    if a in o.attrib:
+        return o.attrib[a]
+    else:
+        return ""
+
 @app.route('/planet/<planetname>/edit/<path:xmlpath>')
 def page_planet_editform(planetname,xmlpath):
-    return "edit form"
+    oec = app.oec
+    try:
+        xmlPair = oec.planetXmlPairs[planetname]
+    except:
+        abort(404)
+    system,planet,star,filename = xmlPair
+    o = system.find(xmlpath)
+    title = ""
+    if o.tag in oec_fields.titles:
+        title = oec_fields.titles[o.tag]
+    return render_template("edit_form_float.html",
+        title=title,
+        value=o.text,
+        errorminus=getAttribText(o,"errorminus"),
+        errorplus=getAttribText(o,"errorplus"),
+        lowerlimit=getAttribText(o,"lowerlimit"),
+        upperlimit=getAttribText(o,"upperlimit"),
+        xmlpath=xmlpath,
+        )
 
 
 @app.route('/correlations/')
