@@ -62,10 +62,12 @@ def render(xmlPair,type):
         return renderFloat(system.find("./distance"),3.2615638)
     if type=="massEarth":
         return renderFloat(planet.find("./mass"),317.8942)
-    if type=="mass":
-        o = planet.find("./mass")
-        button = getEditButton(system,o)
-        return renderFloat(o)+button
+    if type in ["mass","radius","eccentricity","temperature","semimajoraxis"]:
+        o = planet.find("./"+type)
+        return renderFloat(o)+getEditButton(system,o)
+    if type=="period":
+        o = planet.find("./period")
+        return renderFloat(o)+getEditButton(system,o)
     if type=="radiusEarth":
         return renderFloat(planet.find("./radius"),10.973299)
     # Text based object
