@@ -1,0 +1,36 @@
+{%extends "layout.html"%}
+{%block content%}
+<table>
+	<tr>
+		<th>Action</th>
+		<th>Patch</th>
+		<th>Link</th>
+		<th>Submitter ip</th>
+		<th>Submitter name</th>
+
+	</tr>
+	{%for edit in edits%}
+	<tr>
+		<td style="vertical-align: top;">
+			Approve<br/>
+			Delete
+		</td>
+
+		<td style="vertical-align: top;">
+			<pre>
+			{{- edit["patch"] -}}
+			</pre>
+		</td>
+		<td style="vertical-align: top;"> 
+			<a href="{{ edit["link"] | safe }}">{{ edit["link"] }}</a> 
+		</td>
+		<td style="vertical-align: top;"> 
+			{{ edit["ip"] }}
+		</td>
+		<td style="vertical-align: top;"> 
+			{{ edit["name"] }}
+		</td>
+	</tr>
+	{%endfor%}
+</table>
+{%endblock content%}

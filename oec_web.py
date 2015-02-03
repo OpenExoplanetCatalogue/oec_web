@@ -2,6 +2,7 @@
 import lxml.etree as ET
 import glob
 import os
+import time
 import urllib
 import difflib
 import copy
@@ -13,6 +14,8 @@ import threading
 import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response
+from flask.ext.pymongo import PyMongo
+
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -72,6 +75,8 @@ class FlaskApp(Flask):
         return mydata.oec
 
 app = FlaskApp(__name__)
+mongo = PyMongo(app)
+
 def isList(value):
     return isinstance(value, list)
 def getFirst(value):
@@ -288,7 +293,6 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-editlock = threading.Lock()
 
 @app.route('/planet/<planetname>/submit-edit/<path:xmlpath>',methods=["POST"])
 def page_planet_submiteditform(planetname,xmlpath):
@@ -316,30 +320,22 @@ def page_planet_submiteditform(planetname,xmlpath):
     
     indent(new_system)
     diff = difflib.unified_diff(
-            ET.tostring(new_system, encoding="UTF-8", xml_declaration=False).split("\n"), 
-            ET.tostring(system, encoding="UTF-8", xml_declaration=False).split("\n"), 
+            ET.tostring(new_system, encoding="UTF-8", xml_declaration=False).strip().split("\n"), 
+            ET.tostring(system, encoding="UTF-8", xml_declaration=False).strip().split("\n"), 
             fromfile=filename, 
             tofile=filename,
             lineterm='')
     
-    with editlock:
-        patchcount = 0
-        with open('patch.count') as f:
-            try:
-                patchcount = int(f.readline())
-            except:
-                patchcount = 0
-        
-        # Just for testing. Needs a proper backend.
-        with open('patch.count',"w") as f:
-            f.write("%i"%(patchcount+1))
-        
-        with open("patches/%05d.patch"%patchcount, "w") as f:
-            f.write('\n'.join(diff))
-        with open("patches/%05d.details"%patchcount, "w") as f:
-            f.write(request.form["name"]+"\n")
-            f.write(request.form["paper"]+"\n")
-            f.write(request.remote_addr+"\n")
+    
+    # Just for testing. Needs a proper backend.
+    d = {}
+    d["patch"]  = '\n'.join(diff)
+    d["paper"]  = request.form["paper"]
+    d["name"]   = request.form["name"]
+    d["ip"]     = request.remote_addr
+    d["date"]   = time.time()
+
+    mongo.db.edits.insert(d)
 
     return "Thanks for your contribution. We're checking your commit now."
 
@@ -363,6 +359,12 @@ def page_systems_xml():
 def page_robots_txt():
     return "User-agent: *\nDisallow:\n"
 
+@app.route('/edits/')
+def page_edits():
+    edits = mongo.db.edits.find()
+    return render_template("edits.html",
+        edits=edits,
+        )
 
 if __name__ == '__main__':
     app.run(debug=True,threaded=True)
