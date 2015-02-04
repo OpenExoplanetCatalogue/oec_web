@@ -51,21 +51,28 @@ def getEditButton(xmlPair,o):
             return "<a class='editbutton' href='/edit/form/"+filename+path[7:]+"'>edit</a>"
     return ""
 
-def render(xmlPair,type):
+def render(xmlPair,type,editbutton=True):
     system, planet, star, filename = xmlPair
     if type=="numberofplanets":
         return "%d"%len(system.findall(".//planet"))
     if type=="numberofstars":
         return "%d"%len(system.findall(".//star"))
-    if type=="distance":
-        return renderFloat(system.find("./distance"))
+    if type in ["distance"]:
+        o = system.find("./"+type)
+        html = renderFloat(o)
+        if editbutton:
+            html += getEditButton(xmlPair,o)
+        return html
     if type=="distancelightyears":
         return renderFloat(system.find("./distance"),3.2615638)
     if type=="massEarth":
         return renderFloat(planet.find("./mass"),317.8942)
     if type in ["mass","radius","period","eccentricity","temperature","semimajoraxis"]:
         o = planet.find("./"+type)
-        return renderFloat(o)+getEditButton(xmlPair,o)
+        html = renderFloat(o)
+        if editbutton:
+            html += getEditButton(xmlPair,o)
+        return html
     if type=="radiusEarth":
         return renderFloat(planet.find("./radius"),10.973299)
     # Text based object
@@ -148,6 +155,12 @@ def render(xmlPair,type):
                     alternativenames += ", "
                 alternativenames += name.text
             return alternativenames
+        if type in ["mass","radius","age","metallicity","temperature"]:
+            o = star.find("./"+type)
+            html = renderFloat(o)
+            if editbutton:
+                html += getEditButton(xmlPair,o)
+            return html
         # Default: just search for the property in the planet xml. 
         return renderFloat(star.find("./"+type))
     # Long texts

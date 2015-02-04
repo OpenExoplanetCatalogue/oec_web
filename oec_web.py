@@ -154,7 +154,7 @@ def page_systems():
         d = {}
         d["fields"] = [tablecolour]
         for field in fields:
-            d["fields"].append(oec_fields.render(xmlPair,field))
+            d["fields"].append(oec_fields.render(xmlPair,field,editbutton=False))
         p.append(d)
     return render_template("systems.html",
         columns=[oec_fields.titles[field] for field in fields],
@@ -195,7 +195,7 @@ def page_planet(planetname):
         rowdata = []
         for p in planets:
             rowdata.append(oec_fields.render((system,p,star,filename),row))
-        if len(set(rowdata)) <= 1 and row!="name": # all fields identical:
+        if len(set(rowdata)) <= 1 and row!="name" and rowdata[0]!=notAvailableString: # all fields identical:
             rowdata = rowdata[0]
         planettable.append(rowdata)
     
@@ -206,7 +206,7 @@ def page_planet(planetname):
         rowdata = []
         for s in stars:
             rowdata.append(oec_fields.render((system,planet,s,filename),row))
-        if len(set(rowdata)) <= 1 and row!="starname": # all fields identical:
+        if len(set(rowdata)) <= 1 and row!="starname" and rowdata[0]!=notAvailableString: # all fields identical:
             rowdata = rowdata[0]
         startable.append(rowdata)
 
@@ -264,7 +264,6 @@ def page_planet_edit_form(fullpath):
             break
     if filename!=urlfilename:
         abort(404)
-    print xmlpath
     planetname = planet.find("./name").text
     o = system.find(xmlpath)
     title = ""
@@ -302,6 +301,7 @@ def indent(elem, level=0):
 @app.route('/edit/submit/<path:fullpath>',methods=["POST"])
 def page_planet_edit_submit(fullpath):
     path = fullpath.split(".xml/")
+    print path
     if len(path)!=2:
         abort(404)
     urlfilename = path[0]+".xml"
@@ -330,8 +330,8 @@ def page_planet_edit_submit(fullpath):
     
     indent(new_system)
     diff = difflib.unified_diff(
-            ET.tostring(new_system, encoding="UTF-8", xml_declaration=False).strip().split("\n"), 
             ET.tostring(system, encoding="UTF-8", xml_declaration=False).strip().split("\n"), 
+            ET.tostring(new_system, encoding="UTF-8", xml_declaration=False).strip().split("\n"), 
             fromfile=filename, 
             tofile=filename,
             lineterm='')
