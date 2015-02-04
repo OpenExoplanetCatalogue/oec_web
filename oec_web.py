@@ -11,11 +11,11 @@ import visualizations
 import oec_filters
 import datetime
 import oec_fields
-import threading
-import oec_plots
+#import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response
 from flask.ext.pymongo import PyMongo
+import threading
 
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -98,11 +98,11 @@ def page_planet_redirect():
 @app.route('/plot/<plotname>')
 @app.route('/plot/<plotname>.svg')
 def page_plot(plotname):
-    oec = app.oec
-    if plotname=="discoveryyear":
-        return  Response(oec_plots.discoveryyear(oec.oec_meta_statistics),  mimetype='image/svg+xml')
-    if plotname=="skypositions":
-        return  Response(oec_plots.skypositions(oec.systems),  mimetype='image/svg+xml')
+#    oec = app.oec
+#    if plotname=="discoveryyear":
+#        return  Response(oec_plots.discoveryyear(oec.oec_meta_statistics),  mimetype='image/svg+xml')
+#    if plotname=="skypositions":
+#        return  Response(oec_plots.skypositions(oec.systems),  mimetype='image/svg+xml')
     abort(404)
 
 @app.route('/')
