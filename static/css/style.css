@@ -261,20 +261,24 @@ span.NA {
 }
 
 .edit {
-	border:1px solid #C1DAD7;
-	background: 	#f5fafa;
 	padding: 4px; 
-	width:20em;
+	width:	308px;
 }
 
 .edit label {
 	display: inline-block;
-	width: 10em;
+	width: 160px;
 	text-align:	right;
 }
 
-.edit input {
-	width: 10em;
+.edit input[type=text] {
+	width: 130px;
+  	margin-top: 2px;
+  	margin-bottom: 2px;
+  	padding: 2px;
+  -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
+     -moz-box-sizing: border-box; /* For legacy (Firefox <29) Gecko based browsers */
+          box-sizing: border-box;
 }
 
 .editsubmit {
@@ -289,10 +293,9 @@ span.NA {
 	background-color: 	#c5cafa;
 }
 
-.editdone {
-	background: 	#e5fae5;
+.editmessage {
 	padding: 4px; 
-	width:20em;
+	width:308px;
 }
 
 pre {
@@ -302,3 +305,4 @@ pre {
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+

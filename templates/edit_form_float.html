@@ -20,27 +20,38 @@
 	<label for="paper">Link to scientific paper</label>
 	<input type="text" name="paper" value="">
 	<br>
-	<label for="name">Your name (optional)</label>
+	<label for="name">Your name</label>
 	<input type="text" name="name" value="">
-	<br>
-	<br>
+	<div style="margin-top: 5px; margin-bottom: 5px;" id="captchacontainer"></div>
 	<div>
-	Note: The submission will be vetted before it is merged into the public version. 
-	It is crucial that you include a link to a scientific article.
+	<small>
+	<i><b>Note:</b> Your commit will be vetted before it is merged into the public version. 
+	It is crucial that you include a link to a scientific publication. 
+	For more information on the meaning of the different datafields see the <a href="https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/blob/master/README.md">readme file</a> in the Open Exoplanet Catalogue repository on github.</i>
+	</small>
 	</div>
 	<br>
 	<input class="editsubmit" type="submit" value="Submit changes">
 </form>
 </div>
+<div class="editmessage" >
+</div>
 <script>
 // Attach a submit handler to the form
 $( "#editform" ).submit(function( event ) {
 	event.preventDefault();
-  	var form = $( this ),l
+  	var form = $( this );
 	var url = form.attr( "action" );
 	var posting = $.post( url, form.serialize() ,function( data ) { 
-		$(".edit").empty().append(data).attr('class', 'editdone').delay(2000).fadeOut(1000.);
-
-	});
+		if (data["success"]){
+			$(".edit").fadeOut(500, function(){
+				$(".edit").empty();
+				$(".editmessage").empty().append(data["message"]).css( "background-color", "lightgreen");
+			});
+		}else{
+			$(".editmessage").empty().append(data["message"]).css( "background-color", "lightpink");
+			grecaptcha.reset();
+		}
+	},"json");
 });
 </script>

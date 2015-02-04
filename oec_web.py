@@ -6,6 +6,7 @@ import time
 import urllib
 import difflib
 import copy
+import json
 import visualizations 
 import oec_filters
 import datetime
@@ -267,8 +268,11 @@ def page_planet_edit_form(fullpath):
     planetname = planet.find("./name").text
     o = system.find(xmlpath)
     title = ""
-    if o.tag in oec_fields.titles:
-        title = oec_fields.titles[o.tag]
+    tag = o.tag
+    if o.getparent().tag == "star":
+        tag = "star"+tag
+    if tag in oec_fields.titles:
+        title = oec_fields.titles[tag]
     return render_template("edit_form_float.html",
         title=title,
         value=o.text,
@@ -301,18 +305,36 @@ def indent(elem, level=0):
 @app.route('/edit/submit/<path:fullpath>',methods=["POST"])
 def page_planet_edit_submit(fullpath):
     path = fullpath.split(".xml/")
-    print path
     if len(path)!=2:
         abort(404)
     urlfilename = path[0]+".xml"
     xmlpath = path[1]
+
+    with open("recaptcha.txt") as f: # read in secret from file.
+        content = f.readlines()
+    captchasecret = "".join(content).strip()
+
+    if "g-recaptcha-response" not in request.form:
+        return json.dumps({'success': False, 'message': "Captcha failed. Please try again."})
+    url = "https://www.google.com/recaptcha/api/siteverify?secret="+captchasecret+"&response="+request.form["g-recaptcha-response"]+""
+    captcharesponse = json.load(urllib.urlopen(url))
+    if captcharesponse["success"]!=True:
+        return json.dumps({'success': False, 'message': "Captcha failed. Please try again."})
+    if len(request.form["name"])<2:
+        return json.dumps({'success': False, 'message': "Please enter your name."})
+    if len(request.form["paper"])<10:
+        return json.dumps({'success': False, 'message': "Please enter a valid link to a scientific publication."})
+    
+
+
+
     oec = app.oec
     for key in oec.planetXmlPairs:
         system,planet,star,filename = oec.planetXmlPairs[key]
         if filename==urlfilename:
             break
     if filename!=urlfilename:
-        abort(404)
+        return json.dumps({'success': False, 'message': "Cannot find system."})
     new_system = copy.deepcopy(system)
     o = new_system.find(xmlpath)
     attribs = ["errorplus", "errorminus","upperlimit", "lowerlimit"]
@@ -347,7 +369,7 @@ def page_planet_edit_submit(fullpath):
 
     mongo.db.edits.insert(d)
 
-    return "Thanks for your contribution. We're checking your commit now."
+    return json.dumps({'success': True, 'message': "Thanks for your contribution. We're checking your commit now."})
 
 
 @app.route('/correlations/')
