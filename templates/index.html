@@ -3,10 +3,9 @@
 
 <p>
 	The Open Exoplanet Catalogue is a catalogue of all discovered extra-solar planets. 
-	It is a new kind of astronomical database, based on small text files and a distributed version control system. 
+	It is a new kind of astronomical database.
 	It is decentralized and completely open.
-	Contribution and corrections are welcome. 
-	The Open Exoplanet Catalogue is furthermore the only catalogue that can correctly represent the orbital structure of planets in arbitrary binary, triple and quadruple star systems as well as orphan planets.
+	We welcome contributions and corrections from both professional astronomers and the general public. 
 </p>
 
 
@@ -48,14 +47,11 @@
 <!-- ########################### -->
 <h2><img src="/static/img/database.png" alt="star" />Data access</h2>
 <p>
-	The main repository of the <a href="https://github.com/hannorein/open_exoplanet_catalogue">Open Exoplanet Catalogue</a> is hosted on github.
-	This website is just a front end. 
-</p>
-<p>
-	You do not need to use this website to access the database.
-	You can even build your own front end.
-	All information on this page is directly generated from the XML files in the catalogue. 
-	If you are interested in how, look at the source code of each page or look at the <a href="https://github.com/hannorein/oec_web/">oec_web</a> repository on github. 
+	This website is just a front end that displays the database in a browser. 
+	The actual database is stored in a distributed version control system. 
+	There are multiple ways to download the entire database if you want to dive deeper.
+	As a starting point, visit the <a href="https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/">main repository</a> of the Open Exoplanet Catalogue on github.
+	The website itself is also open source and hosted over at <a href="https://github.com/OpenExoplanetCatalogue/oec_web/">github</a>. 
 </p>
 
 
@@ -66,15 +62,14 @@
 	The data in the Open Exoplanet Catalogue is stored in human readable XML files. 
 	There is one separate file for each planetary system.
 	The combination of small text files and a human readable file format makes the entire catalogue work smoothly with git, a popular version control system used to manage different versions of the catalogue.
-	If you are not familiar with git, you can simply ignore this. 
-	However, git allows you to keep your local database in sync with the main repository on github. 
+	Git allows you to keep your local database in sync with the main repository on github. 
 	You can make correction to the files and submit them back to github to be included in the main repository (you can either ask to get write access or send a pull request).
 	Furthermore, you can trace back all changes made to every parameter and find out who made a certain entry and on what date.
 	The git commit message usually includes the reference to the scientific paper where the data is taken from. 
 	Thus, you can easily find the scientific reference for every value in the catalogue.
 </p>
 <p>
-	If you are more familiar with simple comma or tab-separated ASCII tables, you can find these in the <a href="https://github.com/hannorein/oec_tables/">oec_tables</a> repository on github. 
+	If you are more familiar with simple comma or tab-separated ASCII tables, you can find these in the <a href="https://github.com/OpenExoplanetCatalogue/oec_tables/">oec_tables</a> repository on github. 
 	They contain mostly the same information as the XML files.
 	However, some information, especially in the case of a binary system cannot be easily represented in an ASCII table. 
 	You are therefore encouraged to use the original XML files provided by the Open Exoplanet Catalogue. 
@@ -84,8 +79,6 @@
 </p>
 <p>
 	Please consider contributing to the Open Exoplanet Catalogue!
-	You will find a dedicated tutorial on how to make a contribution at <a href="http://openexoplanetcatalogue.com/contribute/">openexoplanetcatalogue.com/contribute/</a>. 
-	Or watch <a href="http://youtu.be/IckDgF4vNNE">this</a> video which also shows you the basic steps.
 </p>
 
 
