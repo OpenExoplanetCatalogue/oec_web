@@ -41,13 +41,14 @@ titles = {
     "radiusEarth":                  "Radius [R<sub>earth</sub>]",
 }
 
-def getEditButton(system,o):
+def getEditButton(xmlPair,o):
     if o is None:
         return ""
     else:
+        system, planet, star, filename = xmlPair
         path = ET.ElementTree(system).getpath(o)
         if path is not None:
-            return "<a class='editbutton' href='edit"+path[7:]+"'>edit</a>"
+            return "<a class='editbutton' href='/edit/form/"+filename+path[7:]+"'>edit</a>"
     return ""
 
 def render(xmlPair,type):
@@ -62,12 +63,9 @@ def render(xmlPair,type):
         return renderFloat(system.find("./distance"),3.2615638)
     if type=="massEarth":
         return renderFloat(planet.find("./mass"),317.8942)
-    if type in ["mass","radius","eccentricity","temperature","semimajoraxis"]:
+    if type in ["mass","radius","period","eccentricity","temperature","semimajoraxis"]:
         o = planet.find("./"+type)
-        return renderFloat(o)+getEditButton(system,o)
-    if type=="period":
-        o = planet.find("./period")
-        return renderFloat(o)+getEditButton(system,o)
+        return renderFloat(o)+getEditButton(xmlPair,o)
     if type=="radiusEarth":
         return renderFloat(planet.find("./radius"),10.973299)
     # Text based object

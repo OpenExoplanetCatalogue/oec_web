@@ -28,7 +28,6 @@ class MyOEC:
         self.planets = []
         self.systems = []
         self.planetXmlPairs = {}
-        self.systemXmlPairs = {}
 
         # Loop over all files and  create new data
         for filename in glob.glob(self.OEC_PATH + "systems/*.xml"):
@@ -52,7 +51,6 @@ class MyOEC:
                 self.planets.append(xmlPair)
                 name = p.find("./name").text
                 self.planetXmlPairs[name] = xmlPair
-            self.systemXmlPairs[root.find("./name").text] = (root,None,filename)
         self.fullxml += "</systems>\n"
 
         print "Parsing OEC META ..."
@@ -252,14 +250,21 @@ def getAttribText(o,a):
     else:
         return ""
 
-@app.route('/planet/<planetname>/edit/<path:xmlpath>')
-def page_planet_editform(planetname,xmlpath):
-    oec = app.oec
-    try:
-        xmlPair = oec.planetXmlPairs[planetname]
-    except:
+@app.route('/edit/form/<path:fullpath>')
+def page_planet_edit_form(fullpath):
+    path = fullpath.split(".xml/")
+    if len(path)!=2:
         abort(404)
-    system,planet,star,filename = xmlPair
+    urlfilename = path[0]+".xml"
+    xmlpath = path[1]
+    oec = app.oec
+    for key in oec.planetXmlPairs:
+        system,planet,star,filename = oec.planetXmlPairs[key]
+        if filename==urlfilename:
+            break
+    if filename!=urlfilename:
+        abort(404)
+    print xmlpath
     planetname = planet.find("./name").text
     o = system.find(xmlpath)
     title = ""
@@ -268,7 +273,7 @@ def page_planet_editform(planetname,xmlpath):
     return render_template("edit_form_float.html",
         title=title,
         value=o.text,
-        planetnameurl=urllib.quote(planetname),
+        filename=filename,
         errorminus=getAttribText(o,"errorminus"),
         errorplus=getAttribText(o,"errorplus"),
         lowerlimit=getAttribText(o,"lowerlimit"),
@@ -294,15 +299,20 @@ def indent(elem, level=0):
 
 
 
-@app.route('/planet/<planetname>/submit-edit/<path:xmlpath>',methods=["POST"])
-def page_planet_submiteditform(planetname,xmlpath):
-    oec = app.oec
-    try:
-        xmlPair = oec.planetXmlPairs[planetname]
-    except:
+@app.route('/edit/submit/<path:fullpath>',methods=["POST"])
+def page_planet_edit_submit(fullpath):
+    path = fullpath.split(".xml/")
+    if len(path)!=2:
         abort(404)
-    system,planet,star,filename = xmlPair
-    planetname = planet.find("./name").text
+    urlfilename = path[0]+".xml"
+    xmlpath = path[1]
+    oec = app.oec
+    for key in oec.planetXmlPairs:
+        system,planet,star,filename = oec.planetXmlPairs[key]
+        if filename==urlfilename:
+            break
+    if filename!=urlfilename:
+        abort(404)
     new_system = copy.deepcopy(system)
     o = new_system.find(xmlpath)
     attribs = ["errorplus", "errorminus","upperlimit", "lowerlimit"]
