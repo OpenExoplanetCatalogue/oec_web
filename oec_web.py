@@ -17,8 +17,11 @@ from flask import Flask, abort, render_template, send_from_directory, request, r
 from flask.ext.pymongo import PyMongo
 import threading
 
-
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+with open(APP_ROOT+"/recaptcha.txt") as f: # read in secret from file.
+	content = f.readlines()
+captchasecret = "".join(content).strip()
+
 
 class MyOEC:
     OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
@@ -309,10 +312,6 @@ def page_planet_edit_submit(fullpath):
         abort(404)
     urlfilename = path[0]+".xml"
     xmlpath = path[1]
-
-    with open("recaptcha.txt") as f: # read in secret from file.
-        content = f.readlines()
-    captchasecret = "".join(content).strip()
 
     if "g-recaptcha-response" not in request.form:
         return json.dumps({'success': False, 'message': "Captcha failed. Please try again."})
