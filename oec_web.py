@@ -47,10 +47,9 @@ class MyOEC:
             pstars = root.findall("./star")
             for p in root.findall(".//planet"):
                 star = None
-                for s in pstars:
-                    if p in s:
-                        star = s
-                        break
+                parent = p.getparent()
+                if parent.tag=="star":
+                    star = parent
                 xmlPair = (root,p,star,filename)
                 self.planets.append(xmlPair)
                 name = p.find("./name").text

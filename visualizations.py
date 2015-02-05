@@ -134,50 +134,60 @@ def habitable(xmlPair):
         if semimajoraxis>maxa:
             maxa = semimajoraxis
 
-
-
-    spectraltype = getText(star,"./spectraltype","O")[0]
-    stellarr = getFloat(star,"./stellarr")
-    if stellarr is None or stellarr<0.01:
-        stellarr = 1.
-        if spectraltype=='O': stellarr=10.
-        if spectraltype=='B': stellarr=3.0
-        if spectraltype=='A': stellarr=1.5
-        if spectraltype=='F': stellarr=1.3
-        if spectraltype=='G': stellarr=1.0
-        if spectraltype=='K': stellarr=0.8
-        if spectraltype=='M': stellarr=0.5
-        
     temperature = getFloat(star,"./temperature")
+    spectralTypeMain = getText(star,"./spectraltype","G")[0]
     if temperature is None:
-        temperature=5500
-        if spectraltype=='O': temperature=40000
-        if spectraltype=='B': temperature=20000
-        if spectraltype=='A': temperature=8500
-        if spectraltype=='F': temperature=6500
-        if spectraltype=='G': temperature=5500
-        if spectraltype=='K': temperature=4000
-        if spectraltype=='M': temperature=3000
+        if spectralTypeMain=="O":
+            temperature = 40000
+        if spectralTypeMain=="B":
+            temperature = 20000
+        if spectralTypeMain=="A":
+            temperature = 8500
+        if spectralTypeMain=="F":
+            temperature = 6500
+        if spectralTypeMain=="G":
+            temperature = 5500
+        if spectralTypeMain=="K":
+            temperature = 4000
+        if spectralTypeMain=="M":
+            temperature = 3000
+        
+    rel_temp = temperature - 5700.
     
-    temperature -= 5700
-        
-        
-    linsun2  = 0.68    
-    linsun1  = 0.95
-    loutsun1 = 1.67
-    loutsun2 = 1.95
-
-
-    _stellarMass = getFloat(star,"./mass",1.)
-    if _stellarMass>2.:
-        luminosity = pow(_stellarMass,3.5)
+    stellarMass = getFloat(star,"./mass")
+    if stellarMass is None:
+        stellarMass = 1.
+    
+    stellarRadius = getFloat(star,"./radius")
+    if stellarRadius is None or stellarRadius<0.01:
+        stellarRadius = 1.
+        if spectralTypeMain=='O': 
+            stellarRadius=10.
+        if spectralTypeMain=='B': 
+            stellarRadius=3.0
+        if spectralTypeMain=='A': 
+            stellarRadius=1.5
+        if spectralTypeMain=='F': 
+            stellarRadius=1.3
+        if spectralTypeMain=='G': 
+            stellarRadius=1.0
+        if spectralTypeMain=='K': 
+            stellarRadius=0.8
+        if spectralTypeMain=='M': 
+            stellarRadius=0.5
+    
+    if stellarMass>2.:
+        luminosity = pow(stellarMass,3.5)
     else:
-        luminosity = pow(_stellarMass,4.)
+        luminosity = pow(stellarMass,4.)
+    
+    
+    HZinner2 = (0.68-2.7619e-9*rel_temp-3.8095e-9*rel_temp*rel_temp) *sqrt(luminosity);
+    HZouter2 = (1.95-1.3786e-4*rel_temp-1.4286e-9*rel_temp*rel_temp) *sqrt(luminosity);
+    HZinner = (0.95-2.7619e-9*rel_temp-3.8095e-9*rel_temp*rel_temp) *sqrt(luminosity);
+    HZouter = (1.67-1.3786e-4*rel_temp-1.4286e-9*rel_temp*rel_temp) *sqrt(luminosity);
 
-    HZinner2 = (linsun2 -2.7619e-9*temperature-3.8095e-9*temperature*temperature) *sqrt(luminosity)
-    HZouter2 = (loutsun2-1.3786e-4*temperature-1.4286e-9*temperature*temperature) *sqrt(luminosity)
-    HZinner  = (linsun1 -2.7619e-9*temperature-3.8095e-9*temperature*temperature) *sqrt(luminosity)
-    HZouter  = (loutsun1-1.3786e-4*temperature-1.4286e-9*temperature*temperature) *sqrt(luminosity)
+
 
     width = 600
     height= 100
@@ -188,13 +198,13 @@ def habitable(xmlPair):
         <defs>
             <radialGradient id="habitablegradient" > 
                 <stop id="stops0" offset=".0" stop-color="lightgreen" stop-opacity="0"/>
-                <stop id="stops1" offset="<?=($HZinner2)/($HZouter2)?>" stop-color="lightgreen" stop-opacity="0"/>
-                <stop id="stops2" offset="<?=($HZinner)/($HZouter2)?>" stop-color="lightgreen" stop-opacity="1"/>
-                <stop id="stops3" offset="<?=($HZouter)/($HZouter2)?>" stop-color="lightgreen" stop-opacity="1"/>
+                <stop id="stops1" offset="%f" stop-color="lightgreen" stop-opacity="0"/>
+                <stop id="stops2" offset="%f" stop-color="lightgreen" stop-opacity="1"/>
+                <stop id="stops3" offset="%f" stop-color="lightgreen" stop-opacity="1"/>
                 <stop id="stops4" offset="1" stop-color="lightgreen" stop-opacity="0"/>
             </radialGradient> 
         </defs>
-        """
+        """ %(HZinner2/HZouter2, HZinner/HZouter2,HZouter/HZouter2 )
     if HZinner2<maxa*2:
         svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" fill="url(#habitablegradient)" />' %(
                 0.,
@@ -209,8 +219,8 @@ def habitable(xmlPair):
     svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" style="fill:red" />' %(
                 0.,
                 height/2,
-                au*stellarr*0.0046524726,
-                au*stellarr*0.0046524726)
+                au*stellarRadius*0.0046524726,
+                au*stellarRadius*0.0046524726)
     
     svg += '<g style="stroke:black;">'
     for planet in planets:
