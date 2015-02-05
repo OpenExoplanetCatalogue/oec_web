@@ -91,7 +91,11 @@ def render(xmlPair,type,editbutton=True):
         except:
             return None
     if type=="description":
-        return renderText(planet.find("./description"))
+        o = planet.find("./description")
+        html = renderText(o)
+        if editbutton:
+            html += getEditButton(xmlPair,o)
+        return html
     if type=="name":
         return renderText(planet.find("./name"))
     if type=="namelink":

@@ -276,6 +276,15 @@ def page_planet_edit_form(fullpath):
         tag = "star"+tag
     if tag in oec_fields.titles:
         title = oec_fields.titles[tag]
+    if tag in ["description"]:
+        # Text
+        return render_template("edit_form_text.html",
+            title=title,
+            value=o.text,
+            filename=filename,
+            xmlpath=xmlpath,
+            )
+    # Default float
     return render_template("edit_form_float.html",
         title=title,
         value=o.text,
@@ -336,17 +345,27 @@ def page_planet_edit_submit(fullpath):
         return json.dumps({'success': False, 'message': "Cannot find system."})
     new_system = copy.deepcopy(system)
     o = new_system.find(xmlpath)
-    attribs = ["errorplus", "errorminus","upperlimit", "lowerlimit"]
-    for attrib in attribs:
-        if attrib in request.form:
-            newv = request.form[attrib]
-            if len(newv)==0:
-                if attrib in o.attrib:
-                    o.attrib.pop(attrib)
-            else:
-                o.attrib[attrib] = newv
-    if "value" in request.form:
-        o.text = request.form["value"]
+
+    tag = o.tag
+    if o.getparent().tag == "star":
+        tag = "star"+tag
+    if tag in ["desription"]:
+        # Text 
+        if "value" in request.form:
+            o.text = request.form["value"]
+    else:
+        # Float
+        attribs = ["errorplus", "errorminus","upperlimit", "lowerlimit"]
+        for attrib in attribs:
+            if attrib in request.form:
+                newv = request.form[attrib]
+                if len(newv)==0:
+                    if attrib in o.attrib:
+                        o.attrib.pop(attrib)
+                else:
+                    o.attrib[attrib] = newv
+        if "value" in request.form:
+            o.text = request.form["value"]
     
     
     indent(new_system)
