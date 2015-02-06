@@ -25,7 +25,7 @@ titles = {
     "starmetallicity":              "Metallicity [Fe/H]",
     "starspectraltype":             "Spectral type",
     "startemperature":              "Temperature [K]",
-    "starvisualmagnitude":          "Visual magnitude",
+    "starmagV":                     "Visual magnitude",
     "period":                       "Orbital period [days]",
     "semimajoraxis":                "Semi-major axis [AU]",
     "eccentricity":                 "Eccentricity",
@@ -159,7 +159,7 @@ def render(xmlPair,type,editbutton=True):
                     alternativenames += ", "
                 alternativenames += name.text
             return alternativenames
-        if type in ["mass","radius","age","metallicity","temperature"]:
+        if type in ["mass","radius","age","metallicity","temperature","magV"]:
             o = star.find("./"+type)
             html = renderFloat(o)
             if editbutton:

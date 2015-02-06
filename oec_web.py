@@ -204,7 +204,7 @@ def page_planet(planetname):
     
     startable = []
     startablefields = []
-    for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starvisualmagnitude"]:
+    for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starmagV"]:
         startablefields.append(oec_fields.titles[row])
         rowdata = []
         for s in stars:
