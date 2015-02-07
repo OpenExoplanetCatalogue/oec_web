@@ -37,19 +37,10 @@ tr.odd {
 }
 
 /* tablesorter class */
-table.tablesorter thead tr .tsheader {
-	background-image: url(../img/bg.png);
+table.tablesorter thead tr th {
+	background-image: url(/static/img/bg.png);
 	background-repeat: no-repeat;
 	background-position: center right;
 	cursor: pointer;
 	padding-right: 20px;
-}
-table.tablesorter thead tr .headerSortUp {
-	background-image: url(../img/asc.png);
-}
-table.tablesorter thead tr .headerSortDown {
-	background-image: url(../img/desc.png);
-}
-table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-	background-color: #8dbdd8;
 }

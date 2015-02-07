@@ -110,50 +110,50 @@ span.NA {
 	color: lightgray;
 }
 
-.header {
+div.header {
 	background: url('/static/img/header_n.jpg') no-repeat;
 	height: 250px;
 	margin-bottom: 0px;
 	text-align: right;
 }
 
-.header .title {
+div.header div.title {
 	padding-top: 60px;
 	padding-right: 100px;
 	text-align: right;
 }
-.header .title .name a {
+div.header div.title .name a {
 	font-size: 4em;
 	color: #000;
 	font-weight: bold;
 	text-decoration: none;
 	text-align: right;
 }
-.header .title .name a:hover {border-color: #F60;}
+div.header div.title .name a:hover {border-color: #F60;}
 
-.header .title .tag {
+div.header div.title .tag {
 	text-align: right;
 	font-size: 1.2em;
 }
-.navigation {
+div.navigation {
 	padding-top: 50px;
 	padding-right: 30px;
 	background: #fff url('/static/img/header2.jpg') no-repeat;
 	float: left; 
 	width: 220px;
 }
-.navigation h2 {
+div.navigation h2 {
 	font-size:	1.3em;
 	line-height: 30px;
 	margin: 0;
 	padding-left: 11px;
 }
-.navigation ul {
+div.navigation ul {
 	padding-bottom: 10px;
 	border-top: 1px solid #000;
 }
-.navigation li {border-bottom: 1px solid #b1b1b1;}
-.navigation li a {
+div.navigation li {border-bottom: 1px solid #b1b1b1;}
+div.navigation li a {
 	font-size: 1.0em;
 	color: #7c7c7c;
 	display: block;
@@ -161,11 +161,11 @@ span.NA {
 	text-decoration: none;
 	width: 95%;
 }
-.navigation li a:hover {
+div.navigation li a:hover {
 	background: #c7c7c7;
 	color: #282828;	
 }
-.content {
+div.content {
 	margin-left: 250px;
 	margin-top: 0px;
 }

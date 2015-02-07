@@ -100,7 +100,7 @@ def render(xmlPair,type,editbutton=True):
         return renderText(planet.find("./name"))
     if type=="namelink":
         planetname = planet.find("./name").text
-        return "<a href=\"/planet/%s/\">%s</a>"%(urllib.quote(planetname),planetname)
+        return "<a href=\"/planet/%s/\"><span class=\"numericvalue\">%s</span></a>"%(urllib.quote(planetname),planetname)
     if type=="discoveryyear":
         return renderText(planet.find("./discoveryyear"))
     if type=="discoverymethod":

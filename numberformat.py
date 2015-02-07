@@ -6,7 +6,7 @@ def toFixed(f,digits):
     formatstring = "%%.%df"%digits
     return formatstring % f
 
-notAvailableString = "<span class=\"NA\">N/A</span>"
+notAvailableString = "<span class=\"NA\"><span class=\"numericvalue\"></span>N/A</span>"
 
 def renderText(tag):
     if tag is None:
@@ -106,12 +106,12 @@ def renderFloat(tag, factor=1.):
     
     
     if value is not None:
-        dataString = toFixed(value,significantdigits)
+        dataString = "<span class=\"numericvalue\">"+toFixed(value,significantdigits)+"</span>"
     else:
         if lowerlimit is not None:
-            dataString = "&gt; "+toFixed(lowerlimit,significantdigits)
+            dataString = "&gt; <span class=\"numericvalue\">"+toFixed(lowerlimit,significantdigits)+"</span>"
         elif upperlimit is not None:
-            dataString = "&lt; "+toFixed(upperlimit,significantdigits)
+            dataString = "&lt; <span class=\"numericvalue\">"+toFixed(upperlimit,significantdigits)+"</span>"
         
     
     if isExp:

@@ -1,12 +1,25 @@
 {% extends "layout.html" %}
 {% block title %}- List of all extrasolar planets{% endblock title %}
 {% block header %}
+<script type="text/javascript" src="/static/js/jquery.tablesorter.min.js"></script>
 <script>
 $(document).ready(function(){
 	$("#fieldsbutton").click(function(){
 		$("#fields").toggle(0);
 		$("#fieldsbutton").toggle();
 	});
+	$(".tablesorter").tablesorter({ 
+		textExtraction: function(node) { 
+			var n = $(node);
+			var numericvalue = n.find(".numericvalue")
+			if(numericvalue.length){
+				return numericvalue.text();
+			}
+            		return n.text(); 
+       	 	},
+		type: "numeric",
+		delayInit: true,
+	}); 
 });
 </script>
 {% endblock header %}
