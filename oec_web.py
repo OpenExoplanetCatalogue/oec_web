@@ -11,6 +11,7 @@ import visualizations
 import oec_filters
 import datetime
 import oec_fields
+from bson.objectid import ObjectId
 from functools import wraps
 #import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
@@ -434,9 +435,12 @@ def page_systems_xml():
 def page_robots_txt():
     return "User-agent: *\nDisallow:\n"
 
-@app.route('/edits/')
+@app.route('/edits/',methods=["POST","GET"])
 @requires_auth
 def page_edits():
+    if "delete" in request.form:
+        print mongo.db.edits.remove( {"_id": ObjectId(request.form["delete"])} )
+
     edits = mongo.db.edits.find()
     return render_template("edits.html",
         edits=edits,

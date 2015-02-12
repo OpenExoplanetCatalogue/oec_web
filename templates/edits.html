@@ -12,8 +12,14 @@
 	{%for edit in edits%}
 	<tr>
 		<td style="vertical-align: top;">
-			Approve<br/>
-			Delete
+			<form action="/edits/" method="post">
+				<input type="hidden" value="{{edit["_id"]|safe}}" name="approve" /> 
+				<input type="submit" value="Approve" />
+			</form>
+			<form action="/edits/" method="post">
+				<input type="hidden" value="{{edit["_id"]|safe}}" name="delete" /> 
+				<input  type="submit" value="Delete" />
+			</form>
 		</td>
 
 		<td style="vertical-align: top;">
