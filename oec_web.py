@@ -11,6 +11,7 @@ import visualizations
 import oec_filters
 import datetime
 import oec_fields
+from functools import wraps
 #import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response
@@ -21,6 +22,9 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(APP_ROOT+"/recaptcha.txt") as f: # read in secret from file.
 	content = f.readlines()
 captchasecret = "".join(content).strip()
+with open(APP_ROOT+"/adminpassword.txt") as f: # read in secret from file.
+	content = f.readlines()
+adminpassword = "".join(content).strip()
 
 
 class MyOEC:
@@ -96,6 +100,28 @@ def page_planet_redirect():
     return redirect("planet/"+planetname, 301)
 
 #################
+
+def check_auth(username, password):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    return username == 'admin' and password == adminpassword
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.route('/plot/<plotname>/')
 @app.route('/plot/<plotname>')
 @app.route('/plot/<plotname>.svg')
@@ -409,6 +435,7 @@ def page_robots_txt():
     return "User-agent: *\nDisallow:\n"
 
 @app.route('/edits/')
+@requires_auth
 def page_edits():
     edits = mongo.db.edits.find()
     return render_template("edits.html",
