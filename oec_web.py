@@ -81,7 +81,10 @@ class FlaskApp(Flask):
         return mydata.oec
 
 app = FlaskApp(__name__)
-mongo = PyMongo(app)
+try:
+    mongo = PyMongo(app)
+except:
+    print("Mongo DB not correctly initialized.")
 
 def isList(value):
     return isinstance(value, list)
@@ -96,6 +99,7 @@ app.jinja_env.filters['getFirst'] = getFirst
 #################
 
 @app.route('/system.html')
+@app.route('/search/')
 def page_planet_redirect():
     planetname = request.args.get("id")
     return redirect("planet/"+planetname, 301)
