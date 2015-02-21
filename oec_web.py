@@ -37,6 +37,7 @@ class MyOEC:
         self.planets = []
         self.systems = []
         self.planetXmlPairs = {}
+        self.planetnames = {}
 
         # Loop over all files and  create new data
         for filename in glob.glob(self.OEC_PATH + "systems/*.xml"):
@@ -59,6 +60,8 @@ class MyOEC:
                 self.planets.append(xmlPair)
                 name = p.find("./name").text
                 self.planetXmlPairs[name] = xmlPair
+                for n in p.findall("./name"):
+                    self.planetnames[n.text] = name
         self.fullxml += "</systems>\n"
 
         print "Parsing OEC META ..."
@@ -101,7 +104,18 @@ app.jinja_env.filters['getFirst'] = getFirst
 @app.route('/system.html')
 @app.route('/search/')
 def page_planet_redirect():
+    oec = app.oec
     planetname = request.args.get("id")
+    if planetname not in oec.planetXmlPairs:
+        print planetname
+        if planetname in oec.planetnames:
+            print planetname
+            planetname = oec.planetnames[planetname]
+        else:
+            print planetname
+            print "not found" 
+            abort(404)
+
     return redirect("planet/"+planetname, 301)
 
 #################
