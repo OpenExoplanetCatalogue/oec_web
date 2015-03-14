@@ -456,15 +456,15 @@ def page_robots_txt():
 @app.route('/edits/',methods=["POST","GET"])
 @requires_auth
 def page_edits():
-    if "delete" in request.form:
-        print mongo.db.edits.remove( {"_id": ObjectId(request.form["delete"])} )
-    elif "approve" in request.form:
+    if "approve" in request.form:
         edit = mongo.db.edits.find_one( {"_id": ObjectId(request.form["approve"])} )
         response = make_response(edit["patch"])
         response.headers["Content-Disposition"] = "attachment; filename=oec.patch"
         response.headers["Content-Type"] = "application/patch" 
         return response
     else:
+        if "delete" in request.form:
+            print mongo.db.edits.remove( {"_id": ObjectId(request.form["delete"])} )
         edits = mongo.db.edits.find()
         return render_template("edits.html",
             edits=edits,
