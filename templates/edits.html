@@ -41,6 +41,8 @@
 	<td colspan="5">
 		<pre>
 patch -p0 &lt; oec.patch
+python cleanup.py
+git diff
 git commit -a -m "Patch via openexoplanetcatalogue.com\n Source: {{edit["paper"] |safe}}" --author="{{ edit["name"] }} &lt;&gt;"
 		</pre>
 	</td>
