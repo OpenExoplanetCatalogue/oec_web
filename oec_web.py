@@ -15,7 +15,7 @@ from bson.objectid import ObjectId
 from functools import wraps
 #import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
-from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response
+from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response, make_response
 from flask.ext.pymongo import PyMongo
 import threading
 
@@ -458,11 +458,17 @@ def page_robots_txt():
 def page_edits():
     if "delete" in request.form:
         print mongo.db.edits.remove( {"_id": ObjectId(request.form["delete"])} )
-
-    edits = mongo.db.edits.find()
-    return render_template("edits.html",
-        edits=edits,
-        )
+    elif "approve" in request.form:
+        edit = mongo.db.edits.find_one( {"_id": ObjectId(request.form["approve"])} )
+        response = make_response(edit["patch"])
+        response.headers["Content-Disposition"] = "attachment; filename=oec.patch"
+        response.headers["Content-Type"] = "application/patch" 
+        return response
+    else:
+        edits = mongo.db.edits.find()
+        return render_template("edits.html",
+            edits=edits,
+            )
 
 if __name__ == '__main__':
     app.run(debug=True,threaded=True)

@@ -14,7 +14,7 @@
 		<td style="vertical-align: top;">
 			<form action="/edits/" method="post">
 				<input type="hidden" value="{{edit["_id"]|safe}}" name="approve" /> 
-				<input type="submit" value="Approve" />
+				<input type="submit" value="Download" />
 			</form>
 			<form action="/edits/" method="post">
 				<input type="hidden" value="{{edit["_id"]|safe}}" name="delete" /> 
@@ -36,6 +36,14 @@
 		<td style="vertical-align: top;"> 
 			{{ edit["name"] }}
 		</td>
+	</tr>
+	<tr>
+	<td colspan="5">
+		<pre>
+patch -p0 &lt; oec.patch
+git commit -a -m "Patch via openexoplanetcatalogue.com\n Source: {{edit["paper"] |safe}}" --author="{{ edit["name"] }} &lt;&gt;"
+		</pre>
+	</td>
 	</tr>
 	{%endfor%}
 </table>
