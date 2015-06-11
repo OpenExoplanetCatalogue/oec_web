@@ -1,0 +1,41 @@
+{% set OEC_LOCAL = "/open_exoplanet_catalogue/" %}
+{% set OEC_OUTREACH_LOCAL = "/oec_outreach/" %}
+{% set OEC_IPHONE_LOCAL = "/oec_iphone/" %}
+{% set OEC_GITHUB = "https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/" %}
+{% set OEC_TABLES_GITHUB = "https://github.com/OpenExoplanetCatalogue/oec_tables/" %}
+<head profile="http://www.w3.org/2005/10/profile">
+	<link rel="stylesheet" type="text/css" href="/static/css/style.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="/static/css/tables.css" media="screen" />
+	<script type="text/javascript" src="/static/js/d3.v3.min.js"></script>
+	<script type="text/javascript" src="/static/js/rgbcolor.js"></script> 
+	<script type="text/javascript" src="/static/js/canvg.js"></script> 
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
+	{% block header %}
+	{% endblock %}
+</head>
+<body>
+<div class="outer-container">
+<div class="inner-container">
+<div class="header">
+<div class="title">
+</div> <!-- title -->
+</div> <!-- header -->
+<div class="navigation">
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+</div> <!-- navigation -->
+<div class="content">
+	<h1 style="font-size: 5em;">
+		Number of confirmed exoplanets {{numconfirmedplanets}}
+	</h1>
+	Last update {{lastupdate}}
+</div> <!-- content -->
+</div> <!-- inner container -->
+</div> <!-- outer container -->
+</body>
+</html>

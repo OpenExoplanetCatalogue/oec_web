@@ -171,6 +171,17 @@ def page_main():
             contributors=contributors,
         )
 
+
+@app.route('/kiosk/')
+def page_kiosk():
+    oec = app.oec
+    commitdate = datetime.datetime.fromtimestamp(int(oec.oec_meta_statistics.find(".//lastcommittimestamp").text))
+
+    return render_template("kiosk.html",
+            numconfirmedplanets=int(oec.oec_meta_statistics.find("./confirmedplanets").text),
+            lastupdate=commitdate.strftime("%c"),
+        )
+
 @app.route('/systems/',methods=["POST","GET"])
 def page_systems():
     oec = app.oec
