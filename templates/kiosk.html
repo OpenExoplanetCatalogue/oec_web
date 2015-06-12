@@ -10,9 +10,27 @@
 	<script type="text/javascript" src="/static/js/rgbcolor.js"></script> 
 	<script type="text/javascript" src="/static/js/canvg.js"></script> 
 	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-	<script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
-	{% block header %}
-	{% endblock %}
+	<style>
+	  .chart {
+	    height: 100%;
+	    width: 100%;
+            position: absolute;
+            left: 0px;
+	    top: 0px;
+	    z-index: -1;
+            
+	    border-bottom: 1px solid #ccc;
+	    display: block;
+	  }
+	  .chart .bar {
+	    fill: #888;
+	  }
+	  .chart .bar2 {
+		  font-size: 0.75em;
+		  color: #F00;
+		  text-anchor: middle;
+	  }
+	</style>	
 </head>
 <body>
 <div class="outer-container">
@@ -30,10 +48,74 @@
 <br/>
 </div> <!-- navigation -->
 <div class="content">
-	<h1 style="font-size: 5em;">
-		Number of confirmed exoplanets {{numconfirmedplanets}}
+	<h1 style="font-size: 5em; position:absolute; top: 1em;">
+		Number of confirmed exoplanets: {{numconfirmedplanets}}
 	</h1>
-	Last update {{lastupdate}}
+	
+	<br />
+	<p style=" position:absolute; top: 20em;">
+	Last updated: {{lastupdate}} (UTC)<br />
+	Source: Open Exoplanet Catalogue<br />
+	</p>
+	
+<svg class="chart" data-bar-chart data-data="{{discoverynumbers}}" ></svg>
+<svg data-labels data-data="{{discoveryyears}}" ></svg>
+
+
+<script>
+function build(){
+  var labels = $('[data-labels]').data('data').split(',');
+
+  $('[data-bar-chart]').each(function (i, svg) {
+    var $svg = $(svg);
+    var data = $svg.data('data').split(',').map(function (datum) {
+      return parseFloat(datum);
+    });
+    var barSpace = 10;
+    var barWidth = (parseFloat($svg.css("width"))-(data.length-1)*barSpace)/data.length;
+    var chartHeight = $svg.outerHeight();
+
+    var y = d3.scale.linear()
+              .domain([0, d3.max(data)])
+              .range([0, chartHeight/1.4]);
+
+    var groups = d3.select(svg)
+      .selectAll("rect")
+        .data(data);
+
+    var gs = groups.enter().append("g");
+
+     gs.append("rect")
+        .attr("class", "bar")
+        .attr("width", barWidth)
+        .attr("x", function (d, i) { return barWidth*i + barSpace*i; })
+        .attr("y", chartHeight)
+        .attr("height", 0)
+        .transition()
+        .delay(function (d, i) { return i*190; })
+        .attr("y", function (d, i) { return chartHeight-y(d); })
+        .attr("height", function (d) { return y(d); })
+	;
+     gs.append("text")
+        .attr("class", "bar2")
+        .attr("width", barWidth)
+        .attr("x", function (d, i) { return barWidth*i + barSpace*i+0.5*barWidth; })
+        .attr("y", function (d, i) { return chartHeight-12; })
+        .attr("height", 0)
+        .text(function (d, i) { return labels[i]; })
+	;
+     setTimeout(
+     	function(){
+    	d3.select(svg).selectAll("g").remove(); 
+	build();
+	}
+	,7000
+     );
+  });
+}
+build();
+</script>
+
 </div> <!-- content -->
 </div> <!-- inner container -->
 </div> <!-- outer container -->

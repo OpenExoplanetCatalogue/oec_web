@@ -176,10 +176,20 @@ def page_main():
 def page_kiosk():
     oec = app.oec
     commitdate = datetime.datetime.fromtimestamp(int(oec.oec_meta_statistics.find(".//lastcommittimestamp").text))
+    data_x = ""
+    data_y = ""
+    sum_y = 0
+    for y in oec.oec_meta_statistics.find("./discoveryyear"):
+        data_x += y.tag[1:] + ","
+        sum_y+=int(y.text)
+        data_y += "%d," % sum_y
+
 
     return render_template("kiosk.html",
             numconfirmedplanets=int(oec.oec_meta_statistics.find("./confirmedplanets").text),
-            lastupdate=commitdate.strftime("%c"),
+            lastupdate=commitdate.strftime("%A, %-d %B %Y, %X"),
+            discoverynumbers= data_y[:-1],
+            discoveryyears= data_x[:-1],
         )
 
 @app.route('/systems/',methods=["POST","GET"])
