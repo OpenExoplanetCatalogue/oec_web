@@ -70,7 +70,7 @@
 	<br />
 	<p style=" position:absolute; top: 20em;">
 	Last updated: {{lastupdate}} (UTC)<br />
-	Last page load: {{loaddate}} (ET)<br />
+	Last page load: {{loaddate}} (UTC)<br />
 	Source: Open Exoplanet Catalogue<br />
 	</p>
 	
@@ -100,8 +100,21 @@ function build(){
         .data(data);
 
     var marginBottom = 35; 
-    var delay = 400;
     var gs = groups.enter().append("g");
+    
+    durationfunc = function(d,i){
+	    return Math.max(200,d*0.75);
+    }
+    delayfunc = function(d,i){
+	    if (i<=0){
+		    return 0.;
+	    }
+	    var sum = 0;
+	    for (j=0;j<i;j++){
+		sum += durationfunc(data[j],0);
+	    }
+	    return sum;
+    }
 
      gs.append("rect")
         .attr("class", "bar")
@@ -110,7 +123,8 @@ function build(){
         .attr("y", chartHeight-marginBottom)
         .attr("height", 0)
         .transition()
-        .delay(function (d, i) { return i*delay; })
+	.duration(durationfunc)
+        .delay(delayfunc)
         .attr("y", function (d, i) { return chartHeight-y(d)-marginBottom; })
         .attr("height", function (d) { return y(d); })
 	;
@@ -123,7 +137,8 @@ function build(){
         .text(function (d, i) { return d; })
         .attr("height", 0)
         .transition()
-        .delay(function (d, i) { return i*delay; })
+	.duration(durationfunc)
+        .delay(delayfunc)
         .attr("y", function (d, i) { return chartHeight-y(d)+16-marginBottom; })
 	;
      gs.append("text")
@@ -135,7 +150,8 @@ function build(){
         .text(function (d, i) { return labels[i]; })
         .attr("height", 0)
         .transition()
-        .delay(function (d, i) { return i*delay; })
+	.duration(durationfunc)
+        .delay(delayfunc)
         .attr("y", function (d, i) { return chartHeight-12; })
 	;
      d3.select(svg).append("g").append("rect")
