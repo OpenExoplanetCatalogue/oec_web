@@ -18,17 +18,26 @@
             left: 0px;
 	    top: 0px;
 	    z-index: -1;
+	    margin-bottom: 1px;
             
-	    border-bottom: 1px solid #ccc;
 	    display: block;
 	  }
 	  .chart .bar {
-	    fill: #888;
+	    	  fill: #888;
+	    	  z-index: -3;
 	  }
 	  .chart .bar2 {
 		  font-size: 0.75em;
 		  color: #F00;
 		  text-anchor: middle;
+	    	  z-index: -1;
+	  }
+	  .chart .bar3 {
+		  font-size: 0.75em;
+		  color: #FFF;
+		  fill: #FFF;
+		  text-anchor: middle;
+	    	  z-index: -2;
 	  }
 	</style>	
 </head>
@@ -55,6 +64,7 @@
 	<br />
 	<p style=" position:absolute; top: 20em;">
 	Last updated: {{lastupdate}} (UTC)<br />
+	Last page load: {{loaddate}} (ET)<br />
 	Source: Open Exoplanet Catalogue<br />
 	</p>
 	
@@ -72,7 +82,7 @@ function build(){
       return parseFloat(datum);
     });
     var barSpace = 10;
-    var barWidth = (parseFloat($svg.css("width"))-(data.length-1)*barSpace)/data.length;
+    var barWidth = (parseFloat($svg.css("width"))-(data.length+1)*barSpace)/data.length;
     var chartHeight = $svg.outerHeight();
 
     var y = d3.scale.linear()
@@ -83,33 +93,61 @@ function build(){
       .selectAll("rect")
         .data(data);
 
+    var marginBottom = 35; 
+    var delay = 400;
     var gs = groups.enter().append("g");
 
      gs.append("rect")
         .attr("class", "bar")
         .attr("width", barWidth)
-        .attr("x", function (d, i) { return barWidth*i + barSpace*i; })
-        .attr("y", chartHeight)
+        .attr("x", function (d, i) { return barWidth*i + barSpace*(i+1); })
+        .attr("y", chartHeight-marginBottom)
         .attr("height", 0)
         .transition()
-        .delay(function (d, i) { return i*190; })
-        .attr("y", function (d, i) { return chartHeight-y(d); })
+        .delay(function (d, i) { return i*delay; })
+        .attr("y", function (d, i) { return chartHeight-y(d)-marginBottom; })
         .attr("height", function (d) { return y(d); })
+	;
+     gs.append("text")
+        .attr("class", "bar3")
+        .attr("width", barWidth)
+        .attr("x", function (d, i) { return barWidth*i + barSpace*(i+1)+0.5*barWidth; })
+        .attr("y", chartHeight+12)
+        .attr("height", 0)
+        .text(function (d, i) { return d; })
+        .attr("height", 0)
+        .transition()
+        .delay(function (d, i) { return i*delay; })
+        .attr("y", function (d, i) { return chartHeight-y(d)+16-marginBottom; })
 	;
      gs.append("text")
         .attr("class", "bar2")
         .attr("width", barWidth)
-        .attr("x", function (d, i) { return barWidth*i + barSpace*i+0.5*barWidth; })
-        .attr("y", function (d, i) { return chartHeight-12; })
+        .attr("x", function (d, i) { return barWidth*i + barSpace*(i+1)+0.5*barWidth; })
+        .attr("y", chartHeight+12)
         .attr("height", 0)
         .text(function (d, i) { return labels[i]; })
+        .attr("height", 0)
+        .transition()
+        .delay(function (d, i) { return i*delay; })
+        .attr("y", function (d, i) { return chartHeight-12; })
+	;
+     d3.select(svg).append("g").append("rect")
+        .attr("class", "bar")
+        .attr("width", "100%")
+        .attr("x", 0)
+        .attr("y", chartHeight-marginBottom)
+        .attr("height", 1)
 	;
      setTimeout(
      	function(){
-    	d3.select(svg).selectAll("g").remove(); 
-	build();
+    		d3.select(svg).selectAll("g")
+			.transition()
+	  		.style("opacity",0)
+			.remove(); 
+     		setTimeout( build, 500);
 	}
-	,7000
+	,14000
      );
   });
 }

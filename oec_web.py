@@ -188,6 +188,7 @@ def page_kiosk():
     return render_template("kiosk.html",
             numconfirmedplanets=int(oec.oec_meta_statistics.find("./confirmedplanets").text),
             lastupdate=commitdate.strftime("%A, %-d %B %Y, %X"),
+            loaddate=time.strftime("%A, %-d %B %Y, %X"),
             discoverynumbers= data_y[:-1],
             discoveryyears= data_x[:-1],
         )
