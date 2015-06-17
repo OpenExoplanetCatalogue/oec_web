@@ -12,21 +12,21 @@
 	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
 	<style>
 	  ::-webkit-scrollbar { 
-		    display: none; 
+		display: none; 
 	  }
 	  body {
-		      overflow:hidden;
+		overflow:hidden;
 	  }
 	  .chart {
-	    height: 100%;
-	    width: 100%;
-            position: absolute;
-            left: 0px;
-	    top: 0px;
-	    z-index: -1;
-	    margin-bottom: 1px;
+	    	height: 100%;
+	    	width: 100%;
+            	position: absolute;
+            	left: 0px;
+	    	top: 0px;
+	    	z-index: -1;
+	    	margin-bottom: 1px;
             
-	    display: block;
+	    	display: block;
 	  }
 	  .chart .bar {
 	    	  fill: #888;
@@ -44,6 +44,16 @@
 		  fill: #FFF;
 		  text-anchor: middle;
 	    	  z-index: -2;
+	  }
+	  .frame {
+		  position: absolute;
+		  height: 100%;
+		  width: 100%;
+		  left: 0px;
+		  top: -1em;
+	  }
+	  .frame .pad {
+		  padding: 3em;
 	  }
 	</style>	
 </head>
@@ -63,47 +73,127 @@
 <br/>
 </div> <!-- navigation -->
 <div class="content">
-	<h1 style="font-size: 5em; position:absolute; top: 1em;">
-		Number of confirmed exoplanets: {{numconfirmedplanets}}
-	</h1>
-	
-	<br />
-	<p style=" position:absolute; top: 20em;">
-	Last updated: {{lastupdate}} (UTC)<br />
-	Last page load: {{loaddate}} (UTC)<br />
-	Source: Open Exoplanet Catalogue<br />
-	</p>
-	
-<svg class="chart" data-bar-chart data-data="{{discoverynumbers}}" ></svg>
-<svg data-labels data-data="{{discoveryyears}}" ></svg>
+	<div class="frame" id="frame0">
+		<div class="pad">
+			<h1 style="font-size: 5em;">
+				Number of confirmed exoplanets: {{numconfirmedplanets}}
+			</h1>
+			
+			<br />
+			<p>
+			Last updated: {{lastupdate}} (UTC)<br />
+			Last page load: {{loaddate}} (UTC)<br />
+			Source: Open Exoplanet Catalogue<br />
+			</p>
+			
+			<svg class="chart" id="frame0data" data-bar-chart data-data="{{discoverynumbers}}" data-labels="{{discoveryyears}}" ></svg>
+		</div>
+	</div>
+	<div class="frame" id="frame1">
+		<div class="pad">
+			<h1 style="font-size: 3em; margin:0px;">
+				If you have any questions about astronomy or are interested in a research project, 
+			</h1>
+			<h1 style="font-size: 5em; margin:0px; margin-bottom:.5em;">
+				talk to us!
+			</h1>
+			<style>
+			.personcontainer {
+				width: 100%;
+			}
+			.person {
+				clear: both;
+			}
+			.person img{
+				margin-bottom: 1em;
+				margin-right: 1em;
+				width: 100px;
+				height: 100px;
+				float: left;
+				vertical-align: middle;
+			}
+			.person .name{
+				font-size: 2em;
+				width: 100%;
+				vertical-align: middle;
+			}
+			</style>
+			<div class="personcontainer">
+				<div class="person">
+					<img src="/static/img/hanno.jpg"/> 
+					<div class="name">
+					Hanno Rein
+					</div>
+					Assistant Professor, SW504C
+				</div>
+				<div class="person">
+					<img src="/static/img/amaury.jpg"/> 
+					<div class="name">
+					Amaury Triaud
+					</div>
+					Postdoctoral Fellow, SW506G
+				</div>
+				<div class="person">
+					<img src="/static/img/dan.jpg"/> 
+					<div class="name">
+					Daniel Tamayo
+					</div>
+					Postdoctoral Fellow, SW506G
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 <script>
-function build(){
-  var labels = $('[data-labels]').data('data').split(',');
+var frame  	= 0;
+var frameN 	= 2;
+function update_frame(){
+	var oldframe = (frame-1+frameN)%frameN;
+	console.log("frame: " + frame);
+	$("#frame"+oldframe).fadeTo(500,0.);
+	$("#frame"+frame).fadeTo(500,1.);
+	switch(frame){
+		case 0:
+			build_frame0();
+			break;
+		case 1:
+			build_frame1();
+			break;
+	}
+	frame = (frame +1)%frameN;
+}
 
-  $('[data-bar-chart]').each(function (i, svg) {
-    var $svg = $(svg);
-    var data = $svg.data('data').split(',').map(function (datum) {
-      return parseFloat(datum);
-    });
+$(".frame").hide();
+update_frame();
+
+function build_frame1(){
+	var divs = $('.person').get().sort( function(){ return ( Math.round( Math.random() ) - 0.5 ) } );
+	$(divs).appendTo(divs[0].parentNode).show();
+     	setTimeout(update_frame,15000);
+}
+
+function build_frame0(){
+    var svg = $('#frame0data');
+    svg.empty();
+    var labels = svg.data("labels").split(',');
+    var data = svg.data('data').split(',').map(function (datum) { return parseFloat(datum); });
     var barSpace = 10;
-    var barWidth = (parseFloat($svg.css("width"))-(data.length+1)*barSpace)/data.length;
-    var chartHeight = $svg.outerHeight();
+    var barWidth = (parseFloat(svg.css("width"))-(data.length+1)*barSpace)/data.length;
+    var chartHeight = svg.outerHeight();
 
     var y = d3.scale.linear()
               .domain([0, d3.max(data)])
               .range([0, chartHeight/1.4]);
 
-    var groups = d3.select(svg)
+    var groups = d3.select("#frame0data")
       .selectAll("rect")
         .data(data);
-
     var marginBottom = 35; 
     var gs = groups.enter().append("g");
     
     durationfunc = function(d,i){
-	    return Math.max(200,d*0.75);
+	    return 250;
     }
     delayfunc = function(d,i){
 	    if (i<=0){
@@ -154,26 +244,15 @@ function build(){
         .delay(delayfunc)
         .attr("y", function (d, i) { return chartHeight-12; })
 	;
-     d3.select(svg).append("g").append("rect")
+     d3.select("#frame0data").append("g").append("rect")
         .attr("class", "bar")
         .attr("width", "100%")
         .attr("x", 0)
         .attr("y", chartHeight-marginBottom)
         .attr("height", 1)
 	;
-     setTimeout(
-     	function(){
-    		d3.select(svg).selectAll("g")
-			.transition()
-	  		.style("opacity",0)
-			.remove(); 
-     		setTimeout( build, 500);
-	}
-	,14000
-     );
-  });
+     setTimeout(update_frame,delayfunc(0,data.length)+10000);
 }
-build();
 </script>
 
 </div> <!-- content -->
