@@ -153,18 +153,19 @@ var frame  	= 0;
 var frameN 	= 2;
 function update_frame(){
 	var oldframe = (frame-1+frameN)%frameN;
-	console.log("frame: " + frame);
-	$("#frame"+oldframe).fadeTo(500,0.);
-	$("#frame"+frame).fadeTo(500,1.);
-	switch(frame){
-		case 0:
-			build_frame0();
-			break;
-		case 1:
-			build_frame1();
-			break;
-	}
-	frame = (frame +1)%frameN;
+	$("#frame"+oldframe).fadeTo(500,0.,function(){
+		$("#frame"+frame).fadeTo(500,1.,function(){
+			switch(frame){
+				case 0:
+					build_frame0();
+					break;
+				case 1:
+					build_frame1();
+					break;
+			}
+			frame = (frame +1)%frameN;
+		});
+	});
 }
 
 $(".frame").hide();
