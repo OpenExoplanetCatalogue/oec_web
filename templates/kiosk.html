@@ -154,6 +154,14 @@ var frameN 	= 2;
 function update_frame(){
 	var oldframe = (frame-1+frameN)%frameN;
 	$("#frame"+oldframe).fadeTo(500,0.,function(){
+		switch(frame){
+			case 0:
+				clear_frame0();
+				break;
+			case 1:
+				clear_frame1();
+				break;
+		}
 		$("#frame"+frame).fadeTo(500,1.,function(){
 			switch(frame){
 				case 0:
@@ -171,15 +179,23 @@ function update_frame(){
 $(".frame").hide();
 update_frame();
 
+function clear_frame1(){
+	var divs = $('.person').get().sort( function(){ return ( Math.round( Math.random() ) - 0.5 ) } );
+	$(divs).appendTo(divs[0].parentNode).hide(0);
+}
+
 function build_frame1(){
 	var divs = $('.person').get().sort( function(){ return ( Math.round( Math.random() ) - 0.5 ) } );
 	$(divs).appendTo(divs[0].parentNode).show();
      	setTimeout(update_frame,15000);
 }
 
-function build_frame0(){
+function clear_frame0(){
     var svg = $('#frame0data');
     svg.empty();
+}
+function build_frame0(){
+    var svg = $('#frame0data');
     var labels = svg.data("labels").split(',');
     var data = svg.data('data').split(',').map(function (datum) { return parseFloat(datum); });
     var barSpace = 10;
