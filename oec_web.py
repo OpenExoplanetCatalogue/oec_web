@@ -5,6 +5,7 @@ import os
 import time
 import urllib
 import difflib
+import math
 import copy
 import json
 import visualizations 
@@ -183,6 +184,23 @@ def page_kiosk():
         data_x += y.tag[1:] + ","
         sum_y+=int(y.text)
         data_y += "%d," % sum_y
+    data_r = ""
+    for xmlPair in oec.planets:
+        system,planet,star,filename = xmlPair
+        r = planet.find(".//radius")
+        if r is not None:
+            if r.text is not None:
+                r = float(r.text)
+        else:
+            m = planet.find(".//mass")
+            if m is not None:
+                if m.text is not None:
+                    r = math.pow(float(m.text)*317.8942,1./2.06)/10.973299
+        if r is not None:
+            try:
+                data_r += "%.3f," % r
+            except:
+                pass
 
 
     return render_template("kiosk.html",
@@ -191,6 +209,7 @@ def page_kiosk():
             loaddate=time.strftime("%A, %-d %B %Y, %X"),
             discoverynumbers= data_y[:-1],
             discoveryyears= data_x[:-1],
+            radii= data_r[:-1],
         )
 
 @app.route('/systems/',methods=["POST","GET"])

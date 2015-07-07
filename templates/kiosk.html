@@ -23,7 +23,6 @@
             	position: absolute;
             	left: 0px;
 	    	top: 0px;
-	    	z-index: -1;
 	    	margin-bottom: 1px;
             
 	    	display: block;
@@ -76,6 +75,30 @@
 <br/>
 </div> <!-- navigation -->
 <div class="content">
+	<div class="frame" id="frame2">
+		<div class="pad">
+			<h1 style="font-size: 2em;">
+				This display is currently being remodeled. It will showcase photographs taken by the UTSC telescope, latest research results from the Physics and Astrophysics group and upcoming public events. Please check back soon for updates!
+			</h1>
+		</div>
+	</div>
+	<div class="frame" id="frame3">
+		<div class="pad">
+			<h1 style="font-size: 5em;">
+				The M51 Galaxy
+			</h1>
+			<br />
+			<img src="/static/img/m51.jpg"/ height="50%"> 
+			<br />
+			Photograph taken right here on campus with the UTSC telescope.
+
+		</div>
+	</div>
+	<div class="frame" id="frame4">
+		<div class="pad">
+			<svg class="chart" id="frame4data" style="" data-bar-chart data-data="{{radii}}"></svg>
+		</div>
+	</div>
 	<div class="frame" id="frame0">
 		<div class="pad">
 			<h1 style="font-size: 5em;">
@@ -116,7 +139,7 @@
 			}
 			</style>
 			<h1 style="font-size: 3em; margin:0px;">
-				If you have any questions about astronomy or are interested in a research project, 
+				If you are interested in a research project, 
 			</h1>
 			<h1 style="font-size: 5em; margin:0px; margin-bottom:.5em;">
 				talk to us!
@@ -149,8 +172,8 @@
 
 
 <script>
-var frame  	= 0;
-var frameN 	= 2;
+var frame  	= 3;
+var frameN 	= 4;
 function update_frame(){
 	var oldframe = (frame-1+frameN)%frameN;
 	$("#frame"+oldframe).fadeTo(500,0.,function(){
@@ -161,6 +184,18 @@ function update_frame(){
 			case 1:
 				clear_frame1();
 				break;
+			case 2:
+				clear_frame2();
+				break;
+			case 3:
+				clear_frame3();
+				break;
+			case 4:
+				clear_frame4();
+				break;
+			case 5:
+				clear_frame5();
+				break;
 		}
 		$("#frame"+frame).fadeTo(500,1.,function(){
 			switch(frame){
@@ -170,11 +205,24 @@ function update_frame(){
 				case 1:
 					build_frame1();
 					break;
+				case 2:
+					build_frame2();
+					break;
+				case 3:
+					build_frame3();
+					break;
+				case 4:
+					build_frame4();
+					break;
+				case 5:
+					build_frame5();
+					break;
 			}
 			frame = (frame +1)%frameN;
 		});
 	});
 }
+
 
 $(".frame").hide();
 update_frame();
@@ -207,7 +255,7 @@ function build_frame0(){
               .range([0, chartHeight/1.4]);
 
     var groups = d3.select("#frame0data")
-      .selectAll("rect")
+      	.selectAll("rect")
         .data(data);
     var marginBottom = 35; 
     var gs = groups.enter().append("g");
@@ -273,6 +321,54 @@ function build_frame0(){
 	;
      setTimeout(update_frame,delayfunc(0,data.length)+10000);
 }
+function clear_frame2(){
+}
+function build_frame2(){
+     	setTimeout(update_frame,15000);
+}
+function clear_frame3(){
+}
+function build_frame3(){
+     	setTimeout(update_frame,15000);
+}
+function clear_frame4(){
+}
+function build_frame4(){
+	$("#frame4").show();
+	var svg = $('#frame4data');
+    	var data = svg.data('data').split(',').map(function (datum) { return parseFloat(datum); });
+	var width 	= parseFloat(svg.css("width"));
+	var height 	= parseFloat(svg.css("height"));
+	var bubble = d3.layout.pack()
+		.value(function(planet){
+			return 10;
+			})
+		.size([width, height])
+		.padding(1.5);
+    	var viz = d3.select('#frame4data');
+	var node = viz.selectAll()
+    		.data(bubble.nodes(data))
+		.enter()
+		.append("g")
+		.attr("class", "node")
+		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })	;
+
+	node.append("circle")
+		.attr("r", function(d) { return d.r; })
+	     	.style("fill", function(planet) { 
+			switch(planet.depth){
+				case 1: // system
+					return "#e1e1e1";
+				case 2: // planet
+					return "gray";
+			}
+			return "transparent"; 
+		});
+     	setTimeout(update_frame,15000);
+}
+
+
+    
 </script>
 
 </div> <!-- content -->
