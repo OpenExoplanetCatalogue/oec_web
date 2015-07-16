@@ -75,7 +75,7 @@
 <br/>
 </div> <!-- navigation -->
 <div class="content">
-	<div class="frame" id="frame2">
+	<div class="frame" id="frame4">
 		<div class="pad">
 			<h1 style="font-size: 2em;">
 				This display is currently being remodeled. It will showcase photographs taken by the UTSC telescope, latest research results from the Physics and Astrophysics group and upcoming public events. Please check back soon for updates!
@@ -95,7 +95,18 @@
 
 		</div>
 	</div>
-	<div class="frame" id="frame4">
+	<div class="frame" id="frame2">
+		<div class="pad">
+			<div style="color:#fff; position: absolute; top:1em; left: 1em; margin:0; padding:0; z-index:2;" >
+				<h1 style="color:#fff; font-size: 5em;">
+					Pluto seen through the UTSC telescope!
+				</h1>
+				<b>Contact Prof. Hanno Rein to get on the telescope mailing list!</b>
+			</div>
+			<img src="/static/img/pluto.jpg" style="position: absolute; top:0; left: 0;width:100%"> 
+		</div>
+	</div>
+	<div class="frame" id="frame1">
 		<div class="pad">
 			<div style="color:#fff; position: absolute; top:1em; left: 1em; margin:0; padding:0; z-index:2;" >
 				<h1 style="color:#fff; font-size: 5em;">
@@ -127,7 +138,7 @@
 			<svg class="chart" id="frame0data" data-bar-chart data-data="{{discoverynumbers}}" data-labels="{{discoveryyears}}" ></svg>
 		</div>
 	</div>
-	<div class="frame" id="frame1">
+	<div class="frame" id="frame6">
 		<div class="pad">
 			<style>
 			.personcontainer {
@@ -387,6 +398,11 @@ function build_frame5(){
 			}
 			return "transparent"; 
 		});
+     	setTimeout(update_frame,15000);
+}
+function clear_frame6(){
+}
+function build_frame6(){
      	setTimeout(update_frame,15000);
 }
 
