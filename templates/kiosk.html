@@ -112,7 +112,7 @@
 				<h1 style="color:#fff; font-size: 5em;">
 					The UTSC Telescope
 				</h1>
-				<b>Observing session happening tonight, Tuesday September 15th! Contact Prof. Hanno Rein to get on the telescope mailing list!</b>
+				<b>Contact Prof. Hanno Rein to get on the telescope mailing list!</b>
 			</div>
 			<img src="/static/img/telescope.jpg" style="position: absolute; top:0; left: 0;width:100%"> 
 		</div>
@@ -195,7 +195,7 @@
 
 
 <script>
-var frame  	= 0;
+var frame  	= 4;
 var frameN 	= 5;
 function update_frame(){
 	var oldframe = (frame-1+frameN)%frameN;
@@ -264,8 +264,7 @@ function clear_frame1(){
 function build_frame1(){
 	var divs = $('.person').get().sort( function(){ return ( Math.round( Math.random() ) - 0.5 ) } );
 	$(divs).appendTo(divs[0].parentNode).show();
-     	// DEBUG TODO
-	//setTimeout(update_frame,15000);
+     	setTimeout(update_frame,15000);
 }
 
 function clear_frame0(){
