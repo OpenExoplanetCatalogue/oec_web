@@ -69,9 +69,8 @@ def isHabitable(xmlPair):
     else:
         luminosity = pow(stellarMass,4.)
     
-    HZinner2 = (0.68-2.7619e-9*rel_temp-3.8095e-9*rel_temp*rel_temp) *sqrt(luminosity);
-    #HZinner = (0.95-2.7619e-9*rel_temp-3.8095e-9*rel_temp*rel_temp) *sqrt(luminosity);
-    #HZouter = (1.67-1.3786e-4*rel_temp-1.4286e-9*rel_temp*rel_temp) *sqrt(luminosity);
+    # Ref: http://adsabs.harvard.edu/abs/2007A%26A...476.1373S
+    HZinner2 = (0.68-2.7619e-5*rel_temp-3.8095e-9*rel_temp*rel_temp) *sqrt(luminosity);
     HZouter2 = (1.95-1.3786e-4*rel_temp-1.4286e-9*rel_temp*rel_temp) *sqrt(luminosity);
 
     if semimajoraxis>HZinner2 and semimajoraxis<HZouter2:
