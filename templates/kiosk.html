@@ -4,8 +4,6 @@
 {% set OEC_GITHUB = "https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/" %}
 {% set OEC_TABLES_GITHUB = "https://github.com/OpenExoplanetCatalogue/oec_tables/" %}
 <head profile="http://www.w3.org/2005/10/profile">
-	<link rel="stylesheet" type="text/css" href="/static/css/style.css" media="screen" />
-	<link rel="stylesheet" type="text/css" href="/static/css/tables.css" media="screen" />
 	<script type="text/javascript" src="/static/js/d3.v3.min.js"></script>
 	<script type="text/javascript" src="/static/js/rgbcolor.js"></script> 
 	<script type="text/javascript" src="/static/js/canvg.js"></script> 
@@ -15,34 +13,10 @@
 		display: none; 
 	  }
 	  body {
+		font-family: "Helvetica Neue", sans-serif	;
+		background-color: #000;
+		color: #fff;
 		overflow:hidden;
-	  }
-	  .chart {
-	    	height: 100%;
-	    	width: 100%;
-            	position: absolute;
-            	left: 0px;
-	    	top: 0px;
-	    	margin-bottom: 1px;
-            
-	    	display: block;
-	  }
-	  .chart .bar {
-	    	  fill: #888;
-	    	  z-index: -3;
-	  }
-	  .chart .bar2 {
-		  font-size: 0.75em;
-		  color: #F00;
-		  text-anchor: middle;
-	    	  z-index: -1;
-	  }
-	  .chart .bar3 {
-		  font-size: 0.75em;
-		  color: #FFF;
-		  fill: #FFF;
-		  text-anchor: middle;
-	    	  z-index: -2;
 	  }
 	  .frame {
 		  position: absolute;
@@ -75,14 +49,7 @@
 <br/>
 </div> <!-- navigation -->
 <div class="content">
-	<div class="frame" id="frame4">
-		<div class="pad">
-			<h1 style="font-size: 2em;">
-				This display is currently being remodeled. It will showcase photographs taken by the UTSC telescope, latest research results from the Physics and Astrophysics group and upcoming public events. Please check back soon for updates!
-			</h1>
-		</div>
-	</div>
-	<div class="frame" id="frame3">
+	<div class="frame" id="frame0">
 		<div class="pad">
 			<h1 style="font-size: 5em;">
 				The M51 Galaxy and Saturn
@@ -95,50 +62,28 @@
 
 		</div>
 	</div>
-	<div class="frame" id="frame2">
+	<div class="frame" id="frame1">
 		<div class="pad">
 			<div style="color:#fff; position: absolute; top:1em; left: 1em; margin:0; padding:0; z-index:2;" >
 				<h1 style="color:#fff; font-size: 5em;">
 					Pluto seen through the UTSC telescope!
 				</h1>
-				<b>Contact Prof. Hanno Rein to get on the telescope mailing list!</b>
 			</div>
 			<img src="/static/img/pluto.jpg" style="position: absolute; top:0; left: 0;width:100%"> 
 		</div>
 	</div>
-	<div class="frame" id="frame1">
+	<div class="frame" id="frame2">
 		<div class="pad">
 			<div style="color:#fff; position: absolute; top:1em; left: 1em; margin:0; padding:0; z-index:2;" >
 				<h1 style="color:#fff; font-size: 5em;">
 					The UTSC Telescope
 				</h1>
-				<b>Contact Prof. Hanno Rein to get on the telescope mailing list!</b>
+				<h2>Contact Prof. Hanno Rein to get on the telescope mailing list!</h2>
 			</div>
 			<img src="/static/img/telescope.jpg" style="position: absolute; top:0; left: 0;width:100%"> 
 		</div>
 	</div>
-	<div class="frame" id="frame5">
-		<div class="pad">
-			<svg class="chart" id="frame5data" style="" data-bar-chart data-data="{{radii}}"></svg>
-		</div>
-	</div>
-	<div class="frame" id="frame0">
-		<div class="pad">
-			<h1 style="font-size: 5em;">
-				Current number of confirmed exoplanets: {{numconfirmedplanets}}
-			</h1>
-			
-			<br />
-			<p>
-			Last updated: {{lastupdate}} (UTC)<br />
-			Last page load: {{loaddate}} (UTC)<br />
-			Source: Open Exoplanet Catalogue<br />
-			</p>
-			
-			<svg class="chart" id="frame0data" data-bar-chart data-data="{{discoverynumbers}}" data-labels="{{discoveryyears}}" ></svg>
-		</div>
-	</div>
-	<div class="frame" id="frame6">
+	<div class="frame" id="frame3">
 		<div class="pad">
 			<style>
 			.personcontainer {
@@ -175,28 +120,14 @@
 					</div>
 					Assistant Professor, SW504C
 				</div>
-				<div class="person">
-					<img src="/static/img/amaury.jpg"/> 
-					<div class="name">
-					Amaury Triaud
-					</div>
-					Postdoctoral Fellow, SW506G
-				</div>
-				<div class="person">
-					<img src="/static/img/dan.jpg"/> 
-					<div class="name">
-					Daniel Tamayo
-					</div>
-					Postdoctoral Fellow, SW506G
-				</div>
 			</div>
 		</div>
 	</div>
 
 
 <script>
-var frame  	= 4;
-var frameN 	= 5;
+var frame  	= 0;
+var frameN 	= 3;
 function update_frame(){
 	var oldframe = (frame-1+frameN)%frameN;
 	$("#frame"+oldframe).fadeTo(500,0.,function(){
@@ -256,158 +187,26 @@ function update_frame(){
 $(".frame").hide();
 update_frame();
 
-function clear_frame1(){
-	var divs = $('.person').get().sort( function(){ return ( Math.round( Math.random() ) - 0.5 ) } );
-	$(divs).appendTo(divs[0].parentNode).hide(0);
-}
 
-function build_frame1(){
-	var divs = $('.person').get().sort( function(){ return ( Math.round( Math.random() ) - 0.5 ) } );
-	$(divs).appendTo(divs[0].parentNode).show();
-     	setTimeout(update_frame,15000);
-}
-
-function clear_frame0(){
-    var svg = $('#frame0data');
-    svg.empty();
-}
+function clear_frame0(){ }
 function build_frame0(){
-    var svg = $('#frame0data');
-    var labels = svg.data("labels").split(',');
-    var data = svg.data('data').split(',').map(function (datum) { return parseFloat(datum); });
-    var barSpace = 10;
-    var barWidth = (parseFloat(svg.css("width"))-(data.length+1)*barSpace)/data.length;
-    var chartHeight = svg.outerHeight();
-
-    var y = d3.scale.linear()
-              .domain([0, d3.max(data)])
-              .range([0, chartHeight/1.4]);
-
-    var groups = d3.select("#frame0data")
-      	.selectAll("rect")
-        .data(data);
-    var marginBottom = 35; 
-    var gs = groups.enter().append("g");
-    
-    durationfunc = function(d,i){
-	    return 250;
-    }
-    delayfunc = function(d,i){
-	    if (i<=0){
-		    return 0.;
-	    }
-	    var sum = 0;
-	    for (j=0;j<i;j++){
-		sum += durationfunc(data[j],0);
-	    }
-	    return sum;
-    }
-
-     gs.append("rect")
-        .attr("class", "bar")
-        .attr("width", barWidth)
-        .attr("x", function (d, i) { return barWidth*i + barSpace*(i+1); })
-        .attr("y", chartHeight-marginBottom)
-        .attr("height", 0)
-        .transition()
-	.duration(durationfunc)
-        .delay(delayfunc)
-        .attr("y", function (d, i) { return chartHeight-y(d)-marginBottom; })
-        .attr("height", function (d) { return y(d); })
-	;
-     gs.append("text")
-        .attr("class", "bar3")
-        .attr("width", barWidth)
-        .attr("x", function (d, i) { return barWidth*i + barSpace*(i+1)+0.5*barWidth; })
-        .attr("y", chartHeight+12)
-        .attr("height", 0)
-        .text(function (d, i) { return d; })
-        .attr("height", 0)
-        .transition()
-	.duration(durationfunc)
-        .delay(delayfunc)
-        .attr("y", function (d, i) { return chartHeight-y(d)+16-marginBottom; })
-	;
-     gs.append("text")
-        .attr("class", "bar2")
-        .attr("width", barWidth)
-        .attr("x", function (d, i) { return barWidth*i + barSpace*(i+1)+0.5*barWidth; })
-        .attr("y", chartHeight+12)
-        .attr("height", 0)
-        .text(function (d, i) { return labels[i]; })
-        .attr("height", 0)
-        .transition()
-	.duration(durationfunc)
-        .delay(delayfunc)
-        .attr("y", function (d, i) { return chartHeight-12; })
-	;
-     d3.select("#frame0data").append("g").append("rect")
-        .attr("class", "bar")
-        .attr("width", "100%")
-        .attr("x", 0)
-        .attr("y", chartHeight-marginBottom)
-        .attr("height", 1)
-	;
-     setTimeout(update_frame,delayfunc(0,data.length)+10000);
+     	setTimeout(update_frame,10000);
 }
-function clear_frame2(){
+
+function clear_frame1(){ }
+function build_frame1(){
+     	setTimeout(update_frame,10000);
 }
+function clear_frame2(){ }
 function build_frame2(){
-     	setTimeout(update_frame,15000);
+     	setTimeout(update_frame,10000);
 }
-function clear_frame3(){
-}
+
+function clear_frame3(){ }
 function build_frame3(){
-     	setTimeout(update_frame,15000);
-}
-function clear_frame4(){
-}
-function build_frame4(){
-     	setTimeout(update_frame,20000);
-}
-function clear_frame5(){
-}
-function build_frame5(){
-	$("#frame5").show();
-	var svg = $('#frame5data');
-    	var data = svg.data('data').split(',').map(function (datum) { return parseFloat(datum); });
-	var width 	= parseFloat(svg.css("width"));
-	var height 	= parseFloat(svg.css("height"));
-	var bubble = d3.layout.pack()
-		.value(function(planet){
-			return 10;
-			})
-		.size([width, height])
-		.padding(1.5);
-    	var viz = d3.select('#frame5data');
-	var node = viz.selectAll()
-    		.data(bubble.nodes(data))
-		.enter()
-		.append("g")
-		.attr("class", "node")
-		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })	;
-
-	node.append("circle")
-		.attr("r", function(d) { return d.r; })
-	     	.style("fill", function(planet) { 
-			switch(planet.depth){
-				case 1: // system
-					return "#e1e1e1";
-				case 2: // planet
-					return "gray";
-			}
-			return "transparent"; 
-		});
-     	setTimeout(update_frame,15000);
-}
-function clear_frame6(){
-}
-function build_frame6(){
-     	setTimeout(update_frame,15000);
+     	setTimeout(update_frame,10000);
 }
 
-
-    
 </script>
 
 </div> <!-- content -->
