@@ -133,7 +133,7 @@ def format_item(text,date):
 
 N = 10
 
-with open("./iphone/news/index_auto.php","w") as f:
+with open("./iphone/news/index.php","w") as f:
 	print >>f, header
 	for i in xrange(N):
 	    s = subprocess.check_output(["git", "log", "-n", "1", "--skip=%i"%i, "--no-merges", "--format=%s%b"],cwd="open_exoplanet_catalogue")
