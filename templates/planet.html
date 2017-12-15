@@ -153,17 +153,22 @@ Note that unless the radius has been determined through a transit observation, t
 </svg>
 
 
-{% if vizhabitable %}
+{% if vizhabitable|length > 0 %}
 <h3>Habitable zone</h3>
 <p>
 The following plot shows the approximate location of the planets in this system with respect to the habitable zone (green) and the size of the star (red).
-This is only an estimate, using the star's spectral type and mass. 
+This is only an estimate, using the star's spectral type and mass.
 Note that if no green band is shown in the plot, then the planet's orbit is far outside the habitable zone.
-The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">Selsis, Kasting et al</a> are used to draw the inner and outer boundaries. 
+The equations of <a href="http://adsabs.harvard.edu/abs/2007A%26A...476.1373S">Selsis, Kasting et al</a> are used to draw the inner and outer boundaries.
 </p>
+{% for visualization in vizhabitable %}
+{% if vizhabitable|length > 1 %}
+<h4>{{visualization[0]}}</h4>
+{% endif %}
 <svg width="600" height="100">
-{{ vizhabitable|safe }}
+{{ visualization[1]|safe }}
 </svg>
+{% endfor %}
 {% endif  %}
 
 

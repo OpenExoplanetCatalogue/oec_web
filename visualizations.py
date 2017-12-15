@@ -120,86 +120,88 @@ def size(xmlPair):
 def habitable(xmlPair):
     system, planet, star, filename = xmlPair
 
-    if star is None:
-        return None # cannot draw diagram for binary systems yet
+    stars = system.findall(".//star[planet]") # no binary systems yet
+    visualizations = []
+    for star in stars:
+        hzdata = hzLimits(star)
+        if hzdata is None:
+            continue
 
-    hzdata = hzLimits(xmlPair)
-    if hzdata is None:
-        return None
+        HZinner2, HZinner, HZouter, HZouter2, stellarRadius = hzdata
 
-    HZinner2, HZinner, HZouter, HZouter2, stellarRadius = hzdata
+        planets = star.findall("./planet")
 
-    planets = system.findall(".//planet")
+        maxa = 0
+        for planet in planets:
+            semimajoraxis = getFloat(planet,"./semimajoraxis")
+            if semimajoraxis is None:
+                hostmass = getFloat(star,"./mass",1.)
+                period = getFloat(planet,"./period",265.25)
+                semimajoraxis = pow(pow(period/6.283/365.25,2)*39.49/hostmass,1.0/3.0)
+            if semimajoraxis>maxa:
+                maxa = semimajoraxis
 
-    maxa = 0
-    for planet in planets:
-        semimajoraxis = getFloat(planet,"./semimajoraxis")
-        if semimajoraxis is None:
-            hostmass = getFloat(star,"./mass",1.)
-            period = getFloat(planet,"./period",265.25)
-            semimajoraxis = pow(pow(period/6.283/365.25,2)*39.49/hostmass,1.0/3.0)
-        if semimajoraxis>maxa:
-            maxa = semimajoraxis
+        width = 600
+        height= 100
+        au     = 2.0/ maxa*(width-100)*0.49
+        last_text_y=12
 
-    width = 600
-    height= 100
-    au     = 2.0/ maxa*(width-100)*0.49
-    last_text_y=12
-
-    svg = """
-        <defs>
-            <radialGradient id="habitablegradient" >
-                <stop id="stops0" offset=".0" stop-color="lightgreen" stop-opacity="0"/>
-                <stop id="stops1" offset="%f" stop-color="lightgreen" stop-opacity="0"/>
-                <stop id="stops2" offset="%f" stop-color="lightgreen" stop-opacity="1"/>
-                <stop id="stops3" offset="%f" stop-color="lightgreen" stop-opacity="1"/>
-                <stop id="stops4" offset="1" stop-color="lightgreen" stop-opacity="0"/>
-            </radialGradient>
-        </defs>
-        """ %(HZinner2/HZouter2, HZinner/HZouter2,HZouter/HZouter2 )
-    if HZinner2<maxa*2:
-        svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" fill="url(#habitablegradient)" />' %(
-                0.,
-                height/2,
-                au*HZouter2,
-                au*HZouter2)
-        svg += '<text     x="%f"" y="%f" font-family="sans-serif" font-weight="normal"  font-size="12" stroke="none" style="fill:green">Habitable zone</text>' %(
-                au*HZinner2,
-                height-1)
-
-
-    svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" style="fill:red" />' %(
-                0.,
-                height/2,
-                au*stellarRadius*0.0046524726,
-                au*stellarRadius*0.0046524726)
-
-    svg += '<g style="stroke:black;">'
-    for planet in planets:
-        semimajoraxis = getFloat(planet,"./semimajoraxis")
-        if semimajoraxis is None:
-            hostmass = getFloat(star,"./mass",1.)
-            period = getFloat(planet,"./period",265.25)
-            semimajoraxis = pow(pow(period/6.283/365.25,2)*39.49/hostmass,1.0/3.0)
-        size= 12
-        textx=semimajoraxis*au+2
-        texty=last_text_y+size
-        last_text_y = texty
-
-        svg += '<g>'
-        svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" style="fill:none" />' %(
+        svg = """
+            <defs>
+                <radialGradient id="habitablegradient" >
+                    <stop id="stops0" offset=".0" stop-color="lightgreen" stop-opacity="0"/>
+                    <stop id="stops1" offset="%f" stop-color="lightgreen" stop-opacity="0"/>
+                    <stop id="stops2" offset="%f" stop-color="lightgreen" stop-opacity="1"/>
+                    <stop id="stops3" offset="%f" stop-color="lightgreen" stop-opacity="1"/>
+                    <stop id="stops4" offset="1" stop-color="lightgreen" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            """ %(HZinner2/HZouter2, HZinner/HZouter2,HZouter/HZouter2 )
+        if HZinner2<maxa*2:
+            svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" fill="url(#habitablegradient)" />' %(
                     0.,
                     height/2,
-                    semimajoraxis*au,
-                    semimajoraxis*au)
-        svg += '<text x="%f" y="%f" font-family="sans-serif" font-weight="normal"  font-size="%f" stroke="none" >%s</text>' %(
-                    textx,
-                    texty,
-                    size,
-                    getText(planet,"./name"))
-        svg += '</g>'
+                    au*HZouter2,
+                    au*HZouter2)
+            svg += '<text     x="%f"" y="%f" font-family="sans-serif" font-weight="normal"  font-size="12" stroke="none" style="fill:green">Habitable zone</text>' %(
+                    au*HZinner2,
+                    height-1)
 
-    return svg
+
+        svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" style="fill:red" />' %(
+                    0.,
+                    height/2,
+                    au*stellarRadius*0.0046524726,
+                    au*stellarRadius*0.0046524726)
+
+        svg += '<g style="stroke:black;">'
+        for planet in planets:
+            semimajoraxis = getFloat(planet,"./semimajoraxis")
+            if semimajoraxis is None:
+                hostmass = getFloat(star,"./mass",1.)
+                period = getFloat(planet,"./period",265.25)
+                semimajoraxis = pow(pow(period/6.283/365.25,2)*39.49/hostmass,1.0/3.0)
+            size= 12
+            textx=semimajoraxis*au+2
+            texty=last_text_y+size
+            last_text_y = texty
+
+            svg += '<g>'
+            svg += '<ellipse cx="%f" cy="%f" rx="%f" ry="%f" style="fill:none" />' %(
+                        0.,
+                        height/2,
+                        semimajoraxis*au,
+                        semimajoraxis*au)
+            svg += '<text x="%f" y="%f" font-family="sans-serif" font-weight="normal"  font-size="%f" stroke="none" >%s</text>' %(
+                        textx,
+                        texty,
+                        size,
+                        getText(planet,"./name"))
+            svg += '</g>'
+
+        visualizations.append((getText(star,"./name",""),svg))
+
+    return visualizations
 
 def textArchitecture(o,stype=0):
     architecture = ""
