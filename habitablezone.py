@@ -11,17 +11,16 @@ spectralTypeTempRadius = {
     "M": (3000., 0.5)
 }
 
-def hzLimits(xmlPair):
-    system, planet, star, filename = xmlPair
+def hzLimits(star):
     if star is None:
         return None
 
     temperature = getFloat(star,"./temperature")
     stellarRadius = getFloat(star,"./radius")
+    if stellarRadius is not None and stellarRadius < 0.01:
+        return None
+
     if temperature is not None and stellarRadius is not None:
-        if stellarRadius < 0.01:
-            # no habitable zone for pulsars
-            return None
         luminosity = (temperature/5778.)**4 * stellarRadius**2
     else:
         stellarMass = getFloat(star,"./mass")

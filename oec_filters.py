@@ -18,7 +18,7 @@ def isHabitable(xmlPair):
     if star is None:
         return False # no binary systems (yet)
 
-    hzData = hzLimits(xmlPair)
+    hzData = hzLimits(star)
     if hzData is None:
         return False
 
