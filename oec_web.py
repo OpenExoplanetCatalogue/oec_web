@@ -7,7 +7,7 @@ import urllib
 import difflib
 import copy
 import json
-import visualizations 
+import visualizations
 import oec_filters
 import datetime
 import oec_fields
@@ -67,7 +67,7 @@ class MyOEC:
         print "Parsing OEC META ..."
         with open(self.OEC_META_PATH+"statistics.xml", 'rt') as f:
             self.oec_meta_statistics = ET.parse(f).getroot()
-        
+
         print "Parsing done."
 
 
@@ -113,7 +113,7 @@ def page_planet_redirect():
             planetname = oec.planetnames[planetname]
         else:
             print planetname
-            print "not found" 
+            print "not found"
             abort(404)
 
     return redirect("planet/"+planetname, 301)
@@ -204,12 +204,12 @@ def page_systems():
         listfilters = request.args.getlist("filters")
         for filter in listfilters:
             if filter in oec_filters.titles:
-                filters.append(filter) 
+                filters.append(filter)
     if "fields" in request.args:
         listfields = request.args.getlist("fields")
         for field in listfields:
             if field in oec_fields.titles and field!="namelink":
-                fields.append(field) 
+                fields.append(field)
     else:
         fields += ["mass","radius","massEarth","radiusEarth","numberofplanets","numberofstars"]
     lastfilename = ""
@@ -257,7 +257,7 @@ def page_planet(planetname):
     systemtable = []
     for row in ["systemname","systemalternativenames","rightascension","declination","distance","distancelightyears","numberofstars","numberofplanets"]:
         systemtable.append((oec_fields.titles[row],oec_fields.render(xmlPair,row)))
-    
+
     planettable = []
     planettablefields = []
     for row in ["name","alternativenames","description","lists","mass","massEarth","radius","radiusEarth","period","semimajoraxis","eccentricity","temperature","discoverymethod","discoveryyear","lastupdate"]:
@@ -268,7 +268,7 @@ def page_planet(planetname):
         if len(set(rowdata)) <= 1 and row!="name" and rowdata[0]!=notAvailableString: # all fields identical:
             rowdata = rowdata[0]
         planettable.append(rowdata)
-    
+
     startable = []
     startablefields = []
     for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starmagV"]:
@@ -282,12 +282,15 @@ def page_planet(planetname):
 
     references = []
     contributors = []
-    with open(oec.OEC_META_PATH+filename, 'rt') as f:
-        root = ET.parse(f).getroot()
-        for l in root.findall(".//link"):
-            references.append(l.text) 
-        for c in root.findall(".//contributor"):
-            contributors.append((c.attrib["commits"],c.attrib["email"],c.text)) 
+    try:
+        with open(oec.OEC_META_PATH+filename, 'rt') as f:
+            root = ET.parse(f).getroot()
+            for l in root.findall(".//link"):
+                references.append(l.text)
+            for c in root.findall(".//contributor"):
+                contributors.append((c.attrib["commits"],c.attrib["email"],c.text))
+    except IOError:
+        pass
 
     vizsize = visualizations.size(xmlPair)
     vizhabitable = visualizations.habitable(xmlPair)
@@ -398,7 +401,7 @@ def page_planet_edit_submit(fullpath):
         return json.dumps({'success': False, 'message': "Please enter your name."})
     if len(request.form["paper"])<10:
         return json.dumps({'success': False, 'message': "Please enter a valid link to a scientific publication."})
-    
+
 
 
 
@@ -416,7 +419,7 @@ def page_planet_edit_submit(fullpath):
     if o.getparent().tag == "star":
         tag = "star"+tag
     if tag in ["desription"]:
-        # Text 
+        # Text
         if "value" in request.form:
             o.text = request.form["value"]
     else:
@@ -432,17 +435,17 @@ def page_planet_edit_submit(fullpath):
                     o.attrib[attrib] = newv
         if "value" in request.form:
             o.text = request.form["value"]
-    
-    
+
+
     indent(new_system)
     diff = difflib.unified_diff(
-            ET.tostring(system, encoding="UTF-8", xml_declaration=False).strip().split("\n"), 
-            ET.tostring(new_system, encoding="UTF-8", xml_declaration=False).strip().split("\n"), 
-            fromfile=filename, 
+            ET.tostring(system, encoding="UTF-8", xml_declaration=False).strip().split("\n"),
+            ET.tostring(new_system, encoding="UTF-8", xml_declaration=False).strip().split("\n"),
+            fromfile=filename,
             tofile=filename,
             lineterm='')
-    
-    
+
+
     # Just for testing. Needs a proper backend.
     d = {}
     d["patch"]  = '\n'.join(diff)
@@ -482,7 +485,7 @@ def page_edits():
         edit = mongo.db.edits.find_one( {"_id": ObjectId(request.form["approve"])} )
         response = make_response(edit["patch"])
         response.headers["Content-Disposition"] = "attachment; filename=oec.patch"
-        response.headers["Content-Type"] = "application/patch" 
+        response.headers["Content-Type"] = "application/patch"
         return response
     else:
         if "delete" in request.form:
