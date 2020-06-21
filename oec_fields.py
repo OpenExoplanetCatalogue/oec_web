@@ -52,6 +52,7 @@ def getEditButton(xmlPair,o):
     return ""
 
 def render(xmlPair,type,editbutton=True):
+    editbutton = False ## Manual override (June 21 2020)
     system, planet, star, filename = xmlPair
     if type=="numberofplanets":
         return "%d"%len(system.findall(".//planet"))
@@ -100,7 +101,7 @@ def render(xmlPair,type,editbutton=True):
         return renderText(planet.find("./name"))
     if type=="namelink":
         planetname = planet.find("./name").text
-        return "<a href=\"/planet/%s/\"><span class=\"numericvalue\">%s</span></a>"%(urllib.quote(planetname),planetname)
+        return "<a href=\"/planet/%s/\"><span class=\"numericvalue\">%s</span></a>"%(urllib.quote(planetname.encode('utf8')),planetname)
     if type=="discoveryyear":
         return renderText(planet.find("./discoveryyear"))
     if type=="discoverymethod":
