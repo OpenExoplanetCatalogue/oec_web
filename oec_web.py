@@ -108,13 +108,9 @@ def page_planet_redirect():
     oec = app.oec
     planetname = request.args.get("id")
     if planetname not in oec.planetXmlPairs:
-        print planetname
         if planetname in oec.planetnames:
-            print planetname
             planetname = oec.planetnames[planetname]
         else:
-            print planetname
-            print "not found"
             abort(404)
 
     return redirect("planet/"+planetname, 301)
