@@ -16,7 +16,7 @@ from functools import wraps
 #import oec_plots
 from numberformat import renderFloat, renderText, notAvailableString
 from flask import Flask, abort, render_template, send_from_directory, request, redirect, Response, make_response
-from flask.ext.pymongo import PyMongo
+#from flask.ext.pymongo import PyMongo
 import threading
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -324,7 +324,8 @@ def getAttribText(o,a):
     else:
         return ""
 
-@app.route('/edit/form/<path:fullpath>')
+# form disabled
+#@app.route('/edit/form/<path:fullpath>')
 def page_planet_edit_form(fullpath):
     path = fullpath.split(".xml/")
     if len(path)!=2:
@@ -383,8 +384,8 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-
-@app.route('/edit/submit/<path:fullpath>',methods=["POST"])
+# form disabled
+#@app.route('/edit/submit/<path:fullpath>',methods=["POST"])
 def page_planet_edit_submit(fullpath):
     path = fullpath.split(".xml/")
     if len(path)!=2:
