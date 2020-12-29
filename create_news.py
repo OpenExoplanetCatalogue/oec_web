@@ -29,6 +29,12 @@ header ="""
 			padding:		0.1em;
 			padding-bottom:		0.2em;
 		}
+		.blacktitlesmall {
+			font-size:		1.em;
+			width:			100%;
+			padding:		0.1em;
+			padding-bottom:		0.2em;
+		}
 		.blackmain {
 			width:			100%;
 			padding:		0.1em;
@@ -49,9 +55,7 @@ header ="""
 			border-bottom:		1px #777 solid;
 		}
 		.blacksmall a, .blacksmall img{
-			<?if(intval($_REQUEST["version"])<9925){?>
 			display: none;
-			<?}?>
 		}
 		.blacksmall a:link {
 			color:			#888;
@@ -88,28 +92,10 @@ header ="""
 	</script>
 </head>
 <body>
+		<div class="blacktitle">
+		This section lists recent updates to the Open Exoplanet Catalogue. 
+		</div>
 
-<?
-if(intval($_REQUEST["version"])<9947&&$_REQUEST["desktop"]!=1){
-?>
-<div class="newsitem">
-<div class="blackmain">
-<img src="new.png" alt="New version" class="blackimage"/>
-Version 15.0.1 of the Exoplanet App is available as a free update with several new features. 
-Please go to the AppStore and update the app.
-</div>
-<div class="blacksmall">Update made available on 16 February 2015. <a href="javascript:void(0)" onclick="share.call(this)"><img src="share_iphone.png">Share.</a></div>
-</div>
-<?}else{?>
-<div class="newsitem">
-<div class="blackmain">
-<img src="new.png" alt="New version" class="blackimage"/>
-Hurray! You are running the latest version of the Exoplanet App.
-This version now includes images of near and far galaxies from the Hubble Space telescope and other observatories. This allows you to explore our extra-galactic neighbourhood in even more detail. Just go to the Milky-Way, zoom out (requires add-on) and enjoy the stunning views! 
-</div>
-<div class="blacksmall">Update made available on 9 February 2015. <a href="javascript:void(0)" onclick="share.call(this)"><img src="share_iphone.png">Share.</a></div>
-</div>
-<?}?>
 """
 footer = """
 <script type="text/javascript" src="retina.js"></script>
@@ -120,9 +106,6 @@ footer = """
 def format_item(text,date):
 	return """
 	<div class="newsitem">
-		<div class="blacktitle">
-		Database update
-		</div>
 		<div class="blackmain">
 		<img src="push.png" alt="Push notification" class="blackimage"/>
 		%s
@@ -143,3 +126,26 @@ with open("./iphone/news/index.php","w") as f:
 	print >>f, footer
 
 
+ignored = """
+<?
+if(intval($_REQUEST["version"])<9964&&$_REQUEST["desktop"]!=1){
+?>
+<div class="newsitem">
+<div class="blackmain">
+<img src="new.png" alt="New version" class="blackimage"/>
+Version 19.0.0 of the Exoplanet App is available as a free update with several new features. 
+Please go to the AppStore and update the app.
+</div>
+<div class="blacksmall">Update made available on 16 February 2015. <a href="javascript:void(0)" onclick="share.call(this)"><img src="share_iphone.png">Share.</a></div>
+</div>
+<?}else{?>
+<div class="newsitem">
+<div class="blackmain">
+<img src="new.png" alt="New version" class="blackimage"/>
+Hurray! You are running the latest version of the Exoplanet App.
+This version now includes images of near and far galaxies from the Hubble Space telescope and other observatories. This allows you to explore our extra-galactic neighbourhood in even more detail. Just go to the Milky-Way, zoom out (requires add-on) and enjoy the stunning views! 
+</div>
+<div class="blacksmall">Update made available on 9 February 2015. <a href="javascript:void(0)" onclick="share.call(this)"><img src="share_iphone.png">Share.</a></div>
+</div>
+<?}?>
+"""

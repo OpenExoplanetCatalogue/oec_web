@@ -84,10 +84,11 @@ class FlaskApp(Flask):
         return mydata.oec
 
 app = FlaskApp(__name__)
-try:
-    mongo = PyMongo(app)
-except:
-    print("Mongo DB not correctly initialized.")
+#try:
+#    mongo = PyMongo(app)
+#except:
+#    print("Mongo DB not correctly initialized.")
+mongo = None
 
 def isList(value):
     return isinstance(value, list)
