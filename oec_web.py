@@ -271,11 +271,12 @@ def page_planet(planetname):
     for row in ["starname","staralternativenames","starmass","starradius","starage","starmetallicity","startemperature","starspectraltype","starmagV"]:
         startablefields.append(oec_fields.titles[row])
         rowdata = []
-        for s in stars:
-            rowdata.append(oec_fields.render((system,planet,s,filename),row))
-        if len(set(rowdata)) <= 1 and row!="starname" and rowdata[0]!=notAvailableString: # all fields identical:
-            rowdata = rowdata[0]
-        startable.append(rowdata)
+        if len(stars)>0: # free floating planets
+            for s in stars:
+                rowdata.append(oec_fields.render((system,planet,s,filename),row))
+            if len(set(rowdata)) <= 1 and row!="starname" and rowdata[0]!=notAvailableString: # all fields identical:
+                rowdata = rowdata[0]
+            startable.append(rowdata)
 
     references = []
     contributors = []
