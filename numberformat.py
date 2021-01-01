@@ -57,10 +57,10 @@ def renderFloat(tag, factor=1.):
             exponent = -2
             dexponent = pow(10, exponent)
 
-    elif upperlimit is not None:
+    elif upperlimit is not None and upperlimit!=0.0:
         exponent = floor(log10(upperlimit))
         dexponent = pow(10, exponent)
-    elif lowerlimit is not None:
+    elif lowerlimit is not None and lowerlimit!=0.0:
         exponent = floor(log10(lowerlimit))
         dexponent = pow(10, exponent)
     else:
