@@ -1,8 +1,5 @@
-<?include(".inc/prepend.php");?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<!-- If this is run as a php script on a server, you can include your own header that includes a navigation bar, and other stylistic features -->
-<script language="php"> include "./.inc/header.php"; if (false){ </script> 
 <!-- ** start server side header ** -->
 <head profile="http://www.w3.org/2005/10/profile">
 <link rel="icon" type="image/ico" href="favicon.ico" />
@@ -17,8 +14,6 @@
 <div class="outer-container">
 <div class="inner-container">
 <div class="content">
-<!-- ** end server side header ** -->
-<script language="php"> } </script>
 <!-- ########################### -->
 <h2><img src="./img/kig.png" alt="kig" />Open Exoplanet Catalogue Orrery</h2>
 <p>This orrery shows all planetary systems (excluding circum-binary systems)
@@ -102,7 +97,10 @@ function systems(root){
 		}
 		);
 		if (planets.length>2){
-			systems.push({s:1., name: $(this).find("name:first").text(), radius: max_semimajoraxis*1., fill: "green", color:"none", planets: planets});
+            planets.forEach(function(planet){
+                planet.radius /= max_semimajoraxis;
+            });
+			systems.push({s:1., name: $(this).find("name:first").text(), radius:1.3, fill: "green", color:"none", planets: planets});
 		}
 	}
 	);
@@ -110,7 +108,7 @@ function systems(root){
 }
 
 var updatePlot = function(first){ 
-	var scale = 1.0;
+	var scale = 14.3;
 	var nodes = systems(xmldata);
 
 
@@ -140,17 +138,6 @@ var updatePlot = function(first){
 			})
 
 	});
-
-//	node.append("circle")
-//		.attr("r", function(d) { return d.radius*scale; })
-//		.attr("title", function(d) { return d.name; })
-//	     	.style("fill", function(d) { 
-//			return d.fill;
-//		})
-//	     	.style("stroke-width", 1) 
-//	     	.style("stroke", function(d) { 
-//			return d.color;
-//		})
 
 	function collide(node) {
 		var r = node.radius*scale + 16,
@@ -186,9 +173,7 @@ var updatePlot = function(first){
 					.attr("r", d.radius*scale*0.05)
 					.style("fill", "#FF8C00")
 
-
 				d.planets.map( function(planet){
-			//		console.log(planet);
 					d3.select(system).append("circle")
 						.attr("r", planet.radius*scale)
 		     				.style("stroke-width", planet.radius*0.04*scale) 
@@ -212,19 +197,18 @@ var updatePlot = function(first){
 					.text(d.name)
 				
 				d3.select(system).append("circle")
-					.attr("r", d.radius*1.5)
+					.attr("r", d.radius*scale*1.)
 					.style("fill", "red")
 					.style("opacity", 0)
 					.on("mouseover", function(){
-						d3.select(this).transition().style("opacity", 0.5);
+						d3.select(this).style("opacity", 0.5);
 					})
 					.on("mouseout", function(){
-						d3.select(this).transition().style("opacity", 0.);
+						d3.select(this).style("opacity", 0.);
 					})
 					.on("click", function(){
 					d3.select(system)[0][0].__data__.radius*=2;
 					})
-
 			}
 		})
 		;
@@ -233,7 +217,7 @@ var updatePlot = function(first){
 
 };
 
-d3.xml("systems.xml", "application/xml", function(xml) {
+d3.xml("/oec_iphone/data_iphone_11/systems.xml", "application/xml", function(xml) {
 	xmldata = xml;
 	updatePlot(true);	
 });
