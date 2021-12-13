@@ -6,7 +6,7 @@ Flask-PyMongo==0.3.0
 idna==2.10
 itsdangerous==0.24
 Jinja2==2.11.3
-lxml==3.4.1
+lxml==4.6.5
 MarkupSafe==0.23
 matplotlib==1.4.2
 mock==1.0.1
