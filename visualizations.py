@@ -218,7 +218,7 @@ def textArchitecture(o,stype=0):
             architecture += ", semi-major axis: "+renderFloat(a)+" AU"
         period = b.find("./period")
         if period is not None:
-            if period>1000.:
+            if float(period.text)>1000.:
                  architecture += ", "+renderFloat(period,0.002737909)+" years"
             else:
                  architecture += ", "+renderFloat(period)+" days"
