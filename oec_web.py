@@ -32,7 +32,7 @@ class MyOEC:
     OEC_PATH = APP_ROOT+"/open_exoplanet_catalogue/"
     OEC_META_PATH = APP_ROOT+"/oec_meta/"
     def __init__(self):
-        print "Parsing OEC ..."
+        print("Parsing OEC ...")
         self.fullxml = "<systems>\n"
         self.planets = []
         self.systems = []
@@ -42,7 +42,7 @@ class MyOEC:
         # Loop over all files and  create new data
         for filename in glob.glob(self.OEC_PATH + "systems/*.xml"):
             # Open file
-            f = open(filename, 'rt')
+            f = open(filename, 'rt', encoding="utf-8")
             xml = f.read()
             f.close()
             self.fullxml+=xml
@@ -64,11 +64,11 @@ class MyOEC:
                     self.planetnames[n.text] = name
         self.fullxml += "</systems>\n"
 
-        print "Parsing OEC META ..."
+        print("Parsing OEC META ...")
         with open(self.OEC_META_PATH+"statistics.xml", 'rt') as f:
             self.oec_meta_statistics = ET.parse(f).getroot()
 
-        print "Parsing done."
+        print("Parsing done.")
 
 
 
@@ -488,7 +488,7 @@ def page_edits():
         return response
     else:
         if "delete" in request.form:
-            print mongo.db.edits.remove( {"_id": ObjectId(request.form["delete"])} )
+            print(mongo.db.edits.remove( {"_id": ObjectId(request.form["delete"])} ))
         edits = mongo.db.edits.find()
         return render_template("edits.html",
             edits=edits,
