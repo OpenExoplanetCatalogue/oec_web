@@ -63,7 +63,11 @@ def size(xmlPair):
     global earth,pl_i,texty
     system, planet, star, filename = xmlPair
     planets = system.findall(".//planet")
-    maxr = max(map(getRadius,planets))
+    radii = map(getRadius,planets)
+    maxr = 0.0
+    for r in radii:
+        if r is not None:
+            maxr = max(maxr,r)
     pl_i=0
     textx=0
 
